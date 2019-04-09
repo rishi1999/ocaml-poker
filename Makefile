@@ -22,7 +22,7 @@ bisect-test:
 	  $(TEST) && ./$(TEST) -runner sequential
 
 check:
-	bash checkenv.sh
+	bash checkenv.sh && bash checktypes.sh
 
 finalcheck: check
 	bash finalcheck.sh
