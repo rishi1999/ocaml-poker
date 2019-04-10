@@ -60,7 +60,7 @@ let pick_card =
     let state_update = update_state [card] in
     card
 
-(** [pick_cards num] returns [num] cards from the top of the deck.
+(** [pick_cards num] returns a list of [num] cards from the top of the deck.
     Raises: Failure "Insufficient Cards" if you attempt to pick more cards
     than currently available in the deck. *)
 let pick_cards num = 
