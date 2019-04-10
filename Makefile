@@ -1,6 +1,6 @@
-MODULES=authors
+MODULES=authors deck state
 #MODULES=dictionary dictionarySet listDictionary engine listEngine authors \
-  treeDictionary treeEngine
+  treeDictionary treeEngine Deck State
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
