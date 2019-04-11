@@ -1,4 +1,4 @@
-MODULES=authors deck state table
+MODULES=authors deck state table save_load_engine command main
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
