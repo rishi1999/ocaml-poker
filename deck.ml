@@ -1,4 +1,4 @@
-(* Deck initialization and card choosing *)
+(** Deck initialization and card choosing *)
 
 type rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack
           |Queen | King | Ace
@@ -57,7 +57,7 @@ let pick_card =
   if deck_size = 0 then failwith "Deck is empty"
   else 
     let card = List.hd !current_deck in
-    let state_update = update_state [card] in
+    let _state_update = update_state [card] in
     card
 
 (** [pick_cards num] returns a list of [num] cards from the top of the deck.
@@ -71,7 +71,7 @@ let pick_cards num =
       | h :: t when count = 0 -> outlist
       | h :: t -> list_builder (count - 1) (h :: outlist) t in
     let cards = List.rev (list_builder num [] !current_deck) in
-    let state_update = update_state cards in
+    let _state_update = update_state cards in
     cards
 
 (*
