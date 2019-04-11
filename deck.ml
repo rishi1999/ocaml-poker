@@ -1,4 +1,4 @@
-(** Deck initialization and card choosing *)
+(* Deck initialization and card choosing *)
 
 type rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack
           |Queen | King | Ace
