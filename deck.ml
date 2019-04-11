@@ -1,4 +1,5 @@
 (* Deck initialization and card choosing *)
+open Table
 
 type rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack
           |Queen | King | Ace
@@ -16,7 +17,7 @@ type card = suit * rank
 let played_cards = ref []
 let current_deck = ref []
 
-let all_ranks suit = List.map (fun rank -> (suit,rank)) ranks
+let all_ranks (suit:suit) = List.map (fun rank -> (suit,rank)) ranks
 
 let deck = List.concat (List.map (fun suit -> all_ranks suit) suits)
 
