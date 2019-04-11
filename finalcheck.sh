@@ -32,4 +32,4 @@ WARNING: Unable to find a working MD5 command
 EOF
 fi
 
-$MD5 search_src.zip
+$MD5 final_submission.zip
