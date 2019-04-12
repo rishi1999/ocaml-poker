@@ -2,8 +2,7 @@
 open Deck
 
 type player = {name: string; cards: (Deck.suit * Deck.rank) list; money: int}
-type players = player list
-type table = {dealer: int; blind: int; participants: players; hole_cards: (Deck.suit * Deck.rank) list}
+type table = {dealer: int; blind: int; participants: player list; hole_cards: (Deck.suit * Deck.rank) list}
 
 
 
@@ -41,7 +40,7 @@ let add_to_hole (table:table) = function
     -> {dealer = d; blind = b; participants = p; hole_cards = (Deck.pick_card::c)}
 
 
-let rec clear_players (p:players) list= match p with
+let rec clear_players (p:player list) list= match p with
   |[] -> list
   |{name = s; cards = c; money = m}::t
     -> clear_players t ({name = s; cards = []; money = m}::list)
