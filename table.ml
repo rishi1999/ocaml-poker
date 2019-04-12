@@ -20,7 +20,7 @@ let deal (table:table)=
   Deck.deck_init;
   Deck.shuffle_deck;
   let deal_helper = function
-    | {name = s; cards = []} when List.length c < 2
+    | {name = s; cards = []}
       -> {name = s; cards = Deck.pick_cards 2}
     | _ -> failwith "player issue"
   in
