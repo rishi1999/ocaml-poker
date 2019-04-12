@@ -33,3 +33,10 @@ let deal (table:table)=
   match table with
   |{dealer = d; blind = b; participants = p; hole_cards = c} 
     -> {dealer = d; blind = b; participants = (deal_to_each p []); hole_cards = c}
+
+let add_to_hole (table:table) = function
+  |{dealer = d; blind = b; participants = p; hole_cards = c} when List.length c > 3
+    -> failwith "too many hole cards"
+  |{dealer = d; blind = b; participants = p; hole_cards = c}
+    -> {dealer = d; blind = b; participants = p; hole_cards = (Deck.pick_card::c)}
+
