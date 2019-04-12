@@ -1,3 +1,6 @@
+# This Makefile and the related environment/build scripts are based on
+# the ones given to us by the 3110 staff in previous assignments.
+
 MODULES=authors deck state table save_load_engine command main
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
