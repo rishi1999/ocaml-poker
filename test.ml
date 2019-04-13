@@ -1,5 +1,6 @@
 open OUnit2
 open Table
+open Player
 
 
 (**Deck Tests*)
@@ -12,8 +13,8 @@ let deck_tests =
         assert_equal [] []);
 
   ]
-let james:player = {name = "James"; cards = []; money = 32}
-let bob:player = {name = "Bob"; cards = []; money = 32}
+let james:player = {action = Fold; name = "James"; cards = []; money = 32}
+let bob:player = {action = Fold; name = "Bob"; cards = []; money = 32}
 let table1: table = {dealer = 0; blind = 1; participants = [james;bob]; hole_cards= []}
 let table2: table = deal table1
 
