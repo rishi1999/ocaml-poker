@@ -25,10 +25,10 @@ let init_player num_players money =
   let cnt = ref 0 in
   let rec init_player_helper outlist money = function
     | 0 -> outlist
-    | t -> let curr_player = 
+    | t -> let curr_player =
              {
-               id = !cnt; 
-               action = None; 
+               id = !cnt;
+               action = None;
                cards = [];
                money = money
              } in
@@ -106,16 +106,15 @@ let check_bet_amount st =
 
 (* check if we can go to next round *)
 let check_for_next_round st =
-  if st.bet.bet_amount = 0 && st.player_turn = button st then true
-  else if (st.bet.bet_amount <> 0) && (check_bet_amount st) then true
-  else false
+  (st.bet.bet_amount = 0 && st.player_turn = st.button) ||
+  (st.bet.bet_amount <> 0) && (check_bet_amount st)
 
 type check_result =
   | Legal of t
   | Illegal
 
 let check st =
-  if st.player_turn = button st && check_for_next_round st then
+  if st.player_turn = st.button && check_for_next_round st then
     Legal
       {
         game_type = st.game_type;
