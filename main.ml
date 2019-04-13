@@ -1,36 +1,58 @@
-open Deck
-open State
-
 exception Wrong_Input
 
-(* let rec get_and_read_input expected_output = 
+let rec get_and_read_input expected_output = 
   let input = int_of_string (read_line()) in
   if List.mem (input) expected_output then input
-  else raise Wrong_Input *)
+  else raise Wrong_Input
 
-(* let print_string_list string_list =
+let print_string_list string_list =
   List.iter print_endline string_list
 
-let play_multi_game f =
-  exit 0 *)
+let print_int_list int_list =
+  int_list |> List.map string_of_int |> List.iter print_endline
+
+(* NOT WORKING *)
+let print_card_list card_list = 
+  let rec print_helper outstr = function
+  | [] -> outstr
+  | h::t -> match h with
+            | (a, b) -> print_helper (a ^ b ^ outstr) t in 
+  print_helper "" card_list
+
+let play_game st = 
+  match State.game_type st with
+  | 0 -> print_endline "starting multiplayer game";
+  print_int_list (State.players_in st);
+    exit 0
+  | 1 ->  print_endline "starting AI GAME";
+    exit 0
+  | _ -> failwith "Wrong gametype"
+
 
 let init_multiplayer f =
-  match f with
-  | 0 -> print_endline "here";
-    exit 0
-  | _ -> exit 0
+  print_endline "how many players?";
+  let num_players = int_of_string (read_line ()) in
+  print_endline "starting stack?";
+  let money = int_of_string (read_line ()) in
+  print_endline "blinds?";
+  let blind = int_of_string (read_line ()) in
+
+  play_game (State.init_state 0 num_players money blind)
   
 
-(* let init_ai =
-  let blind = 4 in
-  let money = 500 in
-  (* State.init_state  *)
-  play_ai_game blind money *)
+let init_ai f =
+  print_endline "starting stack?";
+  let money = int_of_string (read_line ()) in
+  print_endline "blinds?";
+  let blind = int_of_string (read_line ()) in
+  let st = State.init_state 1 2 money blind in
+
+  play_game st
 
 let init_game game_type =
   match int_of_string game_type with
-  | 0 -> init_multiplayer 1
-  | 1 -> exit 0 
+  | 0 -> init_multiplayer 0
+  | 1 -> init_ai 1
   | x -> print_endline "Wrong gametype!";
     exit 0
 

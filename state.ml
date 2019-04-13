@@ -9,9 +9,11 @@ type bet = {
 }
 
 type t = {
+  game_type: int;
   player_number: int;
   table: Table.table;
   player_turn: int;
+  button : int;
   (* players playing *)
   players_in: int list;
   (* who bet? *)
@@ -44,24 +46,36 @@ let init_bet =
     bet_paid_amt = [];
   }
 
+let init_players_in num_players = 
+  let rec helper outlst = function
+  | 0 -> outlst 
+  | t -> helper (t::outlst) (t-1) in
+  List.sort compare (helper [] num_players)
+
 (**  [init_state adv] creates a State.t record with information corresponding
      to the initial state of the [adv] as defined in the adventure file.*)
-let init_state num_players money blind =
+let init_state game_type num_players money blind =
   {
+    game_type = game_type;
     player_number = num_players;
     table = init_table num_players money blind;
-    player_turn = 0;
-    players_in = [];
+    player_turn = 1;
+    button = 1;
+    players_in = init_players_in num_players;
     (* who bet? *)
     bet = init_bet;
     avail_action = ["fold"; "bet"; "check"]
   }
+
+let game_type st = st.game_type
 
 let player_number st = st.player_number
 
 let table st = st.table
 
 let player_turn st = st.player_turn
+
+let button st = st.button
 
 let players_in st = st.players_in
 
@@ -76,9 +90,6 @@ let next_player st =
   | [] -> pos
   | h::t -> if ele = h then find  *)
 
-let check_last_player_in st =
-  (st.players_in |> List.sort compare |> List.rev |> List.hd)
-
 (* check if everyone called the bet *)
 let check_bet_amount st = 
   let bet_amt = st.bet.bet_amount in
@@ -92,7 +103,7 @@ let check_bet_amount st =
 
 (* check if we can go to next round *)
 let check_for_next_round st = 
-  if st.bet.bet_amount = 0 && st.player_turn = check_last_player_in st then true
+  if st.bet.bet_amount = 0 && st.player_turn = button st then true
   else if (st.bet.bet_amount <> 0) && (check_bet_amount st) then true
   else false
 
@@ -101,12 +112,14 @@ type check_result =
   | Illegal
 
 let check st =
-  if st.player_turn = check_last_player_in st && check_for_next_round st then
+  if st.player_turn = button st && check_for_next_round st then
     Legal
       {
+        game_type = st.game_type;
         player_number = st.player_number;
         table = st.table;
         player_turn = st.player_turn;
+        button = st.button;
         players_in = st.players_in;
         (* who bet? *)
         bet = st.bet;
@@ -115,9 +128,11 @@ let check st =
   else
     Legal
       {
+        game_type = st.game_type;
         player_number = st.player_number;
         table = st.table;
         player_turn = st.player_turn;
+        button = st.button;
         players_in = st.players_in;
         (* who bet? *)
         bet = st.bet;
