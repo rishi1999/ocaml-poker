@@ -1,9 +1,9 @@
 type t
-type bet 
+type bet
 
 val game_type : t -> int
 
-val player_number : t -> int
+val num_players : t -> int
 
 val table : t -> Table.table
 
