@@ -11,7 +11,7 @@ type table = {
   hole_cards: (Deck.suit * Deck.rank) list;
 }
 
-let next_round_players table = function
+let next_round_players (tab:table) = match tab with
   |
     {
       dealer;
@@ -45,7 +45,7 @@ let deal (table : table) : table =
   let deal_helper (player:player) = match player with
     | {
       Player.action;
-      name;
+      id;
       cards = c;
       money;
     } when List.length c <> 0 -> failwith "player issue"
@@ -100,7 +100,7 @@ let add_to_hole (table:table) : table = match table with
     }
 
 
-let rec clear_players (p:player list) list= match p with
+let rec clear_players (p:player list) list = match p with
   | [] -> list
   | pl :: t
     -> clear_players t
@@ -112,7 +112,7 @@ let rec clear_players (p:player list) list= match p with
          )
 
 (** [clear_round table x] is the table with the cards cleared. *)
-let rec clear_round table = function
+let rec clear_round table = match table with 
   |
     {
       dealer;

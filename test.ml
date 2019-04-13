@@ -13,8 +13,8 @@ let deck_tests =
         assert_equal [] []);
 
   ]
-let james:player = {action = Fold; name = "James"; cards = []; money = 32}
-let bob:player = {action = Fold; name = "Bob"; cards = []; money = 32}
+let james:player = {id = 0; action = Fold; cards = []; money = 32}
+let bob:player = {id = 1; action = Fold; cards = []; money = 32}
 let table1: table = {dealer = 0; blind = 1; participants = [james;bob]; hole_cards= []}
 let table2: table = deal table1
 
@@ -22,13 +22,13 @@ let table2: table = deal table1
 let table2_players table2 =  match table2 with 
     { dealer = d ; blind = b; participants = p ; _ } -> p
 let james_cards_2 table2_players = match table2_players with 
-  | {name = s; cards = c; money = m}::t -> c
+  | {id = s; cards = c; money = m}::t -> c
   | _ -> failwith "table2 not dealt"
 
 let table1_players=  match table1 with 
     { dealer = d ; blind = b; participants = p ; _ } -> p
 let james_cards= match table1_players with 
-  | {name = s; cards = c; money = m}::t -> c
+  | {id = s; cards = c; money = m}::t -> c
   | _ -> failwith "table2 not dealt"
 
 let empty: (Deck.suit * Deck.rank) list = []

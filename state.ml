@@ -1,5 +1,6 @@
 open Deck
 open Table
+open Player
 
 type bet = {
   bet_player: int;
@@ -21,10 +22,10 @@ type t = {
 let init_player num_players money =
   let cnt = ref 0 in
   let rec init_player_helper outlst money = function
-  | 0 -> outlst
-  | t -> let curr_player:player = {id = !cnt; cards = []; money = money} in
-  cnt := !cnt + 1;
-  init_player_helper (curr_player::outlst) money (t-1) in
+    | 0 -> outlst
+    | t -> let curr_player:player = {id = !cnt; action = None; cards = []; money = money} in
+      cnt := !cnt + 1;
+      init_player_helper (curr_player::outlst) money (t-1) in
 
   List.rev (init_player_helper [] money num_players)
 
@@ -47,14 +48,14 @@ let init_bet =
      to the initial state of the [adv] as defined in the adventure file.*)
 let init_state num_players money blind =
   {
-  player_number = num_players;
-  table = init_table num_players money blind;
-  player_turn = 0;
-  players_in = [];
-  (* who bet? *)
-  bet = init_bet;
-  avail_action = ["fold"; "bet"; "check"]
-}
+    player_number = num_players;
+    table = init_table num_players money blind;
+    player_turn = 0;
+    players_in = [];
+    (* who bet? *)
+    bet = init_bet;
+    avail_action = ["fold"; "bet"; "check"]
+  }
 
 let player_number st = st.player_number
 
@@ -70,7 +71,7 @@ let avail_action st = st.avail_action
 (* 
 let next_player st =
   let curr_player = st.player_turn in
-  
+
   let rec find ele pos = function
   | [] -> pos
   | h::t -> if ele = h then find  *)
@@ -82,11 +83,11 @@ let check_last_player_in st =
 let check_bet_amount st = 
   let bet_amt = st.bet.bet_amount in
   let rec helper = function
-  | [] -> true
-  | h::t -> if List.nth st.bet.bet_paid_amt (h-1) = bet_amt then
-    helper t
-    else false in
-  
+    | [] -> true
+    | h::t -> if List.nth st.bet.bet_paid_amt (h-1) = bet_amt then
+        helper t
+      else false in
+
   helper st.players_in
 
 (* check if we can go to next round *)
@@ -101,24 +102,24 @@ type check_result =
 
 let check st =
   if st.player_turn = check_last_player_in st && check_for_next_round st then
-  Legal
-  {
-  player_number = st.player_number;
-  table = st.table;
-  player_turn = st.player_turn;
-  players_in = st.players_in;
-  (* who bet? *)
-  bet = st.bet;
-  avail_action = ["fold"; "bet"; "check"]
-  }
+    Legal
+      {
+        player_number = st.player_number;
+        table = st.table;
+        player_turn = st.player_turn;
+        players_in = st.players_in;
+        (* who bet? *)
+        bet = st.bet;
+        avail_action = ["fold"; "bet"; "check"]
+      }
   else
-  Legal
-  {
-  player_number = st.player_number;
-  table = st.table;
-  player_turn = st.player_turn;
-  players_in = st.players_in;
-  (* who bet? *)
-  bet = st.bet;
-  avail_action = ["fold"; "bet"; "check"]
-  }
+    Legal
+      {
+        player_number = st.player_number;
+        table = st.table;
+        player_turn = st.player_turn;
+        players_in = st.players_in;
+        (* who bet? *)
+        bet = st.bet;
+        avail_action = ["fold"; "bet"; "check"]
+      }

@@ -1,9 +1,9 @@
-type action = Fold | Call | Raise | Small | Big | Ante
+type action = Fold | Call | Raise | Small | Big | Ante | None
 
 type player =
   {
+    id: int;
     action: action;
-    name: string;
     cards: (Deck.suit * Deck.rank) list;
     money: int;
   }
