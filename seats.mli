@@ -1,2 +1,4 @@
 (*Keeps track of players, dealers, and blinds*)
-open Deck
+open Player
+
+type seat = player list
