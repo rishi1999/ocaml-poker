@@ -5,7 +5,7 @@ MLIS=$(MODULES:=.mli)
 TEST=test.byte
 MAIN=main.byte
 OCAMLBUILD=ocamlbuild -use-ocamlfind
-PKGS=unix,oUnit,str,qcheck,ANSITerminal,opam,dune
+PKGS=unix,oUnit,str,qcheck,ANSITerminal,dune
 
 default: build
 	utop
@@ -51,7 +51,4 @@ docs-private: build
 
 clean:
 	ocamlbuild -clean
-	rm -rf doc.public doc.private report bisect*.out
-#clean:
-#	ocamlbuild -clean
-#	rm -rf doc.public doc.private report search_src.zip bisect*.out
+	rm -rf doc.public doc.private report final_submission.zip bisect*.out
