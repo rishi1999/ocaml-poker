@@ -21,26 +21,24 @@ type t = {
   avail_action: string list;
 }
 
-let init_player num_players money =
-  let cnt = ref 0 in
-  let rec init_player_helper outlist money = function
-    | 0 -> outlist
-    | t -> let curr_player =
-             {
-               id = !cnt;
-               action = None;
-               cards = [];
-               money = money
-             } in
-      incr cnt;
-      init_player_helper (curr_player :: outlist) money (t-1) in
-  List.rev (init_player_helper [] money num_players)
+let init_players num_players money =
+  let rec init_players' acc money = function
+    | 0 -> acc
+    | id -> let curr_player =
+              {
+                id;
+                action = None;
+                cards = [];
+                money;
+              } in
+      init_players' (curr_player :: acc) money (id - 1) in
+  init_players' [] money num_players
 
 let init_table num_players money blind =
   {
     dealer = 0;
     blind;
-    participants = init_player num_players money;
+    participants = init_players num_players money;
     hole_cards = [];
   }
 
