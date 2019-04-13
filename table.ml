@@ -7,7 +7,7 @@ open Player
 type table = {
   dealer: int;
   blind: int;
-  participants: player list;
+  participants: seats;
   hole_cards: (Deck.suit * Deck.rank) list;
 }
 
