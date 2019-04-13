@@ -1,8 +1,6 @@
-(*Keeps track of players, dealers, and blinds*)
 open Deck
 open Seats
 open Player
-
 
 type table = {
   dealer: int;
@@ -106,13 +104,13 @@ let rec clear_players (p:player list) list = match p with
     -> clear_players t
          (
            {
-             pl with 
+             pl with
              cards = [];
            } :: list
          )
 
 (** [clear_round table x] is the table with the cards cleared. *)
-let rec clear_round table = match table with 
+let rec clear_round table = match table with
   |
     {
       dealer;

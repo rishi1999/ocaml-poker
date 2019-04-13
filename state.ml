@@ -25,7 +25,7 @@ let init_player num_players money =
   let cnt = ref 0 in
   let rec init_player_helper outlst money = function
     | 0 -> outlst
-    | t -> let curr_player:player = {id = !cnt; action = None; cards = []; money = money} in
+    | t -> let curr_player = {id = !cnt; action = None; cards = []; money = money} in
       cnt := !cnt + 1;
       init_player_helper (curr_player::outlst) money (t-1) in
 
@@ -48,8 +48,8 @@ let init_bet =
 
 let init_players_in num_players = 
   let rec helper outlst = function
-  | 0 -> outlst 
-  | t -> helper (t::outlst) (t-1) in
+    | 0 -> outlst 
+    | t -> helper (t::outlst) (t-1) in
   List.sort compare (helper [] num_players)
 
 (**  [init_state adv] creates a State.t record with information corresponding
@@ -91,7 +91,7 @@ let next_player st =
   | h::t -> if ele = h then find  *)
 
 (* check if everyone called the bet *)
-let check_bet_amount st = 
+let check_bet_amount st =
   let bet_amt = st.bet.bet_amount in
   let rec helper = function
     | [] -> true
@@ -102,7 +102,7 @@ let check_bet_amount st =
   helper st.players_in
 
 (* check if we can go to next round *)
-let check_for_next_round st = 
+let check_for_next_round st =
   if st.bet.bet_amount = 0 && st.player_turn = button st then true
   else if (st.bet.bet_amount <> 0) && (check_bet_amount st) then true
   else false
