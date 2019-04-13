@@ -3,3 +3,4 @@ PKG oUnit
 PKG str
 PKG unix
 PKG qcheck
+PKG ANSITerminal

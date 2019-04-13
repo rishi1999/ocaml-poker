@@ -2,3 +2,4 @@
 #require "str";;
 #require "bisect";;
 #require "qcheck";;
+#require "ANSITerminal";;

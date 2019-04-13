@@ -1,13 +1,11 @@
-# This Makefile and the related environment/build scripts are based on
-# the ones given to us by the 3110 staff in previous assignments.
-
 MODULES=authors deck state player table save_load_engine command main
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
 TEST=test.byte
+MAIN=main.byte
 OCAMLBUILD=ocamlbuild -use-ocamlfind
-PKGS=unix,oUnit,str,qcheck
+PKGS=unix,oUnit,str,qcheck,ANSITerminal,opam,dune
 
 default: build
 	utop
@@ -17,6 +15,9 @@ build:
 
 test:
 	$(OCAMLBUILD) -tag debug $(TEST) && ./$(TEST)
+
+play:
+	$(OCAMLBUILD) $(MAIN) && ./$(MAIN)
 
 bisect-test:
 	$(OCAMLBUILD) -package bisect -syntax camlp4o,bisect_pp \
@@ -30,6 +31,7 @@ finalcheck: check
 
 bisect: clean bisect-test
 	bisect-report -I _build -html report bisect0001.out
+
 
 #zip:
 #	zip search_src.zip *.ml* _tags Makefile analysis.pdf

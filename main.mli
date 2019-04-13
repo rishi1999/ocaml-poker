@@ -6,4 +6,4 @@
     or if [f] does not exist, an exception will be thrown.
     Example: [play_game poker.txt] plays the game with [poker.txt].
 *)
-val play_game : string -> unit
+(* val init_game : int -> unit *)
