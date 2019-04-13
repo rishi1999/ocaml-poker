@@ -46,6 +46,11 @@ let deal (table : table) : table =
   Deck.deck_init;
   Deck.shuffle_deck;
   let deal_helper = function
+    | {
+      name;
+      cards;
+      money;
+    } when List.length cards <> 0 -> failwith "player issue"
     | pl ->
       {
         pl with
@@ -72,12 +77,13 @@ let deal (table : table) : table =
       participants = deal_to_each participants [];
     }
 
-let add_to_hole (table:table) = function
+let add_to_hole (table:table) : table = match table with
   |
-    {dealer;
-     blind;
-     participants;
-     hole_cards;
+    {
+      dealer;
+      blind;
+      participants;
+      hole_cards;
     } when List.length hole_cards > 3
     -> failwith "too many hole cards"
   |
@@ -85,13 +91,16 @@ let add_to_hole (table:table) = function
       dealer;
       blind;
       participants;
-      hole_cards;
-    } as tab
+      hole_cards = h;
+    }
     ->
     {
-      tab with
-      hole_cards = Deck.pick_card :: hole_cards;
+      dealer;
+      blind;
+      participants;
+      hole_cards = Deck.pick_card :: h;
     }
+
 
 let rec clear_players (p:player list) list= match p with
   | [] -> list
@@ -99,7 +108,7 @@ let rec clear_players (p:player list) list= match p with
     -> clear_players t
          (
            {
-             pl with
+             pl with 
              cards = [];
            } :: list
          )

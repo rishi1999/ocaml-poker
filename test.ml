@@ -36,11 +36,13 @@ let empty: (Deck.suit * Deck.rank) list = []
 let table_tests =
   [
     "deal_test_1" >:: (fun _->
-        assert ((deal table1) != table1));
+        assert ((deal table1) <> table1));
     "deal_test_2" >:: (fun _->
         assert_equal james_cards empty);
     "deal_failure_test_1" >:: (fun _->
         assert_raises (Failure "player issue") (fun () -> deal table2));
+    "add_to_hole_test_1" >:: (fun _->
+        assert (table1 <> (add_to_hole (table1))));
   ]
 
 let suite = 
