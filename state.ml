@@ -101,7 +101,6 @@ let check_bet_amount st =
     | h::t -> if List.nth st.bet.bet_paid_amt (h-1) = bet_amt then
         helper t
       else false in
-
   helper st.players_in
 
 (* check if we can go to next round *)
@@ -117,26 +116,12 @@ let check st =
   if st.player_turn = st.button && check_for_next_round st then
     Legal
       {
-        game_type = st.game_type;
-        player_number = st.player_number;
-        table = st.table;
-        player_turn = st.player_turn;
-        button = st.button;
-        players_in = st.players_in;
-        (* who bet? *)
-        bet = st.bet;
-        avail_action = ["fold"; "bet"; "check"]
+        st with
+        avail_action = ["fold"; "bet"; "check"];
       }
   else
     Legal
       {
-        game_type = st.game_type;
-        player_number = st.player_number;
-        table = st.table;
-        player_turn = st.player_turn;
-        button = st.button;
-        players_in = st.players_in;
-        (* who bet? *)
-        bet = st.bet;
-        avail_action = ["fold"; "bet"; "check"]
+        st with
+        avail_action = ["fold"; "bet"; "check"];
       }
