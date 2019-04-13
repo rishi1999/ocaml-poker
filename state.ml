@@ -49,11 +49,12 @@ let init_bet =
     bet_paid_amt = [];
   }
 
+(* WHAT IS THE POINT OF THIS FUNCTION? -- removed the sort since the elements already seem to be ordered *)
 let init_players_in num_players =
-  let rec helper outlst = function
-    | 0 -> outlst
-    | t -> helper (t::outlst) (t-1) in
-  List.sort compare (helper [] num_players)
+  let rec init_players_in' acc = function
+    | 0 -> acc
+    | t -> init_players_in' (t :: acc) (t - 1) in
+  (*List.sort compare*) (init_players_in' [] num_players)
 
 let init_state game_type num_players money blind =
   {
