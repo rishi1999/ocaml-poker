@@ -10,7 +10,7 @@ type bet = {
 
 type t = {
   game_type: int;
-  player_number: int;
+  num_players: int;
   table: Table.table;
   player_turn: int;
   button : int;
@@ -58,8 +58,8 @@ let init_players_in num_players =
 
 let init_state game_type num_players money blind =
   {
-    game_type = game_type;
-    player_number = num_players;
+    game_type;
+    num_players;
     table = init_table num_players money blind;
     player_turn = 1;
     button = 1;
@@ -71,7 +71,7 @@ let init_state game_type num_players money blind =
 
 let game_type st = st.game_type
 
-let player_number st = st.player_number
+let num_players st = st.num_players
 
 let table st = st.table
 
