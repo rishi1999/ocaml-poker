@@ -23,37 +23,40 @@ type t = {
 
 let init_player num_players money =
   let cnt = ref 0 in
-  let rec init_player_helper outlst money = function
-    | 0 -> outlst
-    | t -> let curr_player = {id = !cnt; action = None; cards = []; money = money} in
-      cnt := !cnt + 1;
-      init_player_helper (curr_player::outlst) money (t-1) in
-
+  let rec init_player_helper outlist money = function
+    | 0 -> outlist
+    | t -> let curr_player = 
+             {
+               id = !cnt; 
+               action = None; 
+               cards = [];
+               money = money
+             } in
+      incr cnt;
+      init_player_helper (curr_player :: outlist) money (t-1) in
   List.rev (init_player_helper [] money num_players)
 
-let init_table num_players money blind = 
+let init_table num_players money blind =
   {
     dealer = 0;
-    blind = blind;
-    participants = init_player num_players money; 
+    blind;
+    participants = init_player num_players money;
     hole_cards = [];
   }
 
-let init_bet = 
+let init_bet =
   {
     bet_player = 0;
     bet_amount = 0;
     bet_paid_amt = [];
   }
 
-let init_players_in num_players = 
+let init_players_in num_players =
   let rec helper outlst = function
-    | 0 -> outlst 
+    | 0 -> outlst
     | t -> helper (t::outlst) (t-1) in
   List.sort compare (helper [] num_players)
 
-(**  [init_state adv] creates a State.t record with information corresponding
-     to the initial state of the [adv] as defined in the adventure file.*)
 let init_state game_type num_players money blind =
   {
     game_type = game_type;
@@ -82,7 +85,7 @@ let players_in st = st.players_in
 let bet st = st.bet
 
 let avail_action st = st.avail_action
-(* 
+(*
 let next_player st =
   let curr_player = st.player_turn in
 
