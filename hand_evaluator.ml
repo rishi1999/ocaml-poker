@@ -95,7 +95,7 @@ let seven_eval a b c d e f g =
     let () = suit_binary.(f land 0x3) <- suit_binary.(f land 0x3) lor binaries_by_id.(f) in
     let () = suit_binary.(g land 0x3) <- suit_binary.(g land 0x3) lor binaries_by_id.(g) in
     let target_index = suits.(suit_hash) - 1 in
-    flush.(suit_binary.(target_index));
+    flush.(suit_binary.(target_index))
   else
     let () = quinary.(a lsr 2) <- (quinary.(a lsr 2)) + 1 in
     let () = quinary.(b lsr 2) <- (quinary.(b lsr 2)) + 1 in
