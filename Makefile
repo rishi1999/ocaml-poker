@@ -1,4 +1,4 @@
-MODULES= authors deck state player table save_load_engine command main
+MODULES= authors deck state player table save_load_engine command main hand_evaluator tablenoflush
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
