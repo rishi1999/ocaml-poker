@@ -2,6 +2,6 @@ open Player
 
 type seats = player list
 
-let add_player (p:player) (s:seats) = p::s
+let add_player player seats = player :: seats
 
-let size (s:seats) = List.length s
+let size seats = List.length seats

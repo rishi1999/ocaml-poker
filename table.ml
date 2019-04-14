@@ -56,7 +56,7 @@ let deal (table : table) : table =
   let rec deal_to_each players list=
     match players with
     | [] -> list
-    | player::t -> deal_to_each t ((deal_helper player)::list)
+    | player :: t -> deal_to_each t ((deal_helper player) :: list)
 
   in
   match table with
@@ -73,7 +73,7 @@ let deal (table : table) : table =
       participants = deal_to_each participants [];
     }
 
-let add_to_hole (table:table) : table = match table with
+let add_to_hole = function
   |
     {
       dealer;
