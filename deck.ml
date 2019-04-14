@@ -74,6 +74,35 @@ let pick_cards num =
     let _state_update = update_state cards in
     cards
 
+(* [int_convereter card] returns an integer representation of the card
+   such that the card is in the range 0 to 52. The integer is calculcated by
+   taking the rank of the card and mapping it from 0 to 12 such that Two maps
+   to 0 and Ace to 12 and the suit of the card (0 for Clubs, 1 for Diamonds,
+   2 for Hearts and 3 for Spades). The card is then represented as
+   Rank * 4 + Suit.
+   Example int_converter (Clubs, Nine) = 28
+   Requires: card is a valid (suit, rank) tuple  *)
+let int_converter card = 
+  let offset = match card with
+    | Clubs, _-> 0
+    | (Diamonds, _) -> 1
+    | (Hearts, _) -> 2
+    | (Spades, _) -> 3 in
+  let rank = match card with
+    | (_, Two) -> 0
+    | (_, Three) -> 1
+    | (_, Four) -> 2
+    | (_, Five) -> 3
+    | (_, Six) -> 4
+    | (_, Seven) -> 5
+    | (_, Eight) -> 6
+    | (_, Nine) -> 7
+    | (_, Ten) -> 8
+    | (_, Jack) -> 9
+    | (_, Queen) -> 10
+    | (_, King) -> 11
+    | (_, Ace) -> 12 in
+  rank * 4 + offset
 (*
 let update_state card_list =
 (*

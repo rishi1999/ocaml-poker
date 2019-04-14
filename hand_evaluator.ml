@@ -2,6 +2,8 @@
 open Hashone
 open Tableflush
 open Constantarrays
+open Deck
+
 (* [pow b e] returns the integer result of b raised to the power of e
    Requires: e >= 0 *)
 let rec pow b e = match e with
@@ -42,8 +44,6 @@ let hash_quinary q len k =
       let new_sum = sum + index2array.(k) in (*print_int new_sum; print_endline "";*) loop (i+1) len new_sum newk in
 
   loop 0 len 0 k
-
-
 
 (* 7 card evaluator starts here *)
 

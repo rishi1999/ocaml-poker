@@ -2,6 +2,7 @@ open OUnit2
 open Table
 open Player
 open Hand_evaluator
+open Deck
 
 (**Deck Tests*)
 let make_new_deck =
@@ -11,7 +12,8 @@ let deck_tests =
   [
     "pick first card" >:: (fun _ -> 
         assert_equal [] []);
-
+    "convert 9C" >:: (fun _ -> 
+        assert_equal 28 (int_converter (Clubs, Nine)));
   ]
 let james:player = {id = 0; action = Fold; cards = []; money = 32}
 let bob:player = {id = 1; action = Fold; cards = []; money = 32}
