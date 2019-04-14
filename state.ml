@@ -95,12 +95,12 @@ let next_player st =
 (* check if everyone called the bet *)
 let check_bet_amount st =
   let bet_amt = st.bet.bet_amount in
-  let rec helper = function
+  let rec check_bet_amount' = function
     | [] -> true
-    | h::t -> if List.nth st.bet.bet_paid_amt (h-1) = bet_amt then
-        helper t
+    | h :: t -> if List.nth st.bet.bet_paid_amt (h - 1) = bet_amt then
+        check_bet_amount' t
       else false in
-  helper st.players_in
+  check_bet_amount' st.players_in
 
 (* check if we can go to next round *)
 let check_for_next_round st =
