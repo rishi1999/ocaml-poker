@@ -67,39 +67,6 @@ let hand_evaluator_tests =
 
   ]
 
-(*
-let a = 7*4+0 in
-let b = 2*4+0 in
-let c = 2*4+3 in
-let d = 7*4+1 in
-let e = 2*4+2 in
-let f = 10*4+0 in
-let g = 4*4+0 in
-
-let h = 0 * 4 + 0 in
-let i = 7 * 4 +2 in
-
-seven_eval a b c d e f g
-
-EXPECTED: 292
-
-let a = 7*4+0 in
-let b = 2*4+0 in
-let c = 2*4+3 in
-let d = 7*4+1 in
-let e = 2*4+2 in
-let f = 10*4+0 in
-let g = 4*4+0 in
-
-let h = 0 * 4 + 0 in
-let i = 7 * 4 +2 in
-
-seven_eval a b c d e h i 
-
-Expected: 236
-
-*)
-
 let suite = 
   "test suite for A6"  >::: List.flatten [
     deck_tests;
