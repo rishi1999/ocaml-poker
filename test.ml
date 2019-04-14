@@ -1,7 +1,7 @@
 open OUnit2
 open Table
 open Player
-
+open Hand_evaluator
 
 (**Deck Tests*)
 let make_new_deck =
@@ -46,9 +46,64 @@ let table_tests =
         assert (table1 <> (add_to_hole (table1))));
   ]
 
+let a = 7*4+0
+let b = 2*4+0
+let c = 2*4+3
+let d = 7*4+1
+let e = 2*4+2
+let f = 10*4+0
+let g = 4*4+0
+
+let h = 0 * 4 + 0
+let i = 7 * 4 +2
+
+let hand_evaluator_tests = 
+  [
+    "4_full_house" >:: (fun _->
+        assert_equal 292 (seven_eval a b c d e f g ));
+
+    "9_full_house" >:: (fun _->
+        assert_equal 236 (seven_eval a b c d e h i ));
+
+  ]
+
+(*
+let a = 7*4+0 in
+let b = 2*4+0 in
+let c = 2*4+3 in
+let d = 7*4+1 in
+let e = 2*4+2 in
+let f = 10*4+0 in
+let g = 4*4+0 in
+
+let h = 0 * 4 + 0 in
+let i = 7 * 4 +2 in
+
+seven_eval a b c d e f g
+
+EXPECTED: 292
+
+let a = 7*4+0 in
+let b = 2*4+0 in
+let c = 2*4+3 in
+let d = 7*4+1 in
+let e = 2*4+2 in
+let f = 10*4+0 in
+let g = 4*4+0 in
+
+let h = 0 * 4 + 0 in
+let i = 7 * 4 +2 in
+
+seven_eval a b c d e h i 
+
+Expected: 236
+
+*)
+
 let suite = 
   "test suite for A6"  >::: List.flatten [
     deck_tests;
     table_tests;
+    hand_evaluator_tests;
   ]
 let _ = run_test_tt_main suite
