@@ -97,6 +97,7 @@ let check_bet_amount st = List.for_all
     (fun paid -> paid = st.bet.bet_amount) st.bet.bet_paid_amt
 
 (* check if we can go to next round *)
+(* TODO not done *)
 let check_for_next_round st =
   (st.bet.bet_amount = 0 && st.player_turn = st.button) ||
   (st.bet.bet_amount <> 0) && (check_bet_amount st)
@@ -105,6 +106,7 @@ type check_result =
   | Legal of t
   | Illegal
 
+(* TODO not done *)
 let check st =
   if st.player_turn = st.button && check_for_next_round st then
     Legal
