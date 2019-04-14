@@ -88,13 +88,20 @@ let bet st = st.bet
 let avail_action st = st.avail_action
 
 let is_new_round st = st.is_new_round
-(*
-let next_player st =
-  let curr_player = st.player_turn in
 
-  let rec find ele pos = function
-  | [] -> pos
-  | h::t -> if ele = h then find  *)
+let go_next_round st = 
+  if List.length st.table.hole_cards = 5 then
+    let cleared = Table.clear_round st.table in
+    {
+      st with
+      table = cleared;
+    }
+  else
+    let card_added = Table.add_to_hole st.table in
+    {
+      st with
+      table = card_added;
+    }
 
 (* check if everyone called the bet *)
 let are_all_bets_equal st = List.for_all
@@ -110,14 +117,10 @@ type check_result =
 (* TODO not done *)
 let check st =
   if is_round_complete st then
-    Legal
-      {
-        st with
-        avail_action = ["fold"; "bet"; "check"];
-      }
+    Legal (go_next_round st)
   else
     Legal
       {
         st with
-        avail_action = ["fold"; "raise"; "call"];
+        player_turn = st.player_turn + 1
       }

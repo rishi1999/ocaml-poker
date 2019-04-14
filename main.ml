@@ -24,8 +24,24 @@ let play_game st =
   | 0 -> print_endline "starting multiplayer game";
     print_int_list (State.players_in st);
     exit 0
+
   | 1 ->  print_endline "starting AI GAME";
-    exit 0
+
+    let rec keep_playing st = 
+    match read_line () with
+      | exception End_of_file -> ()
+      | curr_cmd ->
+        match Command.parse curr_cmd with
+        | Fold -> exit 0
+        | Call -> exit 0
+        | Bet bet_amount -> exit 0
+        | Raise bet_amount  -> exit 0
+        | Ante -> exit 0
+        | Stack -> exit 0
+        | Quit -> exit 0 in
+
+    keep_playing st
+
   | _ -> failwith "Wrong gametype"
 
 

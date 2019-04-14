@@ -80,7 +80,7 @@ let add_to_hole = function
       blind;
       participants;
       hole_cards;
-    } when List.length hole_cards > 3
+    } when List.length hole_cards > 5
     -> failwith "too many hole cards"
   |
     {
