@@ -1,7 +1,7 @@
 (* Takes in a hand of 5-7 cards and returns its rank *)
 open Hashone
 open Tableflush
-
+open Constantarrays
 (* [pow b e] returns the integer result of b raised to the power of e
    Requires: e >= 0 *)
 let rec pow b e = match e with
@@ -28,12 +28,14 @@ let hand_evaluator card_ranks card_suits =
   let boolean = if card_suits.(0) = ((card_suits.(1) lor card_suits.(2) lor card_suits.(3) lor card_suits.(4))) then 1 else 0 in
   newv - boolean * multiplier
 
+let dp = Constantarrays.dp
+let suits = Constantarrays.suits
+
 let hash_quinary q len k =
-  let array_dp = Array.make 5 (Array.make 14 (Array.make 8 0)) in
   let rec loop i len sum k =
     if i = len then sum
     else
-      let index1array = array_dp.(q.(i)) in
+      let index1array = dp.(q.(i)) in
       let index2array = index1array.(len - i -1) in
       let new_sum = index2array.(k) in
       let newk = k - (q.(i)) in
@@ -134,7 +136,6 @@ let seven_eval a b c d e f g =
                   suitbit_by_id.(d) + suitbit_by_id.(e) + suitbit_by_id.(f) + 
                   suitbit_by_id.(g) in
 
-  let suits = Array.make 4096 0 in
   let suit_binary = Array.make 4 0 in
   let quinary = Array.make 13 0 in
 
