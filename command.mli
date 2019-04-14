@@ -5,7 +5,6 @@ type command =
   | Call
   | Bet of bet_amount
   | Raise of bet_amount
-  | Ante
   | Stack
   | Quit
 

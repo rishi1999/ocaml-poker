@@ -4,7 +4,6 @@ type command =
   | Call
   | Bet of bet_amount
   | Raise of bet_amount
-  | Ante
   | Stack
   | Quit
 
@@ -27,8 +26,8 @@ let parse str =
   else 
     let head = List.hd list_without_spaces in
     let tail = List.tl list_without_spaces in
-    let standalone_commands = ["quit"; "inventory";"score"] in
-    let phrase_commands = ["go";"take";"drop";"lock";"unlock"] in
+    let standalone_commands = ["fold"; "call";"quit";"stack"] in
+    let phrase_commands = ["bet";"raise"] in
     if List.length tail > 1 then raise Malformed
     else
       if (List.mem head standalone_commands) && tail <> [] then raise Malformed
@@ -37,6 +36,5 @@ let parse str =
       else if head = "call" then Call
       else if head = "bet" then Bet (tail |> List.hd |> int_of_string)
       else if head = "raise" then Raise (tail |> List.hd |> int_of_string)
-      else if head = "ante" then Ante
       else if head = "quit" then Quit
       else raise Malformed

@@ -29,15 +29,43 @@ let play_game st =
 
     let rec keep_playing st = 
     match read_line () with
-      | exception End_of_file -> ()
       | curr_cmd ->
         match Command.parse curr_cmd with
-        | Fold -> exit 0
-        | Call -> exit 0
-        | Bet bet_amount -> exit 0
-        | Raise bet_amount  -> exit 0
-        | Ante -> exit 0
-        | Stack -> exit 0
+        | exception Command.Malformed ->
+          print_endline "Not a valid command.";
+          keep_playing st
+
+        | exception Command.Empty ->
+          print_endline "Please enter a command";
+          keep_playing st
+
+        | Fold -> 
+          print_endline "folded!";
+          keep_playing st
+
+        | Call ->
+          print_endline "called!";
+          keep_playing st
+
+        | Bet bet_amount ->
+          let bet_amt = bet_amount in
+          print_int bet_amt;
+          print_endline "bet!";
+          keep_playing st
+
+        | Raise bet_amount  ->
+          let bet_amt = bet_amount in
+          print_endline "raise!";
+          keep_playing st
+
+        | Ante -> 
+          print_endline "post ante!";
+          keep_playing st
+
+        | Stack -> 
+          print_endline "look at stack!";
+          keep_playing st
+
         | Quit -> exit 0 in
 
     keep_playing st
