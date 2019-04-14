@@ -1,6 +1,7 @@
 type bet_amount = int
 
 type command = 
+  | Check
   | Fold
   | Call
   | Bet of bet_amount

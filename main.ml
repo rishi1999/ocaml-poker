@@ -19,6 +19,20 @@ let print_card_list card_list =
       | (a, b) -> print_helper (a ^ b ^ outstr) t in 
   print_helper "" card_list
 
+let print_current_state st =
+  print_endline "Game Type : ";
+  print_int (State.game_type st);
+  print_endline "\nNumber of Players : ";
+  print_int (State.num_players st);
+  print_endline "\nPlayers in : ";
+  print_int_list (State.players_in st);
+  print_endline "Turn : ";
+  print_int (State.player_turn st);
+  print_endline "\nAvailable actions : ";
+  print_string_list (State.avail_action st);
+  print_endline "\n\n\n";
+  st
+
 let play_game st = 
   match State.game_type st with
   | 0 -> print_endline "starting multiplayer game";
@@ -28,6 +42,9 @@ let play_game st =
   | 1 ->  print_endline "starting AI GAME";
 
     let rec keep_playing st = 
+
+    let st = print_current_state st in
+
     match read_line () with
       | curr_cmd ->
         match Command.parse curr_cmd with
@@ -37,6 +54,10 @@ let play_game st =
 
         | exception Command.Empty ->
           print_endline "Please enter a command";
+          keep_playing st
+
+        | Check -> 
+          print_endline "checked!";
           keep_playing st
 
         | Fold -> 
@@ -49,17 +70,14 @@ let play_game st =
 
         | Bet bet_amount ->
           let bet_amt = bet_amount in
+          print_endline "bet: $";
           print_int bet_amt;
-          print_endline "bet!";
           keep_playing st
 
         | Raise bet_amount  ->
           let bet_amt = bet_amount in
-          print_endline "raise!";
-          keep_playing st
-
-        | Ante -> 
-          print_endline "post ante!";
+          print_endline "raise: $";
+          print_int bet_amt;
           keep_playing st
 
         | Stack -> 
