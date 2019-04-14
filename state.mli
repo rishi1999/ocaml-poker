@@ -17,4 +17,6 @@ val bet : t -> bet
 
 val avail_action : t -> string list
 
+val is_new_round : t -> bool
+
 val init_state : int -> int -> int -> int -> t

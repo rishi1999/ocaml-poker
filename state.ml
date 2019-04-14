@@ -19,6 +19,7 @@ type t = {
   (* who bet? *)
   bet: bet;
   avail_action: string list;
+  is_new_round : bool;
 }
 
 let init_players num_players money =
@@ -66,7 +67,8 @@ let init_state game_type num_players money blind =
     players_in = init_players_in num_players;
     (* who bet? *)
     bet = init_bet;
-    avail_action = ["fold"; "bet"; "check"]
+    avail_action = ["fold"; "bet"; "check"];
+    is_new_round = true;
   }
 
 let game_type st = st.game_type
@@ -84,6 +86,8 @@ let players_in st = st.players_in
 let bet st = st.bet
 
 let avail_action st = st.avail_action
+
+let is_new_round st = st.is_new_round
 (*
 let next_player st =
   let curr_player = st.player_turn in
@@ -93,14 +97,11 @@ let next_player st =
   | h::t -> if ele = h then find  *)
 
 (* check if everyone called the bet *)
-let check_bet_amount st = List.for_all
+let are_all_bets_equal st = List.for_all
     (fun paid -> paid = st.bet.bet_amount) st.bet.bet_paid_amt
 
 (* check if we can go to next round *)
-(* TODO not done *)
-let check_for_next_round st =
-  (st.bet.bet_amount = 0 && st.player_turn = st.button) ||
-  (st.bet.bet_amount <> 0) && (check_bet_amount st)
+let is_round_complete st = st.is_new_round && are_all_bets_equal st
 
 type check_result =
   | Legal of t
@@ -108,7 +109,7 @@ type check_result =
 
 (* TODO not done *)
 let check st =
-  if st.player_turn = st.button && check_for_next_round st then
+  if is_round_complete st then
     Legal
       {
         st with
@@ -118,5 +119,5 @@ let check st =
     Legal
       {
         st with
-        avail_action = ["fold"; "bet"; "check"];
+        avail_action = ["fold"; "raise"; "call"];
       }

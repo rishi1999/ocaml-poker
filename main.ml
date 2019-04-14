@@ -14,15 +14,15 @@ let print_int_list int_list =
 (* NOT WORKING *)
 let print_card_list card_list = 
   let rec print_helper outstr = function
-  | [] -> outstr
-  | h::t -> match h with
-            | (a, b) -> print_helper (a ^ b ^ outstr) t in 
+    | [] -> outstr
+    | h::t -> match h with
+      | (a, b) -> print_helper (a ^ b ^ outstr) t in 
   print_helper "" card_list
 
 let play_game st = 
   match State.game_type st with
   | 0 -> print_endline "starting multiplayer game";
-  print_int_list (State.players_in st);
+    print_int_list (State.players_in st);
     exit 0
   | 1 ->  print_endline "starting AI GAME";
     exit 0
@@ -38,7 +38,7 @@ let init_multiplayer f =
   let blind = int_of_string (read_line ()) in
 
   play_game (State.init_state 0 num_players money blind)
-  
+
 
 let init_ai f =
   print_endline "starting stack?";
@@ -62,27 +62,27 @@ let main () =
                   "\n\nWelcome to the Poker Game.\n");
   print_endline "Do you want to play a multiplayer game(0) or against an AI?(1)";
   print_string  "> ";
-  
+
   match read_line () with
   | exception End_of_file -> ()
   | game_type -> (init_game game_type)
 
-  (* match get_and_read_input [0; 1] with
-  | exception Wrong_Input -> 
-    print_endline "Wrong Input! Try again.";
-    get_and_read_input [0; 1]
-  | x -> let game_type = x in
+(* match get_and_read_input [0; 1] with
+   | exception Wrong_Input -> 
+   print_endline "Wrong Input! Try again.";
+   get_and_read_input [0; 1]
+   | x -> let game_type = x in
 
-    if game_type = 1 then
-      let num_players = 2 in
-    else
-      print_endline "How Many Players?";
-      match get_and_read_input [0; 1; 2; 3; 4; 5] with
-      | exception Wrong_Input -> 
-        print_endline "Wrong Input! Try again.";
-        get_and_read_input [0; 1; 2; 3; 4; 5]
-      | x -> let num_players = x in
-        play_game game_type num_players *)
+   if game_type = 1 then
+    let num_players = 2 in
+   else
+    print_endline "How Many Players?";
+    match get_and_read_input [0; 1; 2; 3; 4; 5] with
+    | exception Wrong_Input ->
+      print_endline "Wrong Input! Try again.";
+      get_and_read_input [0; 1; 2; 3; 4; 5]
+    | x -> let num_players = x in
+      play_game game_type num_players *)
 
 
 (* Execute the game engine. *)
