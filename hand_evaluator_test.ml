@@ -7783,14 +7783,15 @@ let noflush = [|
 let hash_quinary q len k =
   let rec loop i len sum k =
     if i = len then sum
+    else if k <=0 then sum 
     else
+      let newk = k - (q.(i)) in
       let index1array = dp.(q.(i)) in
       let index2array = index1array.(len - i -1) in
-      let new_sum = index2array.(k) in
-      let newk = k - (q.(i)) in
-      if k <=0 then sum 
-      else loop (i+1) len new_sum newk in
+      let new_sum = index2array.(k) in loop (i+1) len new_sum newk in
   loop 0 len 0 k
+
+
 
 (* 7 card evaluator starts here *)
 
@@ -7854,4 +7855,3 @@ let seven_eval a b c d e f g =
     let () = quinary.(g lsr 2) <- (quinary.(g lsr 2)) + 1 in
     let hash = hash_quinary quinary 13 7 in
     noflush.(hash)
-

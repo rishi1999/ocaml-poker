@@ -34,69 +34,16 @@ let suits = Constantarrays.suits
 let hash_quinary q len k =
   let rec loop i len sum k =
     if i = len then sum
+    else if k <=0 then sum 
     else
+      let newk = k - (q.(i)) in
       let index1array = dp.(q.(i)) in
       let index2array = index1array.(len - i -1) in
-      let new_sum = index2array.(k) in
-      let newk = k - (q.(i)) in
-      if k <=0 then sum 
-      else loop (i+1) len new_sum newk in
+      let new_sum = index2array.(k) in loop (i+1) len new_sum newk in
   loop 0 len 0 k
 
-(*
-let a = 7*4+0 in
-let b = 2*4+0 in
-let c = 2*4+3 in
-let d = 7*4+1 in
-let e = 2*4+2 in
-let f = 10*4+0 in
-let g = 4*4+0 in
 
-let h = 0 * 4 + 0 in
-let i = 7 * 4 +2 in
 
-seven_eval a b c d e f g
-
-EXPECTED: 292
-
-let a = 7*4+0 in
-let b = 2*4+0 in
-let c = 2*4+3 in
-let d = 7*4+1 in
-let e = 2*4+2 in
-let f = 10*4+0 in
-let g = 4*4+0 in
-
-let h = 0 * 4 + 0 in
-let i = 7 * 4 +2 in
-
-seven_eval a b c d e h i 
-
-Expected: 236
-
-*)
-
-(*
-    int hash_quinary(unsigned char q[], int len, int k)
-    {
-      int sum = 0;
-      int i;
-
-      for (i=0; i<len; i++)
-          {
-            sum += dp[q[i]][len-i-1][k];
-
-            k -= q[i];
-
-            if (k <= 0)
-                {
-                  break;
-                }
-          }
-
-          return sum;
-    }
-*)
 (* 7 card evaluator starts here *)
 
 let seven_eval a b c d e f g =
@@ -139,7 +86,7 @@ let seven_eval a b c d e f g =
   let suit_binary = Array.make 4 0 in
   let quinary = Array.make 13 0 in
 
-  if ((suits.(suit_hash)) <> 0) then
+  if (suits.(suit_hash)) <> 0 then
     let () = suit_binary.(a land 0x3) <- suit_binary.(a land 0x3) lor binaries_by_id.(a) in
     let () = suit_binary.(b land 0x3) <- suit_binary.(b land 0x3) lor binaries_by_id.(b) in
     let () = suit_binary.(c land 0x3) <- suit_binary.(c land 0x3) lor binaries_by_id.(c) in
@@ -147,18 +94,52 @@ let seven_eval a b c d e f g =
     let () = suit_binary.(e land 0x3) <- suit_binary.(e land 0x3) lor binaries_by_id.(e) in
     let () = suit_binary.(f land 0x3) <- suit_binary.(f land 0x3) lor binaries_by_id.(f) in
     let () = suit_binary.(g land 0x3) <- suit_binary.(g land 0x3) lor binaries_by_id.(g) in
-    let target_index = (suits.(suit_hash)) - 1 in
+    let target_index = suits.(suit_hash) - 1 in
     flush.(suit_binary.(target_index));
   else
     let () = quinary.(a lsr 2) <- (quinary.(a lsr 2)) + 1 in
     let () = quinary.(b lsr 2) <- (quinary.(b lsr 2)) + 1 in
-    let () =quinary.(c lsr 2) <- (quinary.(c lsr 2)) + 1 in
+    let () = quinary.(c lsr 2) <- (quinary.(c lsr 2)) + 1 in
     let () = quinary.(d lsr 2) <- (quinary.(d lsr 2)) + 1 in
     let () = quinary.(e lsr 2) <- (quinary.(e lsr 2)) + 1 in
     let () = quinary.(f lsr 2) <- (quinary.(f lsr 2)) + 1 in  
     let () = quinary.(g lsr 2) <- (quinary.(g lsr 2)) + 1 in
     let hash = hash_quinary quinary 13 7 in
     noflush.(hash)
+
+
+(*
+let a = 7*4+0 in
+let b = 2*4+0 in
+let c = 2*4+3 in
+let d = 7*4+1 in
+let e = 2*4+2 in
+let f = 10*4+0 in
+let g = 4*4+0 in
+
+let h = 0 * 4 + 0 in
+let i = 7 * 4 +2 in
+
+seven_eval a b c d e f g
+
+EXPECTED: 292
+
+let a = 7*4+0 in
+let b = 2*4+0 in
+let c = 2*4+3 in
+let d = 7*4+1 in
+let e = 2*4+2 in
+let f = 10*4+0 in
+let g = 4*4+0 in
+
+let h = 0 * 4 + 0 in
+let i = 7 * 4 +2 in
+
+seven_eval a b c d e h i 
+
+Expected: 236
+
+*)
 
 (*
   int i;
