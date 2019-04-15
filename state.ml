@@ -35,7 +35,7 @@ let init_players num_players money =
   init_players' [] money num_players
 
 let init_table num_players money blind =
-  {
+  Table.deal {
     dealer = 0;
     blind;
     participants = init_players num_players money;

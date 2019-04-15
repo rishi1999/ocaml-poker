@@ -20,17 +20,21 @@ let print_card_list card_list =
   print_helper "" card_list
 
 let print_current_state st =
-  print_endline "Game Type : ";
+  (* print_endline "Game Type : ";
   print_int (State.game_type st);
   print_endline "\nNumber of Players : ";
-  print_int (State.num_players st);
+  print_int (State.num_players st); *)
+  print_endline "\nThe board is : ";
+  print_int_list (List.map Deck.int_converter (Table.hole_cards (State.table st)));
   print_endline "\nPlayers in : ";
   print_int_list (State.players_in st);
   print_endline "Turn : ";
   print_int (State.player_turn st);
+  print_endline "\nYour hand is : ";
+  print_int_list (List.map Deck.int_converter (Player.cards (List.nth 
+  (Table.participants (State.table st)) (State.player_turn st - 1))));
   print_endline "\nAvailable actions : ";
   print_string_list (State.avail_action st);
-  print_endline "\n\n\n";
   st
 
 let play_game st = 
@@ -58,7 +62,14 @@ let play_game st =
 
         | Check -> 
           print_endline "checked!";
-          keep_playing st
+          (
+            match State.check st with
+          | Legal changed ->
+            keep_playing changed
+          | Illegal ->
+            print_endline "You can't check right now!";
+            keep_playing st
+            )
 
         | Fold -> 
           print_endline "folded!";
@@ -130,8 +141,8 @@ let main () =
   (* match read_line () with
   | exception End_of_file -> ()
   | game_type -> (init_game game_type) *)
-  init_game "1"
 
+  init_game (string_of_int 1)
 
 (* Execute the game engine. *)
 let () = main ()
