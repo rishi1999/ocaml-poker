@@ -36,3 +36,5 @@ let parse str =
     else if head = "raise" then Raise (tail |> List.hd |> int_of_string)
     else if head = "quit" then Quit
     else raise Malformed
+
+let empty_list lst = lst = [] 
