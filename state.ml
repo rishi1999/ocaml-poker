@@ -67,7 +67,7 @@ let money_to_pot st amount =
   let changed_bet = 
     {
       bet_player = st.player_turn;
-      bet_amount = amount;
+      bet_amount = if st.bet.bet_amount > amount then st.bet.bet_amount else amount;
       bet_paid_amt = if not (exist st.bet.bet_paid_amt st.player_turn) then ((st.player_turn, amount)::st.bet.bet_paid_amt)
         else bet_paid_helper [] st.player_turn amount st.bet.bet_paid_amt;
     } in
@@ -121,19 +121,19 @@ let init_players_in num_players =
   (*List.sort compare*) (init_players_in' [] num_players)
 
 let init_state game_type num_players money blind =
-  pay_blinds
-    {
-      game_type;
-      num_players;
-      table = init_table num_players money blind;
-      player_turn = 1;
-      button = 1;
-      players_in = init_players_in num_players;
-      (* who bet? *)
-      bet = init_bet;
-      avail_action = ["fold"; "bet"; "check"];
-      is_new_round = true;
-    }
+  (* pay_blinds *)
+  {
+    game_type;
+    num_players;
+    table = init_table num_players money blind;
+    player_turn = 1;
+    button = 1;
+    players_in = init_players_in num_players;
+    (* who bet? *)
+    bet = init_bet;
+    avail_action = ["fold"; "bet"; "check"];
+    is_new_round = true;
+  }
 
 let game_type st = st.game_type
 let num_players st = st.num_players
@@ -172,16 +172,29 @@ let hand_order num_players button =
   let first = list_builder (button + 1) num_players [] in
   first @ second
 
-(** [are_all_bets_equal] is true if all bets made
+(* (** [are_all_bets_equal] is true if all bets made
     in the current round are equal. *)
-let are_all_bets_equal st = List.for_all
-    (fun (player,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt
+   let are_all_bets_equal st = List.for_all
+    (fun (player,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt *)
+
+let get_avail_action st = 
+  st
 
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
-let is_round_complete st = st.is_new_round && are_all_bets_equal st
+let is_round_complete st = 
+  let rec bets_helper = function
+    | [] -> true
+    | (player, amt)::t ->
+      if List.mem player st.players_in then 
+        if amt = st.bet.bet_amount then bets_helper t
+        else false
+      else bets_helper t in
 
-type check_result =
+  (st.is_new_round && bets_helper st.bet.bet_paid_amt) ||
+  List.length st.players_in = 0 
+
+type move_result =
   | Legal of t
   | Illegal
 
@@ -206,13 +219,9 @@ let calculate_pay_amt st =
     | (p, a)::t -> if p = target then a else get_bet_amt target t in 
 
   if exist st.bet.bet_paid_amt st.player_turn then
-    cur_bet_size - get_bet_amt st.player_turn st.bet.bet_paid_amt
+    Pervasives.abs(cur_bet_size - get_bet_amt st.player_turn st.bet.bet_paid_amt)
   else
     cur_bet_size
-
-type call_result =
-  | Legal of t
-  | Illegal
 
 let call st =
   if List.mem "call" st.avail_action then 
@@ -223,9 +232,35 @@ let call st =
       Legal called
   else Illegal
 
-type fold_result= 
-  |Legal of t
-  |Illegal
-
 let fold st =
-  if List.mem "fold" st.avail_action then
+  let rec remove outlst target = function
+    | [] -> outlst
+    | h::t -> if h = target then remove outlst target t
+      else remove (h::outlst) target t in
+  let folded =
+    {
+      st with
+      players_in = remove [] st.player_turn st.players_in;
+      player_turn = get_next_player st;
+    } in
+
+  if is_round_complete folded then
+    Legal (go_next_round folded)
+  else
+    Legal folded
+
+let stack st =
+  let players = List.sort compare st.players_in in
+
+  let rec find_stack player = function
+    | [] -> 0
+    | h::t -> if h.id = player then h.money else find_stack player t in
+
+  let print_stack player =
+    print_string "Player ";
+    print_int player;
+    print_string " has $";
+    print_int (find_stack player st.table.participants);
+    print_endline ". "; in
+
+  List.map print_stack players

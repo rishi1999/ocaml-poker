@@ -92,6 +92,20 @@ let add_to_hole = function
       blind;
       participants;
       hole_cards = h;
+    } when List.length h = 0
+    ->
+    {
+      dealer;
+      blind;
+      participants;
+      hole_cards = Deck.pick_card :: Deck.pick_card :: Deck.pick_card :: h;
+    }
+  | 
+    {
+      dealer;
+      blind;
+      participants;
+      hole_cards = h;
     }
     ->
     {

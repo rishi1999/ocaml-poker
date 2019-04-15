@@ -1,6 +1,6 @@
 type bet_amount = int
 
-type command = 
+type command =
   | Check
   | Fold
   | Call
@@ -11,6 +11,8 @@ type command =
 
 exception Empty
 exception Malformed
+
+val command_to_string : command -> string
 
 val parse : string -> command
 

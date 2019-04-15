@@ -39,17 +39,22 @@ let print_current_state st =
   print_int_list (List.map Deck.int_converter (Table.hole_cards (State.table st)));
   print_endline "\nPlayers in : ";
   print_int_list (State.players_in st);
-  print_endline "Turn : ";
+  print_string "Button ";
+  print_int (State.button st);
+  print_string "\nTurn : ";
   print_int (State.player_turn st);
   print_endline "\nYour hand is : ";
-  print_int_list (List.map Deck.int_converter (Player.cards (List.nth 
-                                                               (Table.participants (State.table st)) (State.player_turn st - 1))));
+  print_int_list (List.map Deck.int_converter (Player.cards 
+                                                 (find_participant st (State.player_turn st))));
+  print_string "You have: ";
+  print_int (Player.money
+               (find_participant st (State.player_turn st)));
+  print_bet_situation st;
   print_endline "\nAvailable actions : ";
   print_string_list (State.avail_action st);
-  print_bet_situation st;
-  st
+  print_endline "------------------------------------"
 
-let play_game st = 
+let play_game st =
   match State.game_type st with
   | 0 -> print_endline "starting multiplayer game";
     print_int_list (State.players_in st);
@@ -57,11 +62,9 @@ let play_game st =
 
   | 1 ->  print_endline "starting AI GAME";
 
-    (** TODOOOOOOOOO*)
-    let rec keep_playing st = 
+    let rec keep_playing st =
+      print_current_state st;
       print_string  "> ";
-
-      let st = print_current_state st in
 
       match read_line () with
       | curr_cmd ->
@@ -74,49 +77,23 @@ let play_game st =
           print_endline "Please enter a command";
           keep_playing st
 
-        | Check -> 
-          print_endline "checked!";
+        | Stack ->
+          print_endline "look at stack!";
+          State.stack st;
+          keep_playing st
+
+        | Quit -> exit 0
+
+        | comm ->
+          print_endline (Command.command_to_string comm);
           (
             match State.check st with
-            | Legal changed ->
-              keep_playing changed
+            | Legal t ->
+              keep_playing t
             | Illegal ->
-              print_endline "You can't check right now!";
+              print_endline "You can't do that right now!";
               keep_playing st
-          )
-
-        | Fold -> 
-          print_endline "folded!";
-          keep_playing st
-
-        | Call ->
-          print_endline "called!";
-          (
-            match State.call st with
-            | Legal changed ->
-              keep_playing changed
-            | Illegal ->
-              print_endline "You can't call right now!";
-              keep_playing st
-          )
-
-        | Bet bet_amount ->
-          let bet_amt = bet_amount in
-          print_endline "bet: $";
-          print_int bet_amt;
-          keep_playing st
-
-        | Raise bet_amount  ->
-          let bet_amt = bet_amount in
-          print_endline "raise: $";
-          print_int bet_amt;
-          keep_playing st
-
-        | Stack -> 
-          print_endline "look at stack!";
-          keep_playing st
-
-        | Quit -> exit 0 in
+          ) in
 
     keep_playing st
 
@@ -130,8 +107,9 @@ let init_multiplayer f =
   let money = int_of_string (read_line ()) in
   print_endline "blinds?";
   let blind = int_of_string (read_line ()) in
+  let st = State.init_state 0 num_players money blind in
 
-  play_game (State.init_state 0 num_players money blind)
+  play_game st
 
 
 let init_ai f =
