@@ -65,9 +65,10 @@ let play_game st =
 
     (** TODOOOOOOOOO*)
     let rec keep_playing st = 
-      print_string  "> ";
 
       let st = print_current_state st in
+      
+      print_string  "> ";
 
       match read_line () with
       | curr_cmd ->
@@ -111,7 +112,7 @@ let play_game st =
 
         | Bet bet_amount ->
           let bet_amt = bet_amount in
-          print_endline "bet: $";
+          print_string "bet: $";
           print_int bet_amt;
           keep_playing st
 
@@ -119,6 +120,7 @@ let play_game st =
           let bet_amt = bet_amount in
           print_endline "raise: $";
           print_int bet_amt;
+          print_endline "";
           keep_playing st
 
         | Stack -> 
