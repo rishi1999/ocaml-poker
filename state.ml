@@ -5,7 +5,7 @@ open Player
 type bet = {
   bet_player: int;
   bet_amount: int;
-  bet_paid_amt: int list;
+  bet_paid_amt: (int*int) list;
 }
 
 type t = {
@@ -21,6 +21,68 @@ type t = {
   avail_action: string list;
   is_new_round : bool;
 }
+
+let get_next_player st = 
+  let rec helper = function
+  | x -> let guess = if x + 1 > st.num_players then 1 else x + 1 in
+    if List.mem guess st.players_in then guess else helper (guess) in
+  helper st.player_turn
+
+let find_participant st target = 
+  let rec helper target = function
+  | [h] -> h
+  | h :: t -> if (Player.id h) = target then h else helper target t in
+  helper target (Table.participants (st.table))
+
+let money_to_pot st amount = 
+  let og_table = st.table in
+  let curr_player = find_participant st st.player_turn in
+  let updated_player = 
+  {
+     curr_player with
+    money = curr_player.money - amount;
+  } in
+
+  let rec helper outlst = function
+  | [] -> outlst
+  | h::t -> if h.id = st.player_turn then helper (updated_player::outlst) t
+    else helper (h::outlst) t in
+
+  let changed_participants = List.rev(helper [] og_table.participants) in
+
+  let changed_table = 
+  {
+    og_table with
+    dealer = og_table.dealer + amount;
+    participants = changed_participants;
+  } in
+
+  let exist lst player = List.exists (fun (x, _) -> x = player) lst in
+
+  let rec bet_paid_helper outlst target bet = function
+  | [] -> outlst
+  | (player, amount)::t -> if player = target then bet_paid_helper ((player, amount + bet)::outlst) target bet t
+  else bet_paid_helper ((player, amount)::outlst) target bet t in
+
+  let changed_bet = 
+  {
+    bet_player = st.player_turn;
+    bet_amount = amount;
+    bet_paid_amt = if not (exist st.bet.bet_paid_amt st.player_turn) then ((st.player_turn, amount)::st.bet.bet_paid_amt)
+      else bet_paid_helper [] st.player_turn amount st.bet.bet_paid_amt;
+  } in
+
+  {
+    st with
+    table = changed_table;
+    player_turn = get_next_player st;
+    bet = changed_bet;
+    avail_action = ["call"; "raise"; "fold";]
+  }
+
+let pay_blinds st =
+  let small_blind = money_to_pot st (st.table.blind / 2) in
+  money_to_pot small_blind st.table.blind
 
 let init_players num_players money =
   let rec init_players' acc money = function
@@ -49,6 +111,8 @@ let init_bet =
     bet_paid_amt = [];
   }
 
+let bet_paid_amt st = st.bet.bet_paid_amt
+
 (* WHAT IS THE POINT OF THIS FUNCTION? -- removed the sort since the elements already seem to be ordered *)
 let init_players_in num_players =
   let rec init_players_in' acc = function
@@ -57,6 +121,7 @@ let init_players_in num_players =
   (*List.sort compare*) (init_players_in' [] num_players)
 
 let init_state game_type num_players money blind =
+  pay_blinds
   {
     game_type;
     num_players;
@@ -110,7 +175,7 @@ let hand_order num_players button =
 (** [are_all_bets_equal] is true if all bets made
     in the current round are equal. *)
 let are_all_bets_equal st = List.for_all
-    (fun paid -> paid = st.bet.bet_amount) st.bet.bet_paid_amt
+    (fun (player,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt
 
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
@@ -122,11 +187,38 @@ type check_result =
 
 (* TODO not done *)
 let check st =
-  if is_round_complete st then
-    Legal (go_next_round st)
+  if List.mem "check" st.avail_action then 
+    if is_round_complete st then
+      Legal (go_next_round st)
+    else
+      Legal
+        {
+          st with
+          player_turn = get_next_player st
+        }
+  else Illegal
+
+let calculate_pay_amt st = 
+  let cur_bet_size = st.bet.bet_amount in
+  let exist lst player = List.exists (fun (x, _) -> x = player) lst in
+  let rec get_bet_amt target = function
+  | [] -> 0
+  | (p, a)::t -> if p = target then a else get_bet_amt target t in 
+
+  if exist st.bet.bet_paid_amt st.player_turn then
+    cur_bet_size - get_bet_amt st.player_turn st.bet.bet_paid_amt
   else
-    Legal
-      {
-        st with
-        player_turn = st.player_turn + 1
-      }
+    cur_bet_size
+
+type call_result =
+    | Legal of t
+    | Illegal
+
+let call st =
+  if List.mem "call" st.avail_action then 
+    let called = money_to_pot st (calculate_pay_amt st) in
+    if is_round_complete called then
+      Legal (go_next_round called)
+    else
+      Legal called
+  else Illegal

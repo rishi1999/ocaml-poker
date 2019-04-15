@@ -11,19 +11,26 @@ let print_string_list string_list =
 let print_int_list int_list =
   int_list |> List.map string_of_int |> List.iter print_endline
 
-(* NOT WORKING *)
-let print_card_list card_list = 
-  let rec print_helper outstr = function
-    | [] -> outstr
-    | h::t -> match h with
-      | (a, b) -> print_helper (a ^ b ^ outstr) t in 
-  print_helper "" card_list
+let print_bet_situation st = 
+  let lst = State.bet_paid_amt st in
+  let rec helper = function
+  | [] -> ()
+  | (a,b)::t -> 
+    print_string "Player";
+    print_int a;
+    print_string " has currently paid: ";
+    print_int b;
+    print_endline "";
+    helper t in
+  helper lst
+
+let find_participant st target = 
+  let rec helper target = function
+  | [h] -> h
+  | h :: t -> if (Player.id h) = target then h else helper target t in
+  helper target (Table.participants (State.table st))
 
 let print_current_state st =
-  (* print_endline "Game Type : ";
-  print_int (State.game_type st);
-  print_endline "\nNumber of Players : ";
-  print_int (State.num_players st); *)
   print_endline "\nThe board is : ";
   print_int_list (List.map Deck.int_converter (Table.hole_cards (State.table st)));
   print_endline "\nPlayers in : ";
@@ -31,10 +38,14 @@ let print_current_state st =
   print_endline "Turn : ";
   print_int (State.player_turn st);
   print_endline "\nYour hand is : ";
-  print_int_list (List.map Deck.int_converter (Player.cards (List.nth 
-  (Table.participants (State.table st)) (State.player_turn st - 1))));
+  print_int_list (List.map Deck.int_converter (Player.cards 
+  (find_participant st (State.player_turn st))));
+  print_endline "\nYou have: ";
+  print_int (Player.money 
+  (find_participant st (State.player_turn st)));
   print_endline "\nAvailable actions : ";
   print_string_list (State.avail_action st);
+  print_bet_situation st;
   st
 
 let play_game st = 
@@ -77,7 +88,14 @@ let play_game st =
 
         | Call ->
           print_endline "called!";
-          keep_playing st
+          (
+            match State.call st with
+          | Legal changed ->
+            keep_playing changed
+          | Illegal ->
+            print_endline "You can't call right now!";
+            keep_playing st
+            )
 
         | Bet bet_amount ->
           let bet_amt = bet_amount in

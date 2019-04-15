@@ -56,3 +56,11 @@ type check_result =
   | Illegal
 
 val check : t -> check_result
+
+val bet_paid_amt : t -> (int*int) list 
+
+type call_result =
+  | Legal of t
+  | Illegal
+
+val call : t -> call_result
