@@ -88,7 +88,7 @@ let avail_action st = st.avail_action
 
 let is_new_round st = st.is_new_round
 
-let go_next_round st = 
+let go_next_round st =
   if List.length st.table.hole_cards = 5 then
     let cleared = Table.clear_round st.table in
     {
@@ -101,25 +101,27 @@ let go_next_round st =
       st with
       table = card_added;
     }
-(** [hand_order num_players button] returns an integer lists
+(** [hand_order num_players button] is an integer list
     containing integers from (button + 1) to num_players and then from 1
     to button.
     Requires: button >= 1 and num_players >=1
     Requires: button <= num_players
     Example:  [hand_order 5 3] is [4; 5; 1; 2; 3] *)
 let hand_order num_players button =
-  let rec list_builder start term outlist = 
+  let rec list_builder start term outlist =
     if start > term then outlist
     else list_builder start (term - 1) (term :: outlist) in
   let second = list_builder 1 button [] in
   let first = list_builder (button + 1) num_players [] in
   first @ second
 
-(* check if everyone called the bet *)
+(** [are_all_bets_equal] is true if all bets made
+    in the current round are equal. *)
 let are_all_bets_equal st = List.for_all
     (fun paid -> paid = st.bet.bet_amount) st.bet.bet_paid_amt
 
-(* check if we can go to next round *)
+(** [is_round_complete st] is true if the game is
+    ready to move on to the next round. *)
 let is_round_complete st = st.is_new_round && are_all_bets_equal st
 
 type check_result =
