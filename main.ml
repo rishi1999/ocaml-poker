@@ -14,23 +14,27 @@ let print_int_list int_list =
 let print_bet_situation st = 
   let lst = State.bet_paid_amt st in
   let rec helper = function
-  | [] -> ()
-  | (a,b)::t -> 
-    print_string "Player";
-    print_int a;
-    print_string " has currently paid: ";
-    print_int b;
-    print_endline "";
-    helper t in
+    | [] -> ()
+    | (a,b)::t -> 
+      print_string "Player";
+      print_int a;
+      print_string " has currently paid: ";
+      print_int b;
+      print_endline "";
+      helper t in
   helper lst
 
 let find_participant st target = 
   let rec helper target = function
-  | [h] -> h
-  | h :: t -> if (Player.id h) = target then h else helper target t in
+    | [h] -> h
+    | h :: t -> if (Player.id h) = target then h else helper target t in
   helper target (Table.participants (State.table st))
 
 let print_current_state st =
+  (* print_endline "Game Type : ";
+     print_int (State.game_type st);
+     print_endline "\nNumber of Players : ";
+     print_int (State.num_players st); *)
   print_endline "\nThe board is : ";
   print_int_list (List.map Deck.int_converter (Table.hole_cards (State.table st)));
   print_endline "\nPlayers in : ";
@@ -57,11 +61,13 @@ let play_game st =
 
   | 1 ->  print_endline "starting AI GAME";
 
+    (** TODOOOOOOOOO*)
     let rec keep_playing st = 
+      print_string  "> ";
 
-    let st = print_current_state st in
+      let st = print_current_state st in
 
-    match read_line () with
+      match read_line () with
       | curr_cmd ->
         match Command.parse curr_cmd with
         | exception Command.Malformed ->
@@ -76,12 +82,12 @@ let play_game st =
           print_endline "checked!";
           (
             match State.check st with
-          | Legal changed ->
-            keep_playing changed
-          | Illegal ->
-            print_endline "You can't check right now!";
-            keep_playing st
-            )
+            | Legal changed ->
+              keep_playing changed
+            | Illegal ->
+              print_endline "You can't check right now!";
+              keep_playing st
+          )
 
         | Fold -> 
           print_endline "folded!";
@@ -91,12 +97,12 @@ let play_game st =
           print_endline "called!";
           (
             match State.call st with
-          | Legal changed ->
-            keep_playing changed
-          | Illegal ->
-            print_endline "You can't call right now!";
-            keep_playing st
-            )
+            | Legal changed ->
+              keep_playing changed
+            | Illegal ->
+              print_endline "You can't call right now!";
+              keep_playing st
+          )
 
         | Bet bet_amount ->
           let bet_amt = bet_amount in
@@ -158,8 +164,8 @@ let main () =
   print_string  "> ";
 
   (* match read_line () with
-  | exception End_of_file -> ()
-  | game_type -> (init_game game_type) *)
+     | exception End_of_file -> ()
+     | game_type -> (init_game game_type) *)
 
   init_game (string_of_int 1)
 
