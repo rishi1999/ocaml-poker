@@ -51,21 +51,14 @@ val init_state : int -> int -> int -> int -> t
 
 val hand_order : int -> int -> int list
 
-type check_result =
+type move_result =
   | Legal of t
   | Illegal
 
-val check : t -> check_result
+val check : t -> move_result
 
-val bet_paid_amt : t -> (int*int) list 
+val bet_paid_amt : t -> (int*int) list
 
-type call_result =
-  | Legal of t
-  | Illegal
+val call : t -> move_result
 
-val call : t -> call_result
-
-type fold_result =
-  | Legal of t
-
-val fold : t -> fold_result
+val fold : t -> move_result

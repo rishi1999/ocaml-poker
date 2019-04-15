@@ -1,5 +1,5 @@
 type bet_amount = int
-type command = 
+type command =
   | Check
   | Fold
   | Call
@@ -10,6 +10,15 @@ type command =
 
 exception Empty
 exception Malformed
+
+let command_to_string = function
+  | Check -> "checked!"
+  | Fold -> "folded!"
+  | Call -> "called!"
+  | Bet amt -> "bet!"
+  | Raise amt -> "raised!"
+  | Stack -> "stacked!"
+  | Quit -> "quit!"
 
 let rec remove_emp_str outlist = function
   | [] -> outlist
@@ -37,4 +46,4 @@ let parse str =
     else if head = "quit" then Quit
     else raise Malformed
 
-let empty_list lst = lst = [] 
+let empty_list lst = lst = []

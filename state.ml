@@ -65,12 +65,12 @@ let money_to_pot st amount =
       else bet_paid_helper ((player, amount)::outlst) target bet t in
 
   let changed_bet = 
-  {
-    bet_player = st.player_turn;
-    bet_amount = if st.bet.bet_amount > amount then st.bet.bet_amount else amount;
-    bet_paid_amt = if not (exist st.bet.bet_paid_amt st.player_turn) then ((st.player_turn, amount)::st.bet.bet_paid_amt)
-      else bet_paid_helper [] st.player_turn amount st.bet.bet_paid_amt;
-  } in
+    {
+      bet_player = st.player_turn;
+      bet_amount = if st.bet.bet_amount > amount then st.bet.bet_amount else amount;
+      bet_paid_amt = if not (exist st.bet.bet_paid_amt st.player_turn) then ((st.player_turn, amount)::st.bet.bet_paid_amt)
+        else bet_paid_helper [] st.player_turn amount st.bet.bet_paid_amt;
+    } in
 
   {
     st with
@@ -174,7 +174,7 @@ let hand_order num_players button =
 
 (* (** [are_all_bets_equal] is true if all bets made
     in the current round are equal. *)
-let are_all_bets_equal st = List.for_all
+   let are_all_bets_equal st = List.for_all
     (fun (player,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt *)
 
 let get_avail_action st = 
@@ -184,17 +184,17 @@ let get_avail_action st =
     ready to move on to the next round. *)
 let is_round_complete st = 
   let rec bets_helper = function
-  | [] -> true
-  | (player, amt)::t ->
-    if List.mem player st.players_in then 
-      if amt = st.bet.bet_amount then bets_helper t
-      else false
-    else bets_helper t in
-    
+    | [] -> true
+    | (player, amt)::t ->
+      if List.mem player st.players_in then 
+        if amt = st.bet.bet_amount then bets_helper t
+        else false
+      else bets_helper t in
+
   (st.is_new_round && bets_helper st.bet.bet_paid_amt) ||
   List.length st.players_in = 0 
 
-type check_result =
+type move_result =
   | Legal of t
   | Illegal
 
@@ -223,10 +223,6 @@ let calculate_pay_amt st =
   else
     cur_bet_size
 
-type call_result =
-  | Legal of t
-  | Illegal
-
 let call st =
   if List.mem "call" st.avail_action then 
     let called = money_to_pot st (calculate_pay_amt st) in
@@ -236,22 +232,19 @@ let call st =
       Legal called
   else Illegal
 
-type fold_result = 
-  | Legal of t
-
-let fold st = 
+let fold st =
   let rec remove outlst target = function
-  | [] -> outlst
-  | h::t -> if h = target then remove outlst target t
-    else remove (h::outlst) target t in
+    | [] -> outlst
+    | h::t -> if h = target then remove outlst target t
+      else remove (h::outlst) target t in
   let folded =
-  {
-    st with
-    players_in = remove [] st.player_turn st.players_in;
-    player_turn = get_next_player st;
-  } in
+    {
+      st with
+      players_in = remove [] st.player_turn st.players_in;
+      player_turn = get_next_player st;
+    } in
 
   if is_round_complete folded then
-  Legal (go_next_round folded)
+    Legal (go_next_round folded)
   else
-  Legal folded
+    Legal folded

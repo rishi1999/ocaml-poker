@@ -45,15 +45,14 @@ let print_current_state st =
   print_int (State.player_turn st);
   print_endline "\nYour hand is : ";
   print_int_list (List.map Deck.int_converter (Player.cards 
-  (find_participant st (State.player_turn st))));
+                                                 (find_participant st (State.player_turn st))));
   print_string "You have: ";
   print_int (Player.money 
-  (find_participant st (State.player_turn st)));
+               (find_participant st (State.player_turn st)));
   print_bet_situation st;
   print_endline "\nAvailable actions : ";
   print_string_list (State.avail_action st);
-  print_endline "------------------------------------";
-  st
+  print_endline "------------------------------------"
 
 let play_game st = 
   match State.game_type st with
@@ -63,11 +62,9 @@ let play_game st =
 
   | 1 ->  print_endline "starting AI GAME";
 
-    (** TODOOOOOOOOO*)
-    let rec keep_playing st = 
+    let rec keep_playing st =
       print_string  "> ";
-
-      let st = print_current_state st in
+      print_current_state st;
 
       match read_line () with
       | curr_cmd ->
@@ -80,22 +77,26 @@ let play_game st =
           print_endline "Please enter a command";
           keep_playing st
 
-        | Check -> 
+        | Check ->
           print_endline "checked!";
           (
             match State.check st with
-            | Legal changed ->
-              keep_playing changed
+            | Legal t ->
+              keep_playing t
             | Illegal ->
               print_endline "You can't check right now!";
               keep_playing st
           )
 
-        | Fold -> 
+        | Fold ->
           print_endline "folded!";
           (
-          match State.fold st with
-          | Legal t -> keep_playing t
+            match State.fold st with
+            | Legal t ->
+              keep_playing t
+            | Illegal ->
+              print_endline "You can't fold right now!";
+              keep_playing st
           )
 
         | Call ->
@@ -121,7 +122,7 @@ let play_game st =
           print_int bet_amt;
           keep_playing st
 
-        | Stack -> 
+        | Stack ->
           print_endline "look at stack!";
           keep_playing st
 
@@ -139,8 +140,9 @@ let init_multiplayer f =
   let money = int_of_string (read_line ()) in
   print_endline "blinds?";
   let blind = int_of_string (read_line ()) in
+  let st = State.init_state 0 num_players money blind in
 
-  play_game (State.init_state 0 num_players money blind)
+  play_game st
 
 
 let init_ai f =
