@@ -67,7 +67,7 @@ let money_to_pot st amount =
   let changed_bet = 
   {
     bet_player = st.player_turn;
-    bet_amount = amount;
+    bet_amount = if st.bet.bet_amount > amount then st.bet.bet_amount else amount;
     bet_paid_amt = if not (exist st.bet.bet_paid_amt st.player_turn) then ((st.player_turn, amount)::st.bet.bet_paid_amt)
       else bet_paid_helper [] st.player_turn amount st.bet.bet_paid_amt;
   } in
@@ -121,7 +121,7 @@ let init_players_in num_players =
   (*List.sort compare*) (init_players_in' [] num_players)
 
 let init_state game_type num_players money blind =
-  pay_blinds
+  (* pay_blinds *)
   {
     game_type;
     num_players;
@@ -172,14 +172,26 @@ let hand_order num_players button =
   let first = list_builder (button + 1) num_players [] in
   first @ second
 
-(** [are_all_bets_equal] is true if all bets made
+(* (** [are_all_bets_equal] is true if all bets made
     in the current round are equal. *)
 let are_all_bets_equal st = List.for_all
-    (fun (player,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt
+    (fun (player,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt *)
+
+let get_avail_action st = 
+  st
 
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
-let is_round_complete st = st.is_new_round && are_all_bets_equal st
+let is_round_complete st = 
+  let rec bets_helper = function
+  | [] -> true
+  | (player, amt)::t ->
+    if List.mem player st.players_in then 
+      if amt = st.bet.bet_amount then bets_helper t
+      else false
+    else bets_helper t in
+    
+  st.is_new_round && bets_helper st.bet.bet_paid_amt
 
 type check_result =
   | Legal of t
@@ -206,7 +218,7 @@ let calculate_pay_amt st =
   | (p, a)::t -> if p = target then a else get_bet_amt target t in 
 
   if exist st.bet.bet_paid_amt st.player_turn then
-    cur_bet_size - get_bet_amt st.player_turn st.bet.bet_paid_amt
+    Pervasives.abs(cur_bet_size - get_bet_amt st.player_turn st.bet.bet_paid_amt)
   else
     cur_bet_size
 

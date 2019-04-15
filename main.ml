@@ -43,9 +43,10 @@ let print_current_state st =
   print_endline "\nYou have: ";
   print_int (Player.money 
   (find_participant st (State.player_turn st)));
+  print_endline "";
+  print_bet_situation st;
   print_endline "\nAvailable actions : ";
   print_string_list (State.avail_action st);
-  print_bet_situation st;
   st
 
 let play_game st = 
