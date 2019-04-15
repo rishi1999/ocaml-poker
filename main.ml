@@ -21,9 +21,9 @@ let print_card_list card_list =
 
 let print_current_state st =
   (* print_endline "Game Type : ";
-  print_int (State.game_type st);
-  print_endline "\nNumber of Players : ";
-  print_int (State.num_players st); *)
+     print_int (State.game_type st);
+     print_endline "\nNumber of Players : ";
+     print_int (State.num_players st); *)
   print_endline "\nThe board is : ";
   print_int_list (List.map Deck.int_converter (Table.hole_cards (State.table st)));
   print_endline "\nPlayers in : ";
@@ -32,7 +32,7 @@ let print_current_state st =
   print_int (State.player_turn st);
   print_endline "\nYour hand is : ";
   print_int_list (List.map Deck.int_converter (Player.cards (List.nth 
-  (Table.participants (State.table st)) (State.player_turn st - 1))));
+                                                               (Table.participants (State.table st)) (State.player_turn st - 1))));
   print_endline "\nAvailable actions : ";
   print_string_list (State.avail_action st);
   st
@@ -45,11 +45,13 @@ let play_game st =
 
   | 1 ->  print_endline "starting AI GAME";
 
+    (** TODOOOOOOOOO*)
     let rec keep_playing st = 
+      print_string  "> ";
 
-    let st = print_current_state st in
+      let st = print_current_state st in
 
-    match read_line () with
+      match read_line () with
       | curr_cmd ->
         match Command.parse curr_cmd with
         | exception Command.Malformed ->
@@ -64,12 +66,12 @@ let play_game st =
           print_endline "checked!";
           (
             match State.check st with
-          | Legal changed ->
-            keep_playing changed
-          | Illegal ->
-            print_endline "You can't check right now!";
-            keep_playing st
-            )
+            | Legal changed ->
+              keep_playing changed
+            | Illegal ->
+              print_endline "You can't check right now!";
+              keep_playing st
+          )
 
         | Fold -> 
           print_endline "folded!";
@@ -139,8 +141,8 @@ let main () =
   print_string  "> ";
 
   (* match read_line () with
-  | exception End_of_file -> ()
-  | game_type -> (init_game game_type) *)
+     | exception End_of_file -> ()
+     | game_type -> (init_game game_type) *)
 
   init_game (string_of_int 1)
 
