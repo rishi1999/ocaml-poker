@@ -222,3 +222,10 @@ let call st =
     else
       Legal called
   else Illegal
+
+type fold_result= 
+  |Legal of t
+  |Illegal
+
+let fold st =
+  if List.mem "fold" st.avail_action then
