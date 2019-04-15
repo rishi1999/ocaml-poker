@@ -20,3 +20,9 @@ val avail_action : t -> string list
 val is_new_round : t -> bool
 
 val init_state : int -> int -> int -> int -> t
+
+type check_result =
+  | Legal of t
+  | Illegal
+
+val check : t -> check_result

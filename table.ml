@@ -5,9 +5,14 @@ open Player
 type table = {
   dealer: int;
   blind: int;
-  participants: seats;
+  participants: Player.player list;
   hole_cards: (Deck.suit * Deck.rank) list;
 }
+
+let dealer tb = tb.dealer
+let blind tb = tb.blind
+let participants tb = tb.participants
+let hole_cards tb = tb.hole_cards
 
 let next_round_players (tab:table) = match tab with
   |
@@ -42,7 +47,6 @@ let deal (table : table) : table =
   Deck.shuffle_deck;
   let deal_helper (player:player) = match player with
     | {
-      Player.action;
       id;
       cards = c;
       money;

@@ -9,6 +9,14 @@ type table = {
   hole_cards: (Deck.suit * Deck.rank) list;
 }
 
+val dealer : table -> int
+
+val blind : table -> int
+
+val participants : table -> Seats.seats
+
+val hole_cards : table -> (Deck.suit * Deck.rank) list
+
 val next_round_players: table -> table
 
 val deal: table -> table

@@ -20,17 +20,21 @@ let print_card_list card_list =
   print_helper "" card_list
 
 let print_current_state st =
-  print_endline "Game Type : ";
+  (* print_endline "Game Type : ";
   print_int (State.game_type st);
   print_endline "\nNumber of Players : ";
-  print_int (State.num_players st);
+  print_int (State.num_players st); *)
+  print_endline "\nThe board is : ";
+  print_int_list (List.map Deck.int_converter (Table.hole_cards (State.table st)));
   print_endline "\nPlayers in : ";
   print_int_list (State.players_in st);
   print_endline "Turn : ";
   print_int (State.player_turn st);
+  print_endline "\nYour hand is : ";
+  print_int_list (List.map Deck.int_converter (Player.cards (List.nth 
+  (Table.participants (State.table st)) (State.player_turn st - 1))));
   print_endline "\nAvailable actions : ";
   print_string_list (State.avail_action st);
-  print_endline "\n\n\n";
   st
 
 let play_game st = 
@@ -58,7 +62,14 @@ let play_game st =
 
         | Check -> 
           print_endline "checked!";
-          keep_playing st
+          (
+            match State.check st with
+          | Legal changed ->
+            keep_playing changed
+          | Illegal ->
+            print_endline "You can't check right now!";
+            keep_playing st
+            )
 
         | Fold -> 
           print_endline "folded!";
@@ -104,9 +115,11 @@ let init_multiplayer f =
 
 let init_ai f =
   print_endline "starting stack?";
-  let money = int_of_string (read_line ()) in
+  (* let money = int_of_string (read_line ()) in *)
+  let money = 500 in
   print_endline "blinds?";
-  let blind = int_of_string (read_line ()) in
+  (* let blind = int_of_string (read_line ()) in *)
+  let blind = 5 in
   let st = State.init_state 1 2 money blind in
 
   play_game st
@@ -125,27 +138,11 @@ let main () =
   print_endline "Do you want to play a multiplayer game(0) or against an AI?(1)";
   print_string  "> ";
 
-  match read_line () with
+  (* match read_line () with
   | exception End_of_file -> ()
-  | game_type -> (init_game game_type)
+  | game_type -> (init_game game_type) *)
 
-(* match get_and_read_input [0; 1] with
-   | exception Wrong_Input -> 
-   print_endline "Wrong Input! Try again.";
-   get_and_read_input [0; 1]
-   | x -> let game_type = x in
-
-   if game_type = 1 then
-    let num_players = 2 in
-   else
-    print_endline "How Many Players?";
-    match get_and_read_input [0; 1; 2; 3; 4; 5] with
-    | exception Wrong_Input ->
-      print_endline "Wrong Input! Try again.";
-      get_and_read_input [0; 1; 2; 3; 4; 5]
-    | x -> let num_players = x in
-      play_game game_type num_players *)
-
+  init_game (string_of_int 1)
 
 (* Execute the game engine. *)
 let () = main ()

@@ -28,7 +28,6 @@ let init_players num_players money =
     | id -> let curr_player =
               {
                 id;
-                action = None;
                 cards = [];
                 money;
               } in
@@ -36,7 +35,7 @@ let init_players num_players money =
   init_players' [] money num_players
 
 let init_table num_players money blind =
-  {
+  Table.deal {
     dealer = 0;
     blind;
     participants = init_players num_players money;
@@ -63,7 +62,7 @@ let init_state game_type num_players money blind =
     num_players;
     table = init_table num_players money blind;
     player_turn = 1;
-    button = 1;
+    button = num_players;
     players_in = init_players_in num_players;
     (* who bet? *)
     bet = init_bet;
@@ -103,6 +102,12 @@ let go_next_round st =
       table = card_added;
     }
 
+let get_next_player st = 
+  let rec helper = function
+  | x -> let guess = if x + 1 > st.num_players then 1 else x + 1 in
+    if List.mem guess st.players_in then guess else helper (guess) in
+  helper st.player_turn
+
 (* check if everyone called the bet *)
 let are_all_bets_equal st = List.for_all
     (fun paid -> paid = st.bet.bet_amount) st.bet.bet_paid_amt
@@ -116,11 +121,20 @@ type check_result =
 
 (* TODO not done *)
 let check st =
-  if is_round_complete st then
-    Legal (go_next_round st)
-  else
-    Legal
+  if List.mem "check" st.avail_action then
+    if is_round_complete st then
+      let next_round = go_next_round st in
+      Legal
+      {
+        next_round with
+        player_turn = get_next_player st
+      }
+    else
+      Legal
       {
         st with
-        player_turn = st.player_turn + 1
+        player_turn = get_next_player st
       }
+    
+  else
+    Illegal
