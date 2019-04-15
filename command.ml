@@ -39,6 +39,7 @@ let parse str =
     if (List.mem head standalone_commands) && tail <> [] then raise Malformed
     else if (List.mem head phrase_commands) && tail = [] then raise Malformed
     else if head = "check" then Check
+    else if head = "stack" then Stack
     else if head = "fold" then Fold
     else if head = "call" then Call
     else if head = "bet" then Bet (tail |> List.hd |> int_of_string)

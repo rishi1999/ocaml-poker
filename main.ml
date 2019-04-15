@@ -54,7 +54,7 @@ let print_current_state st =
   print_string_list (State.avail_action st);
   print_endline "------------------------------------"
 
-let play_game st = 
+let play_game st =
   match State.game_type st with
   | 0 -> print_endline "starting multiplayer game";
     print_int_list (State.players_in st);
@@ -63,8 +63,8 @@ let play_game st =
   | 1 ->  print_endline "starting AI GAME";
 
     let rec keep_playing st =
-      print_string  "> ";
       print_current_state st;
+      print_string  "> ";
 
       match read_line () with
       | curr_cmd ->
@@ -112,7 +112,7 @@ let play_game st =
 
         | Bet bet_amount ->
           let bet_amt = bet_amount in
-          print_endline "bet: $";
+          print_string "bet: $";
           print_int bet_amt;
           keep_playing st
 
@@ -120,10 +120,12 @@ let play_game st =
           let bet_amt = bet_amount in
           print_endline "raise: $";
           print_int bet_amt;
+          print_endline "";
           keep_playing st
 
         | Stack ->
           print_endline "look at stack!";
+          State.stack st;
           keep_playing st
 
         | Quit -> exit 0 in
