@@ -191,7 +191,8 @@ let is_round_complete st =
       else false
     else bets_helper t in
     
-  st.is_new_round && bets_helper st.bet.bet_paid_amt
+  (st.is_new_round && bets_helper st.bet.bet_paid_amt) ||
+  List.length st.players_in = 0 
 
 type check_result =
   | Legal of t
@@ -243,9 +244,14 @@ let fold st =
   | [] -> outlst
   | h::t -> if h = target then remove outlst target t
     else remove (h::outlst) target t in
-  Legal
+  let folded =
   {
     st with
     players_in = remove [] st.player_turn st.players_in;
     player_turn = get_next_player st;
-  }
+  } in
+
+  if is_round_complete folded then
+  Legal (go_next_round folded)
+  else
+  Legal folded
