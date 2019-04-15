@@ -3,6 +3,7 @@ open Table
 open Player
 open Hand_evaluator
 open Deck
+open State
 
 (**Deck Tests*)
 let make_new_deck =
@@ -35,6 +36,14 @@ let james_cards= match table1_players with
 
 let empty: (Deck.suit * Deck.rank) list = []
 
+
+let state_tests =
+
+  [
+    "hand_order_test1" >:: (fun _ -> 
+        assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
+
+  ]
 
 let table_tests =
   [

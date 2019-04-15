@@ -102,6 +102,19 @@ let go_next_round st =
       st with
       table = card_added;
     }
+(** [hand_order num_players button] returns an integer lists
+    containing integers from (button + 1) to num_players and then from 1
+    to button.
+    Requires: button >= 1 and num_players >=1
+    Requires: button <= num_players
+    Example:  [hand_order 5 3] is [4; 5; 1; 2; 3] *)
+let hand_order num_players button =
+  let rec list_builder start term outlist = 
+    if start > term then outlist
+    else list_builder start (term - 1) (term :: outlist) in
+  let second = list_builder 1 button [] in
+  let first = list_builder (button + 1) num_players [] in
+  first @ second
 
 (* check if everyone called the bet *)
 let are_all_bets_equal st = List.for_all
