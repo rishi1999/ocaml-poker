@@ -28,7 +28,6 @@ let init_players num_players money =
     | id -> let curr_player =
               {
                 id;
-                action = None;
                 cards = [];
                 money;
               } in
@@ -94,7 +93,7 @@ let go_next_round st =
     let cleared = Table.clear_round st.table in
     {
       st with
-      table = cleared;
+      table = Table.deal (cleared);
     }
   else
     let card_added = Table.add_to_hole st.table in

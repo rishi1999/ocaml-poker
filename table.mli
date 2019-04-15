@@ -5,9 +5,17 @@ open Player
 type table = {
   dealer: int;
   blind: int;
-  participants: seats;
+  participants: Player.player list;
   hole_cards: (Deck.suit * Deck.rank) list;
 }
+
+val dealer : table -> int
+
+val blind : table -> int
+
+val participants : table -> Seats.seats
+
+val hole_cards : table -> (Deck.suit * Deck.rank) list
 
 val next_round_players: table -> table
 

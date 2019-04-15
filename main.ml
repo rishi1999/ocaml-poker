@@ -104,9 +104,11 @@ let init_multiplayer f =
 
 let init_ai f =
   print_endline "starting stack?";
-  let money = int_of_string (read_line ()) in
+  (* let money = int_of_string (read_line ()) in *)
+  let money = 500 in
   print_endline "blinds?";
-  let blind = int_of_string (read_line ()) in
+  (* let blind = int_of_string (read_line ()) in *)
+  let blind = 5 in
   let st = State.init_state 1 2 money blind in
 
   play_game st
@@ -125,26 +127,10 @@ let main () =
   print_endline "Do you want to play a multiplayer game(0) or against an AI?(1)";
   print_string  "> ";
 
-  match read_line () with
+  (* match read_line () with
   | exception End_of_file -> ()
-  | game_type -> (init_game game_type)
-
-(* match get_and_read_input [0; 1] with
-   | exception Wrong_Input -> 
-   print_endline "Wrong Input! Try again.";
-   get_and_read_input [0; 1]
-   | x -> let game_type = x in
-
-   if game_type = 1 then
-    let num_players = 2 in
-   else
-    print_endline "How Many Players?";
-    match get_and_read_input [0; 1; 2; 3; 4; 5] with
-    | exception Wrong_Input ->
-      print_endline "Wrong Input! Try again.";
-      get_and_read_input [0; 1; 2; 3; 4; 5]
-    | x -> let num_players = x in
-      play_game game_type num_players *)
+  | game_type -> (init_game game_type) *)
+  init_game "1"
 
 
 (* Execute the game engine. *)
