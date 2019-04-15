@@ -47,7 +47,7 @@ let print_current_state st =
   print_int_list (List.map Deck.int_converter (Player.cards 
                                                  (find_participant st (State.player_turn st))));
   print_string "You have: ";
-  print_int (Player.money 
+  print_int (Player.money
                (find_participant st (State.player_turn st)));
   print_bet_situation st;
   print_endline "\nAvailable actions : ";
@@ -77,58 +77,23 @@ let play_game st =
           print_endline "Please enter a command";
           keep_playing st
 
-        | Check ->
-          print_endline "checked!";
-          (
-            match State.check st with
-            | Legal t ->
-              keep_playing t
-            | Illegal ->
-              print_endline "You can't check right now!";
-              keep_playing st
-          )
-
-        | Fold ->
-          print_endline "folded!";
-          (
-            match State.fold st with
-            | Legal t ->
-              keep_playing t
-            | Illegal ->
-              print_endline "You can't fold right now!";
-              keep_playing st
-          )
-
-        | Call ->
-          print_endline "called!";
-          (
-            match State.call st with
-            | Legal changed ->
-              keep_playing changed
-            | Illegal ->
-              print_endline "You can't call right now!";
-              keep_playing st
-          )
-
-        | Bet bet_amount ->
-          let bet_amt = bet_amount in
-          print_string "bet: $";
-          print_int bet_amt;
-          keep_playing st
-
-        | Raise bet_amount  ->
-          let bet_amt = bet_amount in
-          print_endline "raise: $";
-          print_int bet_amt;
-          print_endline "";
-          keep_playing st
-
         | Stack ->
           print_endline "look at stack!";
           State.stack st;
           keep_playing st
 
-        | Quit -> exit 0 in
+        | Quit -> exit 0
+
+        | comm ->
+          print_endline (Command.command_to_string comm);
+          (
+            match State.check st with
+            | Legal t ->
+              keep_playing t
+            | Illegal ->
+              print_endline "You can't do that right now!";
+              keep_playing st
+          ) in
 
     keep_playing st
 
