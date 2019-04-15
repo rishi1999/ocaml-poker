@@ -13,7 +13,7 @@ val dealer : table -> int
 
 val blind : table -> int
 
-val participants : table -> Seats.seats
+val participants : table -> Player.player list
 
 val hole_cards : table -> (Deck.suit * Deck.rank) list
 
