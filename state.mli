@@ -61,10 +61,6 @@ val bet_paid_amt : t -> (int*int) list
 
 val call : t -> move_result
 
-<<<<<<< HEAD
 val fold : t -> move_result
-=======
-val fold : t -> fold_result
 
 val stack : t -> unit list
->>>>>>> 42e8de8e426600f22d112a7f3a425d69777db00b
