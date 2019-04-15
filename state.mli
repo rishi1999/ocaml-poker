@@ -63,4 +63,4 @@ val call : t -> move_result
 
 val fold : t -> move_result
 
-val stack : t -> unit list
+val stack : t -> unit

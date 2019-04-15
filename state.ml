@@ -198,7 +198,6 @@ type move_result =
   | Legal of t
   | Illegal
 
-(* TODO not done *)
 let check st =
   if List.mem "check" st.avail_action then 
     if is_round_complete st then
@@ -216,7 +215,7 @@ let calculate_pay_amt st =
   let exist lst player = List.exists (fun (x, _) -> x = player) lst in
   let rec get_bet_amt target = function
     | [] -> 0
-    | (p, a)::t -> if p = target then a else get_bet_amt target t in 
+    | (p, a)::t -> if p = target then a else get_bet_amt target t in
 
   if exist st.bet.bet_paid_amt st.player_turn then
     Pervasives.abs(cur_bet_size - get_bet_amt st.player_turn st.bet.bet_paid_amt)
@@ -224,7 +223,7 @@ let calculate_pay_amt st =
     cur_bet_size
 
 let call st =
-  if List.mem "call" st.avail_action then 
+  if List.mem "call" st.avail_action then
     let called = money_to_pot st (calculate_pay_amt st) in
     if is_round_complete called then
       Legal (go_next_round called)
@@ -263,4 +262,4 @@ let stack st =
     print_int (find_stack player st.table.participants);
     print_endline ". "; in
 
-  List.map print_stack players
+  List.iter print_stack players

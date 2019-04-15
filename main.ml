@@ -15,7 +15,7 @@ let print_bet_situation st =
   let lst = State.bet_paid_amt st in
   let rec helper = function
     | [] -> ()
-    | (a,b)::t -> 
+    | (a,b)::t ->
       print_string "Player";
       print_int a;
       print_string " has currently paid: ";
@@ -24,7 +24,7 @@ let print_bet_situation st =
       helper t in
   helper lst
 
-let find_participant st target = 
+let find_participant st target =
   let rec helper target = function
     | [h] -> h
     | h :: t -> if (Player.id h) = target then h else helper target t in
@@ -44,7 +44,7 @@ let print_current_state st =
   print_string "\nTurn : ";
   print_int (State.player_turn st);
   print_endline "\nYour hand is : ";
-  print_int_list (List.map Deck.int_converter (Player.cards 
+  print_int_list (List.map Deck.int_converter (Player.cards
                                                  (find_participant st (State.player_turn st))));
   print_string "You have: ";
   print_int (Player.money
@@ -64,7 +64,7 @@ let play_game st =
 
     let rec keep_playing st =
       print_current_state st;
-      print_string  "> ";
+      print_string "> ";
 
       match read_line () with
       | curr_cmd ->
