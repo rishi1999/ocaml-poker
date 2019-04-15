@@ -255,3 +255,19 @@ let fold st =
   Legal (go_next_round folded)
   else
   Legal folded
+
+let stack st =
+  let players = List.sort compare st.players_in in
+
+  let rec find_stack player = function
+  | [] -> 0
+  | h::t -> if h.id = player then h.money else find_stack player t in
+
+  let print_stack player = 
+  print_string "Player ";
+  print_int player;
+  print_string " has $";
+  print_int (find_stack player st.table.participants);
+  print_endline ". "; in
+
+  List.map print_stack players

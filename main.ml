@@ -123,6 +123,7 @@ let play_game st =
 
         | Stack -> 
           print_endline "look at stack!";
+          State.stack st;
           keep_playing st
 
         | Quit -> exit 0 in

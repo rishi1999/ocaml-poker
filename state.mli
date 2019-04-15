@@ -69,3 +69,5 @@ type fold_result =
   | Legal of t
 
 val fold : t -> fold_result
+
+val stack : t -> unit list
