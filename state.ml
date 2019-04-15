@@ -234,3 +234,18 @@ let call st =
     else
       Legal called
   else Illegal
+
+type fold_result = 
+  | Legal of t
+
+let fold st = 
+  let rec remove outlst target = function
+  | [] -> outlst
+  | h::t -> if h = target then remove outlst target t
+    else remove (h::outlst) target t in
+  Legal
+  {
+    st with
+    players_in = remove [] st.player_turn st.players_in;
+    player_turn = get_next_player st;
+  }

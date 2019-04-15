@@ -91,7 +91,10 @@ let play_game st =
 
         | Fold -> 
           print_endline "folded!";
-          keep_playing st
+          (
+          match State.fold st with
+          | Legal t -> keep_playing t
+          )
 
         | Call ->
           print_endline "called!";

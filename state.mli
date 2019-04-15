@@ -64,3 +64,8 @@ type call_result =
   | Illegal
 
 val call : t -> call_result
+
+type fold_result =
+  | Legal of t
+
+val fold : t -> fold_result
