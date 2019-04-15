@@ -39,18 +39,20 @@ let print_current_state st =
   print_int_list (List.map Deck.int_converter (Table.hole_cards (State.table st)));
   print_endline "\nPlayers in : ";
   print_int_list (State.players_in st);
-  print_endline "Turn : ";
+  print_string "Button ";
+  print_int (State.button st);
+  print_string "\nTurn : ";
   print_int (State.player_turn st);
   print_endline "\nYour hand is : ";
   print_int_list (List.map Deck.int_converter (Player.cards 
   (find_participant st (State.player_turn st))));
-  print_endline "\nYou have: ";
+  print_string "You have: ";
   print_int (Player.money 
   (find_participant st (State.player_turn st)));
-  print_endline "";
   print_bet_situation st;
   print_endline "\nAvailable actions : ";
   print_string_list (State.avail_action st);
+  print_endline "------------------------------------";
   st
 
 let play_game st = 
