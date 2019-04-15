@@ -71,21 +71,13 @@ let init_state game_type num_players money blind =
   }
 
 let game_type st = st.game_type
-
 let num_players st = st.num_players
-
 let table st = st.table
-
 let player_turn st = st.player_turn
-
 let button st = st.button
-
 let players_in st = st.players_in
-
 let bet st = st.bet
-
 let avail_action st = st.avail_action
-
 let is_new_round st = st.is_new_round
 
 let go_next_round st =
