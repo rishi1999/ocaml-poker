@@ -183,7 +183,7 @@ Expected: 236
   let rec loop i len =
     if i = len then sum
     else
-      let sum = 
+      let sum =
         int hash_quinary(unsigned char q[], int len, int k)
           {
             int sum = 0;
