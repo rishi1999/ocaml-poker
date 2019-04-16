@@ -24,7 +24,7 @@ let next_round_players (tab:table) = match tab with
     ->
     {
       tab with
-      dealer = dealer + 1
+      dealer = dealer + 1; blind = 1;
     }
   |
     {
@@ -32,7 +32,7 @@ let next_round_players (tab:table) = match tab with
       blind;
       participants;
       hole_cards;
-    } as tab when blind = List.length participants + 1
+    } as tab when dealer = List.length participants + 1
     ->
     {
       tab with
