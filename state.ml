@@ -3,12 +3,29 @@ open Table
 open Player
 open Hand_evaluator
 
+(** [bet] is the bet situation of the current round:
+    [bet_player] : the player that has bet / raised the last
+    [bet_amount] : the current bet amount that the next player has to match
+    [bet_paid_amt] : the current bet situation in form (player, bet_amount) list
+    *)
 type bet = {
   bet_player: int;
   bet_amount: int;
   bet_paid_amt: (int*int) list;
 }
 
+(** [t] is the state of the game described using the following information:
+    [game_type] : an integer representin a game type
+      0 if it is a multiplayer game, 1 if it is against the AI
+    [num_players] : the number of players in the game
+    [table] : type Table.table that represents the table
+    [player_turn] : the player that has the action
+    [button] : the person that goes last in the hand
+    [players_in] : the list of players that are currently playing the hand
+    [bet] : current bet situation in this round
+    [avail_action] : the available actions that the current player can act
+    [is_new_round] : 
+    *)
 type t = {
   game_type: int;
   num_players: int;
@@ -21,21 +38,30 @@ type t = {
   is_new_round: bool;
 }
 
+(** [get_next_player] st returns the number of the player that has 
+    to act next. *)
 let get_next_player st =
   let rec helper = function
     | x -> let guess = if x + 1 > st.num_players then 1 else x + 1 in
       if List.mem guess st.players_in then guess else helper (guess) in
   helper st.player_turn
 
+(** [find_participant] st target returns a type Player.player of a player that
+    has an id of target. *)
 let find_participant st target =
   let rec helper target = function
     | [h] -> h
     | h :: t -> if (Player.id h) = target then h else helper target t in
   helper target (Table.participants (st.table))
 
+(** [list_remove_element] returns a list with all the elements of [list]
+    except for [element].
+    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let exist lst player = List.exists (fun (x, _) -> x = player) lst
 
-
+(** [list_remove_element] returns a list with all the elements of [list]
+    except for [element].
+    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let money_to_pot st amount =
   let og_table = st.table in
   let curr_player = find_participant st st.player_turn in
@@ -82,10 +108,16 @@ let money_to_pot st amount =
     avail_action = ["call"; "raise"; "fold";]
   }
 
+(** [list_remove_element] returns a list with all the elements of [list]
+    except for [element].
+    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let pay_blinds st =
   let small_blind = money_to_pot st (st.table.blind / 2) in
   money_to_pot small_blind st.table.blind
 
+(** [list_remove_element] returns a list with all the elements of [list]
+    except for [element].
+    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let init_players num_players money =
   let rec init_players' acc money = function
     | 0 -> acc
@@ -98,6 +130,9 @@ let init_players num_players money =
       init_players' (curr_player :: acc) money (id - 1) in
   init_players' [] money num_players
 
+(** [list_remove_element] returns a list with all the elements of [list]
+    except for [element].
+    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let init_table num_players money blind =
   Table.deal {
     dealer = 0;
@@ -106,6 +141,9 @@ let init_table num_players money blind =
     hole_cards = [];
   }
 
+(** [list_remove_element] returns a list with all the elements of [list]
+    except for [element].
+    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let init_bet =
   {
     bet_player = 0;
@@ -113,15 +151,18 @@ let init_bet =
     bet_paid_amt = [];
   }
 
-let bet_paid_amt st = st.bet.bet_paid_amt
-
-(* WHAT IS THE POINT OF THIS FUNCTION? -- removed the sort since the elements already seem to be ordered *)
+(** [list_remove_element] returns a list with all the elements of [list]
+    except for [element].
+    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let init_players_in num_players =
   let rec init_players_in' acc = function
     | 0 -> acc
     | t -> init_players_in' (t :: acc) (t - 1) in
-  (*List.sort compare*) (init_players_in' [] num_players)
+  init_players_in' [] num_players
 
+(** [list_remove_element] returns a list with all the elements of [list]
+    except for [element].
+    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let init_state game_type num_players money blind =
   {
     game_type;
@@ -144,6 +185,7 @@ let players_in st = st.players_in
 let bet st = st.bet
 let avail_action st = st.avail_action
 let is_new_round st = st.is_new_round
+let bet_paid_amt st = st.bet.bet_paid_amt
 
 let go_next_round st =
   if List.length st.table.hole_cards = 5 then
@@ -151,12 +193,14 @@ let go_next_round st =
     {
       st with
       table = Table.deal (cleared);
+      bet = init_bet;
     }
   else
     let card_added = Table.add_to_hole st.table in
     {
       st with
       table = card_added;
+      bet = init_bet;
     }
 
 (** [hand_order num_players button] is an integer list
@@ -178,8 +222,33 @@ let hand_order num_players button =
    let are_all_bets_equal st = List.for_all
     (fun (player,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt *)
 
-(* TODO WHAT IS THIS FUNCTION?? *)
-let get_avail_action st = st
+(* need to call get_avail_action before each turn to get the proper actions*)
+let get_avail_action st =
+  let big_blind_player = List.nth st.players_in 2 in
+  (* preflop *)
+  if List.length st.table.hole_cards = 0 then
+    if st.player_turn = big_blind_player && st.bet.bet_amount = st.table.blind then
+      {
+        st with
+        avail_action = ["check"; "bet"; "fold"];
+      }
+    else
+    {
+      st with
+      avail_action = ["call"; "raise"; "fold"];
+    }
+  (* flop *)
+  else
+    if st.bet.bet_amount = 0 then
+      {
+        st with
+        avail_action = ["check"; "bet"; "fold"]
+      }
+    else
+      {
+        st with
+        avail_action = ["call"; "raise"; "fold"]
+      }
 
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
@@ -283,10 +352,25 @@ let command_to_function = Command.(function
   )
 
 
-(**TODO *)
-let winner st =
+let rec get_players_in part players_in ls= match players_in with
+  | a::b -> (List.nth part a) :: ls
+  | [] -> ls
 
-  let part = match st with
+let winner st =
+  let hole = match st with
+    | {
+      game_type;
+      num_players;
+      table = t;
+      player_turn;
+      button;
+      players_in;
+      bet;
+      avail_action;
+      is_new_round;
+    } -> t.hole_cards
+  in
+  let all_part = match st with
     | {
       game_type;
       num_players;
@@ -300,9 +384,23 @@ let winner st =
     } -> t.participants
   in
 
+  let p_in = match st with
+    | {
+      game_type;
+      num_players;
+      table;
+      player_turn;
+      button;
+      players_in = ls;
+      bet;
+      avail_action;
+      is_new_round;
+    } -> ls
+  in
+
   (** ranks returns a list of ranks of the hands of the list players*)
-  let rec ranks (participants:player list) (lst:int list) = match participants with
-    | a::b -> ranks b ((seven_list_eval a.cards)::lst)
+  let rec ranks (participants:player list) (hole_cards:(Deck.suit*Deck.rank) list) (lst:int list) = match participants with
+    | a::b -> ranks b hole_cards ((seven_list_eval (a.cards@hole_cards))::lst)
     | [] -> lst
   in
 
@@ -321,7 +419,9 @@ let winner st =
     | [] -> failwith "not in list"
 
   in
-  let rlist = ranks part []
+  let part = get_players_in all_part p_in []
+  in
+  let rlist = ranks part hole []
   in
   let num_winner = get_player_int (best_rank rlist 0) rlist 0
   in
