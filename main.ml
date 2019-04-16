@@ -36,7 +36,7 @@ let print_player_bets st =
   let lst = State.bet_paid_amt st in
   let rec helper = function
     | [] -> ()
-    | (a,b)::t ->
+    | (a,b) :: t ->
       print_string "Player ";
       print_int a;
       print_string " has currently paid: $";
@@ -72,52 +72,47 @@ let print_current_state st =
   print_endline "------------------------------------"
 
 let play_game st =
-  match State.game_type st with
-  | 0 -> print_endline "Starting multiplayer game...";
-    exit 0
+  (*match State.game_type st with
+    | 0 -> print_endline "Starting multiplayer game..."
+    | 1 -> print_endline "Starting singleplayer game...";*)
+  print_newline ();
+  print_string "The player whose turn it is is shown in ";
+  ANSITerminal.(print_string [green] "green");
+  print_endline ".";
+  print_string "The button is shown in ";
+  ANSITerminal.(print_string [red] "red");
+  print_endline ".";
+  print_newline ();
 
-  | 1 ->  print_endline "Starting singleplayer game...";
+  let rec keep_playing st =
+    print_current_state st;
+    print_string "> ";
 
-    print_newline ();
-    print_string "The player whose turn it is is shown in ";
-    ANSITerminal.(print_string [green] "green");
-    print_endline ".";
-    print_string "The button is shown in ";
-    ANSITerminal.(print_string [red] "red");
-    print_endline ".";
-    print_newline ();
+    match read_line () with
+    | curr_cmd ->
+      match Command.parse curr_cmd with
+      | exception Command.Malformed ->
+        print_endline "Not a valid command.";
+        keep_playing st
 
-    let rec keep_playing st =
-      print_current_state st;
-      print_string "> ";
+      | exception Command.Empty ->
+        print_endline "Please enter a command.";
+        keep_playing st
 
-      match read_line () with
-      | curr_cmd ->
-        match Command.parse curr_cmd with
-        | exception Command.Malformed ->
-          print_endline "Not a valid command.";
+      | Quit -> exit 0
+
+      | comm ->
+        let func = State.command_to_function comm in
+        match func st with
+        | Legal t ->
+          print_endline (Command.command_to_string comm);
+          keep_playing t
+        | Illegal ->
+          print_endline "You can't do that right now!";
           keep_playing st
+  in
 
-        | exception Command.Empty ->
-          print_endline "Please enter a command.";
-          keep_playing st
-
-        | Quit -> exit 0
-
-        | comm ->
-          let func = State.command_to_function comm in
-          match func st with
-          | Legal t ->
-            print_endline (Command.command_to_string comm);
-            keep_playing t
-          | Illegal ->
-            print_endline "You can't do that right now!";
-            keep_playing st
-    in
-
-    keep_playing st
-
-  | _ -> failwith "Wrong gametype"
+  keep_playing st
 
 let init_game num_players =
   print_endline "starting stack?";
