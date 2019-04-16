@@ -66,3 +66,10 @@ val fold : t -> move_result
 val stack : t -> move_result
 
 val command_to_function : Command.command -> (t -> move_result)
+
+(** [winner st] is the player that wins the round
+    Requires that state has a nonempty list of players
+    Requries there are 5 hole cards
+    throws "cannot determine winner" exception if called on 
+    list of empty players or hole cards less than 5*)
+val winner : t -> Player.player
