@@ -36,16 +36,10 @@ let find_participant st target =
   find_participant' target (Table.participants (State.table st))
 
 let print_current_state st =
-  print_endline "Game Type : ";
-  print_int (State.game_type st);
-  print_newline ();
-  print_endline "Number of Players : ";
-  print_int (State.num_players st);
-  print_newline ();
-  print_endline "The board is : ";
-  print_int_list (List.map Deck.int_converter (Table.hole_cards (State.table st)));
-  print_newline ();
-  print_endline "Players in: ";
+  print_string "The board is: ";
+  print_int_list (List.map Deck.int_converter
+                    (Table.hole_cards (State.table st)));
+  print_string "Players in: ";
   print_int_list (State.players_in st);
   print_string "Button: ";
   print_int (State.button st);
@@ -54,8 +48,9 @@ let print_current_state st =
   print_int (State.player_turn st);
   print_newline ();
   print_string "Your hand is: ";
-  print_int_list (List.map Deck.int_converter (Player.cards
-                                                 (find_participant st (State.player_turn st))));
+  print_int_list (List.map Deck.int_converter
+                    (Player.cards (find_participant st
+                                     (State.player_turn st))));
   print_string "You have: ";
   print_int (Player.money
                (find_participant st (State.player_turn st)));
@@ -68,7 +63,6 @@ let print_current_state st =
 let play_game st =
   match State.game_type st with
   | 0 -> print_endline "Starting multiplayer game...";
-    print_int_list (State.players_in st);
     exit 0
 
   | 1 ->  print_endline "Starting singleplayer game...";
@@ -112,12 +106,15 @@ let play_game st =
 
 let init_game num_players =
   print_endline "starting stack?";
+  print_string  "> ";
   let money = read_int () in
   print_endline "blinds?";
+  print_string  "> ";
   let blind = read_int () in
   let st = match num_players with
     | 1 -> State.init_state 1 2 money blind
     | _ -> State.init_state 0 num_players money blind in
+  print_newline ();
   play_game st
 
 (** [main ()] prompts the user for the number of players,
@@ -126,6 +123,7 @@ let main (() : unit) : unit =
   print_newline ();
   print_newline ();
   ANSITerminal.(print_string [red] "Welcome to OCaml Poker.");
+  print_newline ();
   print_newline ();
   print_endline "How many players are there?";
   print_string  "> ";
