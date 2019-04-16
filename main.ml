@@ -85,12 +85,10 @@ let play_game st =
         | Quit -> exit 0
 
         | comm ->
-          print_endline (Command.command_to_string comm);
-
           let func = State.command_to_function comm in
-
           match func st with
           | Legal t ->
+            print_endline (Command.command_to_string comm);
             keep_playing t
           | Illegal ->
             print_endline "You can't do that right now!";
