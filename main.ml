@@ -15,12 +15,29 @@ let print_list func = function
 let print_string_list = print_list print_string
 let print_int_list = print_list print_int
 
+let print_players_in st =
+  let lst = (State.players_in st) in
+  ANSITerminal.(
+    List.iter
+      (fun x ->
+         print_string
+           (
+             if x = (State.player_turn st) then [green]
+             else if x = (State.button st) then [red]
+             else [white]
+           )
+           (string_of_int x);
+         print_string [white] " "
+      ) lst;
+    print_newline ()
+  )
+
 let print_player_bets st =
   let lst = State.bet_paid_amt st in
   let rec helper = function
     | [] -> ()
     | (a,b)::t ->
-      print_string "Player";
+      print_string "Player ";
       print_int a;
       print_string " has currently paid: $";
       print_int b;
@@ -40,15 +57,7 @@ let print_current_state st =
   print_int_list (List.map Deck.int_converter
                     (Table.hole_cards (State.table st)));
   print_string "Players in: ";
-  print_int_list (State.players_in st);
-  print_string "The button is ";
-  print_int (State.button st);
-  print_string ".";
-  print_newline ();
-  print_string "It's player ";
-  print_int (State.player_turn st);
-  print_string "'s turn.";
-  print_newline ();
+  print_players_in st;
   print_string "Your hand is: ";
   print_int_list (List.map Deck.int_converter
                     (Player.cards (find_participant st
@@ -68,6 +77,15 @@ let play_game st =
     exit 0
 
   | 1 ->  print_endline "Starting singleplayer game...";
+
+    print_newline ();
+    print_string "The player whose turn it is is shown in ";
+    ANSITerminal.(print_string [green] "green");
+    print_endline ".";
+    print_string "The button is shown in ";
+    ANSITerminal.(print_string [red] "red");
+    print_endline ".";
+    print_newline ();
 
     let rec keep_playing st =
       print_current_state st;
@@ -119,7 +137,7 @@ let init_game num_players =
 let main (() : unit) : unit =
   print_newline ();
   print_newline ();
-  ANSITerminal.(print_string [red] "Welcome to OCaml Poker.");
+  ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
   print_newline ();
   print_newline ();
   print_endline "How many (human) players are there?";
