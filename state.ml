@@ -186,8 +186,8 @@ let get_avail_action st = st
 let is_round_complete st =
   let rec bets_helper = function
     | [] -> true
-    | (player, amt)::t ->
-      if List.mem player st.players_in then
+    | (p, amt)::t ->
+      if List.mem p st.players_in then
         if amt = st.bet.bet_amount then bets_helper t
         else false
       else bets_helper t in
@@ -263,15 +263,23 @@ let stack st =
     Legal st
   else Illegal
 
-let bet st = Illegal
+let do_the_money amt st comm_str =
+  if List.mem comm_str st.avail_action then
+    let t = money_to_pot st amt in
+    let minimum_amount = 234 in (* TODO WHAT IS THE MINIMUM BET AMOUNT *)
+    if amt > minimum_amount then
+      Legal t
+    else Illegal
+  else Illegal
 
-let raise st = Illegal
+let bet' amt st = do_the_money amt st "bet"
+let raise' amt st = do_the_money amt st "raise"
 
 let command_to_function = Command.(function
     | Check -> check
-    | Bet _ -> bet
+    | Bet amt -> bet' amt
     | Call -> call
-    | Raise _ -> raise
+    | Raise amt -> raise' amt
     | Fold -> fold
     | Stack -> stack
     | _ -> failwith "UNSUPPORTED COMMAND"
