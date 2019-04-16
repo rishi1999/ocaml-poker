@@ -5,15 +5,15 @@ let rec get_and_read_input expected_output =
   if List.mem (input) expected_output then input
   else raise Wrong_Input
 
-let print_string_list string_list =
-  List.iter print_endline string_list
-
-let print_int_list = function
+let print_list func = function
   | h :: t ->
-    print_int h;
-    List.iter (fun x -> print_string ", "; print_int x) t;
+    func h;
+    List.iter (fun x -> print_string ", "; func x) t;
     print_newline ()
   | _ -> print_endline "none"
+
+let print_string_list = print_list print_string
+let print_int_list = print_list print_int
 
 let print_bet_situation st =
   let lst = State.bet_paid_amt st in
@@ -56,7 +56,7 @@ let print_current_state st =
                (find_participant st (State.player_turn st)));
   print_bet_situation st;
   print_newline ();
-  print_endline "Available actions : ";
+  print_string "Available actions: ";
   print_string_list (State.avail_action st);
   print_endline "------------------------------------"
 
