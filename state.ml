@@ -14,21 +14,19 @@ type t = {
   table: Table.table;
   player_turn: int;
   button : int;
-  (* players playing *)
   players_in: int list;
-  (* who bet? *)
   bet: bet;
   avail_action: string list;
   is_new_round : bool;
 }
 
-let get_next_player st = 
+let get_next_player st =
   let rec helper = function
     | x -> let guess = if x + 1 > st.num_players then 1 else x + 1 in
       if List.mem guess st.players_in then guess else helper (guess) in
   helper st.player_turn
 
-let find_participant st target = 
+let find_participant st target =
   let rec helper target = function
     | [h] -> h
     | h :: t -> if (Player.id h) = target then h else helper target t in
@@ -37,7 +35,7 @@ let find_participant st target =
 let exist lst player = List.exists (fun (x, _) -> x = player) lst
 
 
-let money_to_pot st amount = 
+let money_to_pot st amount =
   let og_table = st.table in
   let curr_player = find_participant st st.player_turn in
   let updated_player =
@@ -63,7 +61,8 @@ let money_to_pot st amount =
 
   let rec bet_paid_helper outlst target bet = function
     | [] -> outlst
-    | (player, amount)::t -> if player = target then bet_paid_helper ((player, amount + bet)::outlst) target bet t
+    | (player, amount)::t -> if player = target then bet_paid_helper
+          ((player, amount + bet)::outlst) target bet t
       else bet_paid_helper ((player, amount)::outlst) target bet t in
 
   let changed_bet =
@@ -131,7 +130,6 @@ let init_state game_type num_players money blind =
     player_turn = 1;
     button = 1;
     players_in = init_players_in num_players;
-    (* who bet? *)
     bet = init_bet;
     avail_action = ["fold"; "bet"; "check"];
     is_new_round = true;
@@ -160,6 +158,7 @@ let go_next_round st =
       st with
       table = card_added;
     }
+
 (** [hand_order num_players button] is an integer list
     containing integers from (button + 1) to num_players and then from 1
     to button.
@@ -179,8 +178,8 @@ let hand_order num_players button =
    let are_all_bets_equal st = List.for_all
     (fun (player,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt *)
 
-let get_avail_action st =
-  st
+(* TODO WHAT IS THIS FUNCTION?? *)
+let get_avail_action st = st
 
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
@@ -233,41 +232,47 @@ let call st =
   else Illegal
 
 let fold st =
-  let remove target lst = List.filter (fun x -> not (x = target)) lst in
-  let t =
-    {
-      st with
-      players_in = remove st.player_turn st.players_in;
-      player_turn = get_next_player st;
-    } in
+  if List.mem "fold" st.avail_action then
+    let remove target lst = List.filter (fun x -> not (x = target)) lst in
+    let t =
+      {
+        st with
+        players_in = remove st.player_turn st.players_in;
+        player_turn = get_next_player st;
+      } in
 
-  if is_round_complete t then
-    Legal (go_next_round t)
-  else
-    Legal t
+    if is_round_complete t then
+      Legal (go_next_round t)
+    else
+      Legal t
+  else Illegal
 
 let stack st =
-  let players = List.sort compare st.players_in in
+  if List.mem "stack" st.avail_action then
+    let players = List.sort compare st.players_in in
+    let rec find_stack player = function
+      | [] -> 0
+      | h::t -> if h.id = player then h.money else find_stack player t in
+    let print_stack player =
+      print_string "Player ";
+      print_int player;
+      print_string " has $";
+      print_int (find_stack player st.table.participants);
+      print_endline ". "; in
+    List.iter print_stack players;
+    Legal st
+  else Illegal
 
-  let rec find_stack player = function
-    | [] -> 0
-    | h::t -> if h.id = player then h.money else find_stack player t in
+let bet st = Illegal
 
-  let print_stack player =
-    print_string "Player ";
-    print_int player;
-    print_string " has $";
-    print_int (find_stack player st.table.participants);
-    print_endline ". "; in
-
-  List.iter print_stack players;
-
-  Legal st
+let raise st = Illegal
 
 let command_to_function = Command.(function
     | Check -> check
+    | Bet _ -> bet
     | Call -> call
+    | Raise _ -> raise
     | Fold -> fold
     | Stack -> stack
-    | _ -> failwith "this is bad and confusing."
+    | _ -> failwith "UNSUPPORTED COMMAND"
   )

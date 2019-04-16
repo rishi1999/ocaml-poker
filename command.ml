@@ -15,8 +15,8 @@ let command_to_string = function
   | Check -> "checked!"
   | Fold -> "folded!"
   | Call -> "called!"
-  | Bet amt -> "bet!"
-  | Raise amt -> "raised!"
+  | Bet _ -> "bet!"
+  | Raise _ -> "raised!"
   | Stack -> "looked at stack!"
   | Quit -> "quit!"
 
