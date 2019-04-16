@@ -117,6 +117,7 @@ let rec get_nth : ((Deck.suit * Deck.rank) list * int
   | x::xs, n -> get_nth(xs, n-1)
 (*TODO *)
 let seven_list_eval (hand:(Deck.suit * Deck.rank) list) = 
+  if List.length hand <> 7 then failwith "not 7 cards";
   let a = Deck.int_converter (get_nth (hand,0)) in
   let b = Deck.int_converter (get_nth (hand,1)) in
   let c = Deck.int_converter (get_nth (hand,2)) in

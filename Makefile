@@ -1,4 +1,4 @@
-MODULES= authors deck state player table save_load_engine command main hashone tableflush hand_evaluator constantarrays
+MODULES= authors deck state player table save_load_engine command main hashone tableflush hand_evaluator constantarrays hand_evaluator
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)

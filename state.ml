@@ -290,9 +290,9 @@ let command_to_function = Command.(function
 
 
 (**TODO *)
-let winner st = 
+(* let winner st = 
 
-  let get_table:player list = match st with
+   let get_table:player list = match st with
     | {
       game_type;
       num_players;
@@ -304,7 +304,6 @@ let winner st =
       avail_action;
       is_new_round;
     } -> t.participants
-  in
-  let ranks (participants:player list) (lst:int list) = match participants with
-    | a::b -> a
-  in failwith "unimplemented"
+   in
+   let ranks (participants:player list) (lst:int list) = match participants with
+    | a::b -> seven_list_eval a.cards *)
