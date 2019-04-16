@@ -186,20 +186,20 @@ let is_round_complete st =
   let rec bets_helper = function
     | [] -> true
     | (player, amt)::t ->
-      if List.mem player st.players_in then 
+      if List.mem player st.players_in then
         if amt = st.bet.bet_amount then bets_helper t
         else false
       else bets_helper t in
 
   (st.is_new_round && bets_helper st.bet.bet_paid_amt) ||
-  List.length st.players_in = 0 
+  List.length st.players_in = 0
 
 type move_result =
   | Legal of t
   | Illegal
 
 let check st =
-  if List.mem "check" st.avail_action then 
+  if List.mem "check" st.avail_action then
     if is_round_complete st then
       Legal (go_next_round st)
     else
@@ -210,7 +210,7 @@ let check st =
         }
   else Illegal
 
-let calculate_pay_amt st = 
+let calculate_pay_amt st =
   let cur_bet_size = st.bet.bet_amount in
   let exist lst player = List.exists (fun (x, _) -> x = player) lst in
   let rec get_bet_amt target = function
@@ -262,4 +262,14 @@ let stack st =
     print_int (find_stack player st.table.participants);
     print_endline ". "; in
 
-  List.iter print_stack players
+  List.iter print_stack players;
+
+  Legal st
+
+let command_to_function = Command.(function
+    | Check -> check
+    | Call -> call
+    | Fold -> fold
+    | Stack -> stack
+    | _ -> failwith "this is bad and confusing."
+  )

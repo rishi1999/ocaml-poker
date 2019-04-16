@@ -79,26 +79,23 @@ let play_game st =
           keep_playing st
 
         | exception Command.Empty ->
-          print_endline "Please enter a command";
-          keep_playing st
-
-        | Stack ->
-          print_endline "look at stack!";
-          State.stack st;
+          print_endline "Please enter a command.";
           keep_playing st
 
         | Quit -> exit 0
 
         | comm ->
           print_endline (Command.command_to_string comm);
-          (
-            match State.check st with
-            | Legal t ->
-              keep_playing t
-            | Illegal ->
-              print_endline "You can't do that right now!";
-              keep_playing st
-          ) in
+
+          let func = State.command_to_function comm in
+
+          match func st with
+          | Legal t ->
+            keep_playing t
+          | Illegal ->
+            print_endline "You can't do that right now!";
+            keep_playing st
+    in
 
     keep_playing st
 

@@ -51,16 +51,18 @@ val init_state : int -> int -> int -> int -> t
 
 val hand_order : int -> int -> int list
 
+val bet_paid_amt : t -> (int*int) list
+
 type move_result =
   | Legal of t
   | Illegal
 
 val check : t -> move_result
 
-val bet_paid_amt : t -> (int*int) list
-
 val call : t -> move_result
 
 val fold : t -> move_result
 
-val stack : t -> unit
+val stack : t -> move_result
+
+val command_to_function : Command.command -> (t -> move_result)
