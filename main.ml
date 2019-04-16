@@ -39,23 +39,27 @@ let print_current_state st =
      print_int (State.game_type st);
      print_endline "\nNumber of Players : ";
      print_int (State.num_players st); *)
-  print_endline "\nThe board is : ";
+  print_newline ();
+  print_endline "The board is : ";
   print_int_list (List.map Deck.int_converter (Table.hole_cards (State.table st)));
-  print_endline "\nPlayers in: ";
+  print_newline ();
+  print_endline "Players in: ";
   print_int_list (State.players_in st);
   print_string "Button: ";
   print_int (State.button st);
   print_newline ();
   print_string "Turn: ";
   print_int (State.player_turn st);
-  print_string "\nYour hand is: ";
+  print_newline ();
+  print_string "Your hand is: ";
   print_int_list (List.map Deck.int_converter (Player.cards
                                                  (find_participant st (State.player_turn st))));
   print_string "You have: ";
   print_int (Player.money
                (find_participant st (State.player_turn st)));
   print_bet_situation st;
-  print_endline "\nAvailable actions : ";
+  print_newline ();
+  print_endline "Available actions : ";
   print_string_list (State.avail_action st);
   print_endline "------------------------------------"
 
@@ -137,8 +141,11 @@ let init_game game_type =
 
 (** [main ()] prompts the user for the game to play, then starts it. *)
 let main (() : unit) : unit =
+  print_newline ();
+  print_newline ();
   ANSITerminal.(print_string [red]
-                  "\n\nWelcome to the Poker Game.\n");
+                  "Welcome to the Poker Game.");
+  print_newline ();
   print_endline "Do you want to play a multiplayer game(0) or against an AI?(1)";
   print_string  "> ";
 
