@@ -1,6 +1,6 @@
 exception Wrong_Input
 
-let rec get_and_read_input expected_output = 
+let rec get_and_read_input expected_output =
   let input = int_of_string (read_line()) in
   if List.mem (input) expected_output then input
   else raise Wrong_Input
@@ -8,10 +8,14 @@ let rec get_and_read_input expected_output =
 let print_string_list string_list =
   List.iter print_endline string_list
 
-let print_int_list int_list =
-  int_list |> List.map string_of_int |> List.iter print_endline
+let print_int_list = function
+  | h :: t ->
+    print_int h;
+    List.iter (fun x -> print_string ", "; print_int x) t;
+    print_newline ()
+  | _ -> print_endline "none"
 
-let print_bet_situation st = 
+let print_bet_situation st =
   let lst = State.bet_paid_amt st in
   let rec helper = function
     | [] -> ()
@@ -25,10 +29,10 @@ let print_bet_situation st =
   helper lst
 
 let find_participant st target =
-  let rec helper target = function
+  let rec find_participant' target = function
     | [h] -> h
-    | h :: t -> if (Player.id h) = target then h else helper target t in
-  helper target (Table.participants (State.table st))
+    | h :: t -> if (Player.id h) = target then h else find_participant' target t in
+  find_participant' target (Table.participants (State.table st))
 
 let print_current_state st =
   (* print_endline "Game Type : ";
@@ -37,13 +41,14 @@ let print_current_state st =
      print_int (State.num_players st); *)
   print_endline "\nThe board is : ";
   print_int_list (List.map Deck.int_converter (Table.hole_cards (State.table st)));
-  print_endline "\nPlayers in : ";
+  print_endline "\nPlayers in: ";
   print_int_list (State.players_in st);
-  print_string "Button ";
+  print_string "Button: ";
   print_int (State.button st);
-  print_string "\nTurn : ";
+  print_newline ();
+  print_string "Turn: ";
   print_int (State.player_turn st);
-  print_endline "\nYour hand is : ";
+  print_string "\nYour hand is: ";
   print_int_list (List.map Deck.int_converter (Player.cards
                                                  (find_participant st (State.player_turn st))));
   print_string "You have: ";
@@ -131,7 +136,7 @@ let init_game game_type =
     exit 0
 
 (** [main ()] prompts the user for the game to play, then starts it. *)
-let main () =
+let main (() : unit) : unit =
   ANSITerminal.(print_string [red]
                   "\n\nWelcome to the Poker Game.\n");
   print_endline "Do you want to play a multiplayer game(0) or against an AI?(1)";
