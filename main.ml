@@ -15,7 +15,7 @@ let print_list func = function
 let print_string_list = print_list print_string
 let print_int_list = print_list print_int
 
-let print_bet_situation st =
+let print_player_bets st =
   let lst = State.bet_paid_amt st in
   let rec helper = function
     | [] -> ()
@@ -54,10 +54,10 @@ let print_current_state st =
   print_string "You have: ";
   print_int (Player.money
                (find_participant st (State.player_turn st)));
-  print_bet_situation st;
   print_newline ();
+  print_player_bets st;
   print_string "Available actions: ";
-  print_string_list (State.avail_action st);
+  print_string_list ("quit" :: "stack" :: (State.avail_action st));
   print_endline "------------------------------------"
 
 let play_game st =
@@ -122,7 +122,7 @@ let main (() : unit) : unit =
   ANSITerminal.(print_string [red] "Welcome to OCaml Poker.");
   print_newline ();
   print_newline ();
-  print_endline "How many players are there?";
+  print_endline "How many (human) players are there?";
   print_string  "> ";
 
   match read_int () with
