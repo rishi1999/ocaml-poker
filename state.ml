@@ -286,7 +286,7 @@ let command_to_function = Command.(function
 (**TODO *)
 let winner st =
 
-  let get_table:player list = match st with
+  let part = match st with
     | {
       game_type;
       num_players;
@@ -299,6 +299,31 @@ let winner st =
       is_new_round;
     } -> t.participants
   in
-  let ranks (participants:player list) (lst:int list) = match participants with
-    | a::b -> a
-  in failwith "unimplemented"
+
+  (** ranks returns a list of ranks of the hands of the list players*)
+  let rec ranks (participants:player list) (lst:int list) = match participants with
+    | a::b -> ranks b ((seven_list_eval a.cards)::lst)
+    | [] -> lst
+  in
+
+  (** best_rank gets the best rank in the list of hands*)
+  let rec best_rank (ls: int list) (acc: int) = match ls with
+    | [] -> acc
+    | a::b when a<acc -> best_rank b a
+    | a::b when a>acc -> best_rank b acc
+    | _ -> failwith "cannot find best"
+  in
+
+  (** get_player_in gets the integer position of the list of the best player*)
+  let rec get_player_int (target:int) ls acc = match ls with
+    | a::b when a = target -> acc
+    | a::b -> get_player_int target b (acc+1)
+    | [] -> failwith "not in list"
+
+  in
+  let rlist = ranks part []
+  in
+  let num_winner = get_player_int (best_rank rlist 0) rlist 0
+  in
+
+  List.nth part num_winner

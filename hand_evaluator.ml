@@ -109,21 +109,16 @@ let seven_eval a b c d e f g =
     let hash = hash_quinary quinary 13 7 in
     noflush.(hash)
 
-let rec get_nth : ((Deck.suit * Deck.rank) list * int
-                   -> (Deck.suit * Deck.rank))= function
-  | [], _ -> failwith "can't get nth from empty list"
-  | _, n when n < 0 -> failwith "can't get negative element from list"
-  | x::_, 0 -> x
-  | x::xs, n -> get_nth(xs, n-1)
-(*TODO *)
+
 let seven_list_eval (hand:(Deck.suit * Deck.rank) list) = 
-  let a = Deck.int_converter (get_nth (hand,0)) in
-  let b = Deck.int_converter (get_nth (hand,1)) in
-  let c = Deck.int_converter (get_nth (hand,2)) in
-  let d = Deck.int_converter (get_nth (hand,3)) in
-  let e = Deck.int_converter (get_nth (hand,4)) in
-  let f = Deck.int_converter (get_nth (hand,5)) in
-  let g = Deck.int_converter (get_nth (hand,6)) in
+  if List.length hand <> 7 then failwith "not 7 cards";
+  let a = Deck.int_converter (List.nth hand 0) in
+  let b = Deck.int_converter (List.nth hand 1) in
+  let c = Deck.int_converter (List.nth hand 2) in
+  let d = Deck.int_converter (List.nth hand 3) in
+  let e = Deck.int_converter (List.nth hand 4) in
+  let f = Deck.int_converter (List.nth hand 5) in
+  let g = Deck.int_converter (List.nth hand 6) in
   seven_eval a b c d e f g
 
 
