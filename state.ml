@@ -34,6 +34,9 @@ let find_participant st target =
     | h :: t -> if (Player.id h) = target then h else helper target t in
   helper target (Table.participants (st.table))
 
+let exist lst player = List.exists (fun (x, _) -> x = player) lst
+
+
 let money_to_pot st amount = 
   let og_table = st.table in
   let curr_player = find_participant st st.player_turn in
@@ -57,7 +60,6 @@ let money_to_pot st amount =
       participants = changed_participants;
     } in
 
-  let exist lst player = List.exists (fun (x, _) -> x = player) lst in
 
   let rec bet_paid_helper outlst target bet = function
     | [] -> outlst
@@ -177,12 +179,12 @@ let hand_order num_players button =
    let are_all_bets_equal st = List.for_all
     (fun (player,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt *)
 
-let get_avail_action st = 
+let get_avail_action st =
   st
 
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
-let is_round_complete st = 
+let is_round_complete st =
   let rec bets_helper = function
     | [] -> true
     | (player, amt)::t ->
@@ -212,7 +214,6 @@ let check st =
 
 let calculate_pay_amt st =
   let cur_bet_size = st.bet.bet_amount in
-  let exist lst player = List.exists (fun (x, _) -> x = player) lst in
   let rec get_bet_amt target = function
     | [] -> 0
     | (p, a)::t -> if p = target then a else get_bet_amt target t in
