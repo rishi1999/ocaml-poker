@@ -266,7 +266,7 @@ let stack st =
 let do_the_money amt st comm_str =
   if List.mem comm_str st.avail_action then
     let t = money_to_pot st amt in
-    let minimum_amount = 234 in (* TODO WHAT IS THE MINIMUM BET AMOUNT *)
+    let minimum_amount = 2 in (* TODO WHAT IS THE MINIMUM BET AMOUNT *)
     (* TODO ALSO WE PROBABLY NEED TO MAKE SURE THAT THEY'RE EXCEEDING
        THE CURRENT BET AMOUNT RIGHT? *)
     if amt >= minimum_amount then
