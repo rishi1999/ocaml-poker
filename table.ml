@@ -1,5 +1,4 @@
 open Deck
-open Seats
 open Player
 
 type table = {
