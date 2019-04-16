@@ -108,6 +108,11 @@ let seven_eval a b c d e f g =
     let hash = hash_quinary quinary 13 7 in
     noflush.(hash)
 
+(*TODO *)
+let seven_list_eval (hand:(Deck.suit * Deck.rank) list) = failwith "unimplemented"
+
+
+
 
 (*
 let a = 7*4+0 in

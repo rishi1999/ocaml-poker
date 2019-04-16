@@ -1,6 +1,7 @@
 open Deck
 open Table
 open Player
+open Hand_evaluator
 
 type bet = {
   bet_player: int;
@@ -286,3 +287,24 @@ let command_to_function = Command.(function
     | Stack -> stack
     | _ -> failwith "UNSUPPORTED COMMAND"
   )
+
+
+(**TODO *)
+let winner st = 
+
+  let get_table:player list = match st with
+    | {
+      game_type;
+      num_players;
+      table = t;
+      player_turn;
+      button;
+      players_in;
+      bet;
+      avail_action;
+      is_new_round;
+    } -> t.participants
+  in
+  let ranks (participants:player list) (lst:int list) = match participants with
+    | a::b -> a
+  in failwith "unimplemented"
