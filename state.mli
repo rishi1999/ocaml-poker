@@ -1,6 +1,20 @@
-type t
-type bet
+type bet = {
+  bet_player: int;
+  bet_amount: int;
+  bet_paid_amt: (int*int) list;
+}
 
+type t = {
+  game_type: int;
+  num_players: int;
+  table: Table.table;
+  player_turn: int;
+  button : int;
+  players_in: int list;
+  bet: bet;
+  avail_action: string list;
+  is_new_round : bool;
+}
 (** [game_type st] is the type of the game being played in [st].
     Requires: valid state [st]. *)
 val game_type : t -> int

@@ -16,8 +16,8 @@ let deck_tests =
     "convert 9C" >:: (fun _ -> 
         assert_equal 28 (int_converter (Clubs, Nine)));
   ]
-let james:player = {id = 0; action = Fold; cards = []; money = 32}
-let bob:player = {id = 1; action = Fold; cards = []; money = 32}
+let james:player = {id = 0; cards = []; money = 32}
+let bob:player = {id = 1; cards = []; money = 32}
 let table1: table = {dealer = 0; blind = 1; participants = [james;bob]; hole_cards= []}
 let table2: table = deal table1
 
@@ -36,12 +36,43 @@ let james_cards= match table1_players with
 
 let empty: (Deck.suit * Deck.rank) list = []
 
+let jimmy:player = {id = 0; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
+let bobby:player = {id = 1; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
 
+let state_table_1 = {dealer = 1; blind = 2; participants = [jimmy;bobby]; 
+                     hole_cards = [(Hearts, Ace);(Diamonds, Ace);(Spades, King); (Hearts, King); (Hearts, Three)]}
+let state_bet_1:bet = {
+  bet_player = 1;
+  bet_amount = 0;
+  bet_paid_amt = [(0,0)];
+}
+
+let state1:State.t = {
+  game_type = 0;
+  num_players = 2;
+  table = state_table_1;
+  player_turn = 0;
+  button = 0;
+  players_in = [0;1];
+  bet = state_bet_1;
+  avail_action = ["fold"];
+  is_new_round = true;
+}
+let state2 = {state1 with players_in = [0]}
+let state3 = {state1 with players_in = [1]}
+(** State Tests*)
 let state_tests =
 
   [
     "hand_order_test1" >:: (fun _ -> 
         assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
+
+    "winner_test_1" >:: (fun _ ->
+        assert_equal jimmy (winner state1));
+    "winner_test_2" >:: (fun _ ->
+        assert_equal jimmy (winner state2));
+    "winner_test_2" >:: (fun _ ->
+        assert_equal bobby (winner state3));
 
   ]
 
@@ -83,5 +114,6 @@ let suite =
     deck_tests;
     table_tests;
     hand_evaluator_tests;
+    state_tests;
   ]
 let _ = run_test_tt_main suite

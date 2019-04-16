@@ -352,10 +352,25 @@ let command_to_function = Command.(function
   )
 
 
-(**TODO *)
-let winner st =
+let rec get_players_in part players_in ls= match players_in with
+  | a::b -> (List.nth part a) :: ls
+  | [] -> ls
 
-  let part = match st with
+let winner st =
+  let hole = match st with
+    | {
+      game_type;
+      num_players;
+      table = t;
+      player_turn;
+      button;
+      players_in;
+      bet;
+      avail_action;
+      is_new_round;
+    } -> t.hole_cards
+  in
+  let all_part = match st with
     | {
       game_type;
       num_players;
@@ -369,9 +384,23 @@ let winner st =
     } -> t.participants
   in
 
+  let p_in = match st with
+    | {
+      game_type;
+      num_players;
+      table;
+      player_turn;
+      button;
+      players_in = ls;
+      bet;
+      avail_action;
+      is_new_round;
+    } -> ls
+  in
+
   (** ranks returns a list of ranks of the hands of the list players*)
-  let rec ranks (participants:player list) (lst:int list) = match participants with
-    | a::b -> ranks b ((seven_list_eval a.cards)::lst)
+  let rec ranks (participants:player list) (hole_cards:(Deck.suit*Deck.rank) list) (lst:int list) = match participants with
+    | a::b -> ranks b hole_cards ((seven_list_eval (a.cards@hole_cards))::lst)
     | [] -> lst
   in
 
@@ -390,7 +419,9 @@ let winner st =
     | [] -> failwith "not in list"
 
   in
-  let rlist = ranks part []
+  let part = get_players_in all_part p_in []
+  in
+  let rlist = ranks part hole []
   in
   let num_winner = get_player_int (best_rank rlist 0) rlist 0
   in
