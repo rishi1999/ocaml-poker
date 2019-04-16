@@ -16,7 +16,7 @@ let hole_cards tb = tb.hole_cards
 let next_round_players (tab:table) = match tab with
   |
     {
-      dealer;
+      dealer = d;
       blind;
       participants;
       hole_cards;
@@ -24,7 +24,7 @@ let next_round_players (tab:table) = match tab with
     ->
     {
       tab with
-      dealer = dealer + 1; blind = 1;
+      dealer = d + 1; blind = 1;
     }
   |
     {
@@ -39,7 +39,18 @@ let next_round_players (tab:table) = match tab with
       dealer = 1;
       blind = 2;
     }
-  | tab -> tab
+  | {
+    dealer = d;
+    blind = b;
+    participants;
+    hole_cards;
+  } as tab
+    ->
+    {
+      tab with
+      dealer = d+1;
+      blind = b+1;
+    }
 
 let deal (table : table) : table =
   Deck.deck_init;
