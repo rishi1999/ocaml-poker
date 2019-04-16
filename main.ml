@@ -57,7 +57,7 @@ let print_current_state st =
   print_bet_situation st;
   print_newline ();
   print_string "Available actions: ";
-  print_string_list (State.avail_action st);
+  print_string_list ("quit" :: "stack" :: (State.avail_action st));
   print_endline "------------------------------------"
 
 let play_game st =

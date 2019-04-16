@@ -131,7 +131,7 @@ let init_state game_type num_players money blind =
     button = 1;
     players_in = init_players_in num_players;
     bet = init_bet;
-    avail_action = ["fold"; "bet"; "check"];
+    avail_action = ["bet"; "check"; "fold"];
     is_new_round = true;
   }
 
