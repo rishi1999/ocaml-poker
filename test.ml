@@ -58,6 +58,8 @@ let state1:State.t = {
   avail_action = ["fold"];
   is_new_round = true;
 }
+let state2 = {state1 with players_in = [0]}
+let state3 = {state1 with players_in = [1]}
 (** State Tests*)
 let state_tests =
 
@@ -66,7 +68,11 @@ let state_tests =
         assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
 
     "winner_test_1" >:: (fun _ ->
-        assert_equal jimmy (winner state1))
+        assert_equal jimmy (winner state1));
+    "winner_test_2" >:: (fun _ ->
+        assert_equal jimmy (winner state2));
+    "winner_test_2" >:: (fun _ ->
+        assert_equal bobby (winner state3));
 
   ]
 
@@ -108,5 +114,6 @@ let suite =
     deck_tests;
     table_tests;
     hand_evaluator_tests;
+    state_tests;
   ]
 let _ = run_test_tt_main suite
