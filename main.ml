@@ -24,21 +24,23 @@ let print_bet_situation st =
       print_int a;
       print_string " has currently paid: ";
       print_int b;
-      print_endline "";
+      print_newline ();
       helper t in
   helper lst
 
 let find_participant st target =
   let rec find_participant' target = function
     | [h] -> h
-    | h :: t -> if (Player.id h) = target then h else find_participant' target t in
+    | h :: t -> if (Player.id h) = target then h
+      else find_participant' target t in
   find_participant' target (Table.participants (State.table st))
 
 let print_current_state st =
-  (* print_endline "Game Type : ";
-     print_int (State.game_type st);
-     print_endline "\nNumber of Players : ";
-     print_int (State.num_players st); *)
+  print_endline "Game Type : ";
+  print_int (State.game_type st);
+  print_newline ();
+  print_endline "Number of Players : ";
+  print_int (State.num_players st);
   print_newline ();
   print_endline "The board is : ";
   print_int_list (List.map Deck.int_converter (Table.hole_cards (State.table st)));
@@ -65,11 +67,11 @@ let print_current_state st =
 
 let play_game st =
   match State.game_type st with
-  | 0 -> print_endline "starting multiplayer game";
+  | 0 -> print_endline "Starting multiplayer game...";
     print_int_list (State.players_in st);
     exit 0
 
-  | 1 ->  print_endline "starting AI GAME";
+  | 1 ->  print_endline "Starting singleplayer game...";
 
     let rec keep_playing st =
       print_current_state st;
@@ -108,52 +110,30 @@ let play_game st =
 
   | _ -> failwith "Wrong gametype"
 
-
-let init_multiplayer f =
-  print_endline "how many players?";
-  let num_players = int_of_string (read_line ()) in
+let init_game num_players =
   print_endline "starting stack?";
-  let money = int_of_string (read_line ()) in
+  let money = read_int () in
   print_endline "blinds?";
-  let blind = int_of_string (read_line ()) in
-  let st = State.init_state 0 num_players money blind in
-
+  let blind = read_int () in
+  let st = match num_players with
+    | 1 -> State.init_state 1 2 money blind
+    | _ -> State.init_state 0 num_players money blind in
   play_game st
 
-
-let init_ai f =
-  print_endline "starting stack?";
-  (* let money = int_of_string (read_line ()) in *)
-  let money = 500 in
-  print_endline "blinds?";
-  (* let blind = int_of_string (read_line ()) in *)
-  let blind = 5 in
-  let st = State.init_state 1 2 money blind in
-
-  play_game st
-
-let init_game game_type =
-  match int_of_string game_type with
-  | 0 -> init_multiplayer 0
-  | 1 -> init_ai 1
-  | x -> print_endline "Wrong gametype!";
-    exit 0
-
-(** [main ()] prompts the user for the game to play, then starts it. *)
+(** [main ()] prompts the user for the number of players,
+    then starts the game. *)
 let main (() : unit) : unit =
   print_newline ();
   print_newline ();
-  ANSITerminal.(print_string [red]
-                  "Welcome to the Poker Game.");
+  ANSITerminal.(print_string [red] "Welcome to OCaml Poker.");
   print_newline ();
-  print_endline "Do you want to play a multiplayer game(0) or against an AI?(1)";
+  print_endline "How many players are there?";
   print_string  "> ";
 
-  (* match read_line () with
-     | exception End_of_file -> ()
-     | game_type -> (init_game game_type) *)
+  match read_int () with
+  | exception End_of_file -> ()
+  | num -> (init_game num)
 
-  init_game (string_of_int 1)
 
 (* Execute the game engine. *)
 let () = main ()
