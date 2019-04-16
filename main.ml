@@ -22,7 +22,7 @@ let print_player_bets st =
     | (a,b)::t ->
       print_string "Player";
       print_int a;
-      print_string " has currently paid: ";
+      print_string " has currently paid: $";
       print_int b;
       print_newline ();
       helper t in
@@ -41,17 +41,19 @@ let print_current_state st =
                     (Table.hole_cards (State.table st)));
   print_string "Players in: ";
   print_int_list (State.players_in st);
-  print_string "Button: ";
+  print_string "The button is ";
   print_int (State.button st);
+  print_string ".";
   print_newline ();
-  print_string "Turn: ";
+  print_string "It's player ";
   print_int (State.player_turn st);
+  print_string "'s turn.";
   print_newline ();
   print_string "Your hand is: ";
   print_int_list (List.map Deck.int_converter
                     (Player.cards (find_participant st
                                      (State.player_turn st))));
-  print_string "You have: ";
+  print_string "You have: $";
   print_int (Player.money
                (find_participant st (State.player_turn st)));
   print_newline ();
@@ -85,12 +87,10 @@ let play_game st =
         | Quit -> exit 0
 
         | comm ->
-          print_endline (Command.command_to_string comm);
-
           let func = State.command_to_function comm in
-
           match func st with
           | Legal t ->
+            print_endline (Command.command_to_string comm);
             keep_playing t
           | Illegal ->
             print_endline "You can't do that right now!";

@@ -14,11 +14,11 @@ type t = {
   num_players: int;
   table: Table.table;
   player_turn: int;
-  button : int;
+  button: int;
   players_in: int list;
   bet: bet;
   avail_action: string list;
-  is_new_round : bool;
+  is_new_round: bool;
 }
 
 let get_next_player st =
@@ -123,7 +123,6 @@ let init_players_in num_players =
   (*List.sort compare*) (init_players_in' [] num_players)
 
 let init_state game_type num_players money blind =
-  (* pay_blinds *)
   {
     game_type;
     num_players;
@@ -134,7 +133,7 @@ let init_state game_type num_players money blind =
     bet = init_bet;
     avail_action = ["bet"; "check"; "fold"];
     is_new_round = true;
-  }
+  } |> pay_blinds
 
 let game_type st = st.game_type
 let num_players st = st.num_players
@@ -264,19 +263,14 @@ let stack st =
     Legal st
   else Illegal
 
-let do_the_money amt st comm_str =
+let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
-    let t = money_to_pot st amt in
-    let minimum_amount = 2 in (* TODO WHAT IS THE MINIMUM BET AMOUNT *)
-    (* TODO ALSO WE PROBABLY NEED TO MAKE SURE THAT THEY'RE EXCEEDING
-       THE CURRENT BET AMOUNT RIGHT? *)
-    if amt >= minimum_amount then
-      Legal t
+    if amt >= st.table.blind then Legal (money_to_pot st amt)
     else Illegal
   else Illegal
 
-let bet' amt st = do_the_money amt st "bet"
-let raise' amt st = do_the_money amt st "raise"
+let bet' amt st = bet_or_raise amt st "bet"
+let raise' amt st = bet_or_raise amt st "raise"
 
 let command_to_function = Command.(function
     | Check -> check
@@ -290,7 +284,7 @@ let command_to_function = Command.(function
 
 
 (**TODO *)
-let winner st = 
+let winner st =
 
   let part = match st with
     | {
