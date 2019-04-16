@@ -30,6 +30,7 @@ let hand_evaluator card_ranks card_suits =
   let boolean = if card_suits.(0) = ((card_suits.(1) lor card_suits.(2) lor card_suits.(3) lor card_suits.(4))) then 1 else 0 in
   newv - boolean * multiplier
 
+
 let dp = Constantarrays.dp
 let suits = Constantarrays.suits
 
