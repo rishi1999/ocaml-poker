@@ -162,6 +162,20 @@ let init_players_in num_players =
     | t -> init_players_in' (t :: acc) (t - 1) in
   init_players_in' [] num_players
 
+(** [hand_order num_players button] is an integer list
+    containing integers from (button + 1) to num_players and then from 1
+    to button.
+    Requires: button >= 1 and num_players >=1
+    Requires: button <= num_players
+    Example:  [hand_order 5 3] is [4; 5; 1; 2; 3] *)
+let hand_order num_players button =
+  let rec list_builder start term outlist =
+    if start > term then outlist
+    else list_builder start (term - 1) (term :: outlist) in
+  let second = list_builder 1 button [] in
+  let first = list_builder (button + 1) num_players [] in
+  first @ second
+
 (** [list_remove_element] returns a list with all the elements of [list]
     except for [element].
     Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
@@ -171,7 +185,7 @@ let init_state game_type num_players money blind =
     num_players;
     table = init_table num_players money blind;
     player_turn = 1;
-    button = 1;
+    button = num_players;
     players_in = init_players_in num_players;
     bet = init_bet;
     avail_action = ["bet"; "check"; "fold"];
@@ -189,11 +203,15 @@ let bet_paid_amt st = st.bet.bet_paid_amt
 
 let go_next_round st =
   if List.length st.table.board = 5 then
+    (* showdown *)
+
+    (* everyone folded *)
     let cleared = Table.clear_round st.table in
     {
       st with
       table = Table.deal (cleared);
       bet = init_bet;
+      player_turn = List.nth st.players_in 0;
     }
   else
     let card_added = Table.add_to_hole st.table in
@@ -201,26 +219,8 @@ let go_next_round st =
       st with
       table = card_added;
       bet = init_bet;
+      player_turn = List.nth st.players_in 0;
     }
-
-(** [hand_order num_players button] is an integer list
-    containing integers from (button + 1) to num_players and then from 1
-    to button.
-    Requires: button >= 1 and num_players >=1
-    Requires: button <= num_players
-    Example:  [hand_order 5 3] is [4; 5; 1; 2; 3] *)
-let hand_order num_players button =
-  let rec list_builder start term outlist =
-    if start > term then outlist
-    else list_builder start (term - 1) (term :: outlist) in
-  let second = list_builder 1 button [] in
-  let first = list_builder (button + 1) num_players [] in
-  first @ second
-
-(* (** [are_all_bets_equal] is true if all bets made
-    in the current round are equal. *)
-   let are_all_bets_equal st = List.for_all
-    (fun (player,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt *)
 
 (* need to call get_avail_action before each turn to get the proper actions*)
 let get_avail_action st =
@@ -250,14 +250,16 @@ let get_avail_action st =
       avail_action = ["call"; "raise"; "fold"]
     }
 
+(* (** [are_all_bets_equal] is true if all bets made
+    in the current round are equal. *)
+   let are_all_bets_equal st = List.for_all
+    (fun (player,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt *)
 let check_all_bet_equal st =
 
   let rec players_all_paid = function
   | [] -> true
   | h :: t -> if exist st.bet.bet_paid_amt h then players_all_paid t
     else false in
-
-  if players_all_paid st.players_in then
 
     let rec bets_helper = function
       | [] -> true
@@ -266,9 +268,8 @@ let check_all_bet_equal st =
           if amt = st.bet.bet_amount then bets_helper t
           else false
         else bets_helper t in
-    bets_helper st.bet.bet_paid_amt
   
-  else false
+  players_all_paid st.players_in && bets_helper st.bet.bet_paid_amt
 
 (* true if hand is complete *)
 let is_hand_complete st = 
@@ -308,17 +309,17 @@ type move_result =
 
 let check st =
   if List.mem "check" st.avail_action then
-    if is_round_complete st then
-      Legal (go_next_round st)
-    else
-      Legal
-        {
+    let checked = {
           st with
           player_turn = get_next_player st;
           bet = {st.bet with 
             new_round = false;
-          };
-        }
+          }} in
+    if is_round_complete checked then
+      Legal (go_next_round checked)
+    else
+      Legal
+        checked
   else Illegal
 
 let call st =
