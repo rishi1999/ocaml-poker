@@ -222,11 +222,11 @@ let is_round_complete st =
   let everyone_checked = (st.bet.bet_amount = 0 && st.bet.new_round = false &&
                           st.player_turn = List.nth st.players_in 0) in
   (* NEEDS WORK *)
-  if List.length st.table.board = 0 then
+  (* if List.length st.table.board = 0 then
     let big_blind = List.nth st.players_in 1 in
     let bb = (st.player_turn = big_blind) in
     check_all_bet_equal st
-  else
+  else *)
     everyone_checked || (check_all_bet_equal st && st.bet.new_round = false
     && st.bet.bet_amount != 0)
 
@@ -353,7 +353,7 @@ let go_next_round st =
 (* need to call get_avail_action before each turn to get the proper actions*)
 let get_avail_action st =
   (* preflop *)
-  if List.length st.table.board = 0 then
+  (* if List.length st.table.board = 0 then
     let big_blind_player = List.nth st.players_in 1 in
     if st.player_turn = big_blind_player && st.bet.bet_amount = st.table.blind then
       {
@@ -366,7 +366,7 @@ let get_avail_action st =
         avail_action = ["call"; "raise"; "fold"];
       }
       (* flop *)
-  else
+  else *)
   if st.bet.bet_amount = 0 then
     {
       st with
@@ -401,7 +401,7 @@ let check st =
           bet = {st.bet with 
             new_round = false;
           }} in
-    if is_round_complete checked then
+    if is_round_complete checked || is_hand_complete checked then
       Legal (go_next_round checked)
     else
       Legal
@@ -411,7 +411,7 @@ let check st =
 let call st =
   if List.mem "call" st.avail_action then
     let t = money_to_pot st (calculate_pay_amt st) in
-    if is_round_complete t then
+    if is_round_complete t || is_hand_complete t then
       Legal (go_next_round t)
     else
       Legal t
@@ -430,7 +430,7 @@ let fold st =
               };
       } in
 
-    if is_round_complete t then
+    if is_round_complete t || is_hand_complete t then
       Legal (go_next_round t)
     else
       Legal t
