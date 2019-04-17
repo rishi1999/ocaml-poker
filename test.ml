@@ -55,14 +55,15 @@ let state1:State.t = {
   table = state_table_1;
   player_turn = 0;
   button = 0;
-  players_in = [1;2];
+  players_in = [1;2;3];
   players_played = [];
   bet = state_bet_1;
   avail_action = ["fold"];
   winner = -1;
 }
-let state2 = {state1 with players_in = [0]}
-let state3 = {state1 with players_in = [1]}
+let state2 = {state1 with players_in = [2]}
+let state3 = {state1 with players_in = [3]}
+let state4 = {state1 with players_in = [2;3]}
 (** State Tests*)
 let state_tests =
 
@@ -72,10 +73,12 @@ let state_tests =
 
     "winner_test_1" >:: (fun _ ->
         assert_equal jimmy (winner state1));
-    (* "winner_test_2" >:: (fun _ ->
-         assert_equal jimmy (winner state2));
-       "winner_test_2" >:: (fun _ ->
-         assert_equal bobby (winner state3));*)
+    "winner_test_2" >:: (fun _ ->
+        assert_equal bobby (winner state2));
+    "winner_test_3" >:: (fun _ ->
+        assert_equal alice (winner state3));
+    "winner_test_4" >:: (fun _ ->
+        assert_equal alice (winner state3));
 
   ]
 
