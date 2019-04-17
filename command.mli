@@ -8,6 +8,7 @@ type command =
   | Raise of bet_amount
   | Stack
   | Quit
+  | Save
 
 exception Empty
 exception Malformed
