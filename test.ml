@@ -36,8 +36,8 @@ let james_cards= match table1_players with
 
 let empty: (Deck.suit * Deck.rank) list = []
 
-let jimmy:player = {id = 0; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
-let bobby:player = {id = 1; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
+let jimmy:player = {id = 1; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
+let bobby:player = {id = 2; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
 
 let state_table_1 = {dealer = 1; blind = 2; participants = [jimmy;bobby]; 
                      hole_cards = [(Hearts, Ace);(Diamonds, Ace);(Spades, King); (Hearts, King); (Hearts, Three)]}
@@ -53,7 +53,7 @@ let state1:State.t = {
   table = state_table_1;
   player_turn = 0;
   button = 0;
-  players_in = [0;1];
+  players_in = [1;2];
   bet = state_bet_1;
   avail_action = ["fold"];
   is_new_round = true;
@@ -69,10 +69,10 @@ let state_tests =
 
     "winner_test_1" >:: (fun _ ->
         assert_equal jimmy (winner state1));
-    "winner_test_2" >:: (fun _ ->
-        assert_equal jimmy (winner state2));
-    "winner_test_2" >:: (fun _ ->
-        assert_equal bobby (winner state3));
+    (* "winner_test_2" >:: (fun _ ->
+         assert_equal jimmy (winner state2));
+       "winner_test_2" >:: (fun _ ->
+         assert_equal bobby (winner state3));*)
 
   ]
 
