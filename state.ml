@@ -33,6 +33,7 @@ type t = {
   player_turn: int;
   button: int;
   players_in: int list;
+  players_played: int list;
   bet: bet;
   avail_action: string list;
 }
@@ -54,37 +55,27 @@ let find_participant st target =
     | h :: t -> if (Player.id h) = target then h else helper target t in
   helper target (Table.participants (st.table))
 
-(** [list_remove_element] returns a list with all the elements of [list]
-    except for [element].
-    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
-let exist lst player = List.exists (fun (x, _) -> x = player) lst
-
-(** [list_remove_element] returns a list with all the elements of [list]
-    except for [element].
-    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let money_to_pot st amount =
-  let og_table = st.table in
-  let curr_player = find_participant st st.player_turn in
-  let updated_player =
+  let player = find_participant st st.player_turn in
+  let player =
     {
-      curr_player with
-      money = curr_player.money - amount;
+      player with
+      money = player.money - amount;
     } in
 
   let rec helper outlst = function
     | [] -> outlst
-    | h::t -> if h.id = st.player_turn then helper (updated_player::outlst) t
+    | h::t -> if h.id = st.player_turn then helper (player::outlst) t
       else helper (h::outlst) t in
 
-  let changed_participants = List.rev(helper [] og_table.participants) in
+  let participants' = List.rev(helper [] st.table.participants) in
 
-  let changed_table =
+  let table =
     {
-      og_table with
-      dealer = og_table.dealer + amount;
-      participants = changed_participants;
+      st.table with
+      dealer = st.table.dealer + amount;
+      participants = participants';
     } in
-
 
   let rec bet_paid_helper outlst target bet = function
     | [] -> outlst
@@ -92,21 +83,23 @@ let money_to_pot st amount =
           ((player, amount + bet)::outlst) target bet t
       else bet_paid_helper ((player, amount)::outlst) target bet t in
 
-  let changed_bet =
+  let bet' =
     {
       bet_player = st.player_turn;
-      bet_amount = if st.bet.bet_amount > amount then st.bet.bet_amount else amount;
-      bet_paid_amt = if not (exist st.bet.bet_paid_amt st.player_turn) then ((st.player_turn, amount)::st.bet.bet_paid_amt)
-        else bet_paid_helper [] st.player_turn amount st.bet.bet_paid_amt;
+      bet_amount = if st.bet.bet_amount > amount then st.bet.bet_amount
+        else amount;
+      bet_paid_amt = bet_paid_helper []
+          st.player_turn amount st.bet.bet_paid_amt;
       new_round = false;
     } in
 
   {
     st with
-    table = changed_table;
+    table;
     player_turn = get_next_player st;
-    bet = changed_bet;
-    avail_action = ["call"; "raise"; "fold";]
+    bet = bet';
+    avail_action = ["call"; "raise"; "fold";];
+    players_played = st.player_turn :: st.players_played;
   }
 
 (** [list_remove_element] returns a list with all the elements of [list]
@@ -184,6 +177,7 @@ let init_state game_type num_players money blind =
     player_turn = 1;
     button = num_players;
     players_in = init_players_in num_players;
+    players_played = [];
     bet = init_bet;
     avail_action = ["bet"; "check"; "fold"];
   } |> pay_blinds
@@ -204,31 +198,14 @@ let bet_paid_amt st = st.bet.bet_paid_amt
 let are_all_bets_equal st = List.for_all
     (fun (_,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt
 
-(* (** [are_all_bets_equal] is true if all bets made
-    in the current round are equal. *)
-   let are_all_bets_equal st = List.for_all
-    (fun (player,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt *)
-let check_all_bet_equal st =
-  let rec players_all_paid = function
-  | [] -> true
-  | h :: t -> if exist st.bet.bet_paid_amt h then players_all_paid t
-    else false in
-  
-  players_all_paid st.players_in && are_all_bets_equal st
+let has_everyone_played st = List.sort compare st.players_in = List.sort compare st.players_played
 
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
 let is_round_complete st =
-  let everyone_checked = (st.bet.bet_amount = 0 && st.bet.new_round = false &&
-                          st.player_turn = List.nth st.players_in 0) in
-  (* NEEDS WORK *)
-  if List.length st.table.board = 0 then
-    let big_blind = List.nth st.players_in 1 in
-    let bb = (st.player_turn = big_blind) in
-    check_all_bet_equal st
-  else
-    everyone_checked || (check_all_bet_equal st && st.bet.new_round = false
-    && st.bet.bet_amount != 0)
+  are_all_bets_equal st &&
+  has_everyone_played st
+
 
 (** [is_hand_complete st] is true if hand is complete. *)
 let is_hand_complete st =
@@ -237,16 +214,16 @@ let is_hand_complete st =
   let everyone_folded = (List.length st.players_in < 2) in
   let after_river = (List.length st.table.board = 5) in
 
-  everyone_folded || (after_river && check_all_bet_equal st
+  everyone_folded || (after_river && are_all_bets_equal st
                       && st.bet.new_round = false)
-                      || (after_river && everyone_checked)
+  || (after_river && everyone_checked)
 
 let rec get_players_in part players_in ls = match players_in with
   | a::b -> (List.nth part (a-1)) :: ls
   | [] -> ls
 
 let winner st =
-  let hole = match st with
+  let board = match st with
     | {
       game_type;
       num_players;
@@ -285,8 +262,9 @@ let winner st =
   in
 
   (** ranks returns a list of ranks of the hands of the list players*)
-  let rec ranks participants (board : Deck.card list) lst = match participants with
-    | a::b -> print_int (seven_list_eval (a.cards@hole)); print_string ("yuh"); ranks b board ((seven_list_eval (a.cards@hole))::lst)
+  let rec ranks participants (board : Deck.card list) lst =
+    match participants with
+    | a::b -> ranks b board ((seven_list_eval (a.cards @ board))::lst)
     | [] -> lst
   in
 
@@ -305,7 +283,7 @@ let winner st =
     | a::b -> get_player_int target b (acc+1)
     | [] -> failwith "not in list" in
   let part = get_players_in all_part p_in [] in
-  let rlist = ranks part hole [] in
+  let rlist = ranks part board [] in
   let num_winner = get_player_int (best_rank rlist 0) rlist 0 in
   List.nth part num_winner
 
@@ -318,10 +296,10 @@ let go_next_round st =
     let player_paid = {player_won with money = player_won.money + win_amount} in
 
     let rec update_parcipant target player outlst = function
-    | [] -> outlst
-    | h::t -> if h.id = target then update_parcipant target player (player::outlst) t
-      else update_parcipant target player (h::outlst) t in
-    
+      | [] -> outlst
+      | h::t -> if h.id = target then update_parcipant target player (player::outlst) t
+        else update_parcipant target player (h::outlst) t in
+
     let updated_participants = update_parcipant winner_player player_paid [] st.table.participants in
 
     let updated_table = {
@@ -335,6 +313,7 @@ let go_next_round st =
       table = Table.deal (cleared);
       bet = init_bet;
       player_turn = List.nth st.players_in 0;
+      players_played = [];
     }
   else
     let card_added = Table.add_to_hole st.table in
@@ -343,6 +322,7 @@ let go_next_round st =
       table = card_added;
       bet = init_bet;
       player_turn = List.nth st.players_in 0;
+      players_played = [];
     }
 
 (* need to call get_avail_action before each turn to get the proper actions*)
@@ -379,10 +359,8 @@ let calculate_pay_amt st =
     | [] -> 0
     | (p, a)::t -> if p = target then a else get_bet_amt target t in
 
-  if exist st.bet.bet_paid_amt st.player_turn then
-    Pervasives.abs(cur_bet_size - get_bet_amt st.player_turn st.bet.bet_paid_amt)
-  else
-    cur_bet_size
+  Pervasives.abs(cur_bet_size - get_bet_amt st.player_turn st.bet.bet_paid_amt)
+
 
 type move_result =
   | Legal of t
@@ -391,11 +369,15 @@ type move_result =
 let check st =
   if List.mem "check" st.avail_action then
     let checked = {
-          st with
-          player_turn = get_next_player st;
-          bet = {st.bet with 
-            new_round = false;
-          }} in
+      st with
+      player_turn = get_next_player st;
+      players_played = st.player_turn :: st.players_played;
+      bet =
+        {
+          st.bet with
+          new_round = false;
+        }
+    } in
     if is_round_complete checked then
       Legal (go_next_round checked)
     else
@@ -420,9 +402,11 @@ let fold st =
         st with
         players_in = remove st.player_turn st.players_in;
         player_turn = get_next_player st;
-        bet = {st.bet with
-               new_round = false;
-              };
+        bet =
+          {
+            st.bet with
+            new_round = false;
+          };
       } in
 
     if is_round_complete t then
@@ -463,5 +447,3 @@ let command_to_function = Command.(function
     | Stack -> stack
     | _ -> failwith "UNSUPPORTED COMMAND"
   )
-
-

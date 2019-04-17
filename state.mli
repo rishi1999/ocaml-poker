@@ -12,6 +12,7 @@ type t = {
   player_turn: int;
   button : int;
   players_in: int list;
+  players_played: int list;
   bet: bet;
   avail_action: string list;
 }
