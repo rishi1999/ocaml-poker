@@ -312,7 +312,7 @@ let winner st =
 let go_next_round st =
   if is_hand_complete st then
     (* everyone folded *)
-    let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else (winner st).id in
+    (* let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else (winner st).id in
     let win_amount = st.table.dealer in
     let player_won = find_participant st winner_player in
     let player_paid = {player_won with money = player_won.money + win_amount} in
@@ -327,14 +327,18 @@ let go_next_round st =
     let updated_table = {
       st.table with
       participants = updated_participants;
-    } in
+    } in *)
 
-    let cleared = Table.clear_round updated_table in
+    (* let cleared = Table.clear_round updated_table in *)
+    let cleared = Table.clear_round st.table in
+    let button_updated = if st.button + 1 > st.num_players then 1 else st.button + 1 in
     {
       st with
       table = Table.deal (cleared);
       bet = init_bet;
       player_turn = List.nth st.players_in 0;
+      button = button_updated;
+      players_in = hand_order st.num_players button_updated;
     }
   else
     let card_added = Table.add_to_hole st.table in
