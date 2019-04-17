@@ -129,8 +129,8 @@ let init_table num_players money blind =
 
 let init_bet_paid_amt players_in =
   let rec helper lst = function
-  | [] -> lst
-  | h::t -> helper ((h,0)::lst) t in
+    | [] -> lst
+    | h::t -> helper ((h,0)::lst) t in
   helper [] players_in
 
 let init_players_in num_players =
@@ -192,11 +192,14 @@ let bet_paid_amt st = st.bet.bet_paid_amt
 let are_all_bets_equal st = List.for_all
     (fun (_,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt
 
-let has_everyone_played st = List.sort compare st.players_in = List.sort compare st.players_played
+let has_everyone_played st = List.sort compare st.players_in = List.sort_uniq compare st.players_played
+
+let print_that_list lst = List.iter (fun x -> print_int x) lst
 
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
 let is_round_complete st =
+  print_that_list st.players_in; print_newline (); print_that_list st.players_played;
   are_all_bets_equal st &&
   has_everyone_played st
 
