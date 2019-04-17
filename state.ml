@@ -192,7 +192,13 @@ let bet_paid_amt st = st.bet.bet_paid_amt
 let are_all_bets_equal st = List.for_all
     (fun (_,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt
 
-let has_everyone_played st = List.sort compare st.players_in = List.sort_uniq compare st.players_played
+let has_everyone_played st =
+  let rec check_subset set subset =
+  match subset with
+  | [] -> true
+  | h::t -> if List.mem h set then check_subset set t
+    else false in
+  check_subset st.players_played st.players_in
 
 (* let print_that_list lst = List.iter (fun x -> print_int x) lst *)
 
