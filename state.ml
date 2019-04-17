@@ -261,8 +261,12 @@ let check_all_bet_equal st =
   bets_helper st.bet.bet_paid_amt
 
 (* true if hand is complete *)
-let is_hand_complete st =
-  st
+let is_hand_complete st = 
+  let everyone_folded = (List.length st.players_in < 2) in
+  let after_river = (List.length st.table.board = 5) in
+
+  everyone_folded || (after_river && check_all_bet_equal st 
+                                  && st.bet.new_round = false)
 
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
