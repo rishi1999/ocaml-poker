@@ -4,3 +4,4 @@ PKG str
 PKG unix
 PKG qcheck
 PKG ANSITerminal
+PKG yojson

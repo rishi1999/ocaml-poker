@@ -7,6 +7,7 @@ type command =
   | Raise of bet_amount
   | Stack
   | Quit
+  | Save
 
 exception Empty
 exception Malformed
@@ -19,6 +20,7 @@ let command_to_string = function
   | Raise _ -> "raised!"
   | Stack -> "looked at stack!"
   | Quit -> "quit!"
+  | Save -> "saved the game!"
 
 let rec remove_emp_str outlist = function
   | [] -> outlist
@@ -42,6 +44,7 @@ let parse str =
     else if head = "stack" then Stack
     else if head = "fold" then Fold
     else if head = "call" then Call
+    else if head = "save" then Save
     else if head = "bet" then Bet (tail |> List.hd |> int_of_string)
     else if head = "raise" then Raise (tail |> List.hd |> int_of_string)
     else if head = "quit" then Quit
