@@ -134,3 +134,14 @@ let seven_list_eval (hand:(Deck.suit * Deck.rank) list) =
   let f = Deck.int_converter (List.nth hand 5) in
   let g = Deck.int_converter (List.nth hand 6) in
   seven_eval a b c d e f g
+
+let rank_mapper rank = if rank = 1 then "Royal Flush"
+  else if rank >= 10 then "Straight Flush"
+  else if rank >= 166 then "Four of a Kind"
+  else if rank >= 322 then "Full House"
+  else if rank >= 1599 then "Flush"
+  else if rank >= 1609 then "Straight"
+  else if rank >= 2467 then "Three of a Kind"
+  else if rank >= 3325 then "Two Pair"
+  else if rank >= 6185 then "One Pair"
+  else "High Card"
