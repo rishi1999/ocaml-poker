@@ -133,21 +133,27 @@ let init_table num_players money blind =
     board = [];
   }
 
-(** [list_remove_element] returns a list with all the elements of [list]
-    except for [element].
-    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
-let init_bet =
-  {
-    bet_player = 0;
-    bet_amount = 0;
-    bet_paid_amt = [];
-  }
+let init_bet_paid_amt players_in =
+  let rec helper lst = function
+  | [] -> lst
+  | h::t -> helper ((h,0)::lst) t in
+  helper [] players_in
 
 let init_players_in num_players =
   let rec init_players_in' acc = function
     | 0 -> acc
     | t -> init_players_in' (t :: acc) (t - 1) in
   init_players_in' [] num_players
+
+(** [list_remove_element] returns a list with all the elements of [list]
+    except for [element].
+    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
+let init_bet players_in =
+  {
+    bet_player = 0;
+    bet_amount = 0;
+    bet_paid_amt = init_bet_paid_amt players_in;
+  }
 
 (** [hand_order num_players button] is an integer list
     containing integers from (button + 1) to num_players and then from 1
@@ -175,7 +181,7 @@ let init_state game_type num_players money blind =
     button = num_players;
     players_in = init_players_in num_players;
     players_played = [];
-    bet = init_bet;
+    bet = init_bet (init_players_in num_players);
     avail_action = ["bet"; "check"; "fold"];
   } |> pay_blinds
 
@@ -307,7 +313,7 @@ let go_next_round st =
     {
       st with
       table = Table.deal (cleared);
-      bet = init_bet;
+      bet = init_bet players_in_updated;
       player_turn = List.nth players_in_updated 0;
       button = button_updated;
       players_in = players_in_updated;
@@ -318,7 +324,7 @@ let go_next_round st =
     {
       st with
       table = card_added;
-      bet = init_bet;
+      bet = init_bet st.players_in;
       player_turn = List.nth st.players_in 0;
       players_played = [];
     }
