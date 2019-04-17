@@ -201,8 +201,8 @@ let is_hand_complete st =
   everyone_folded || after_river && is_round_complete st
 
 let rec get_players_in part players_in ls = match players_in with
-  | a::b -> List.rev ((List.nth part (a-1)) :: ls)
-  | [] -> ls
+  | a::b -> ((List.nth part (a-1)) :: ls)
+  | [] -> List.rev ls
 
 let winner st =
   let board = match st with
