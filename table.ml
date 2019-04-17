@@ -53,8 +53,8 @@ let next_round_players (tab:table) = match tab with
     }
 
 let deal (table : table) : table =
-  Deck.deck_init;
-  Deck.shuffle_deck;
+  Deck.deck_init ();
+  Deck.shuffle_deck ();
   let deal_helper (player:player) = match player with
     | {
       id;
