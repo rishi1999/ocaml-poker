@@ -36,13 +36,13 @@ let print_player_bets st =
   let lst = State.bet_paid_amt st in
   let rec helper = function
     | [] -> ()
-    | (a,b) :: t ->
+    | (a,b) :: t -> if b != 0 then(
       print_string "Player ";
       print_int a;
       print_string " has currently paid: $";
       print_int b;
       print_newline ();
-      helper t in
+      helper t) in
   let sorted = List.sort compare lst in
   helper sorted;
   print_newline ()
