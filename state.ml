@@ -206,43 +206,9 @@ let rec get_players_in part players_in ls = match players_in with
   | [] -> List.rev ls
 
 let winner st =
-  let board = match st with
-    | {
-      game_type;
-      num_players;
-      table = t;
-      player_turn;
-      button;
-      players_in;
-      bet;
-      avail_action;
-    } -> t.board
-  in
-  let all_part = match st with
-    | {
-      game_type;
-      num_players;
-      table = t;
-      player_turn;
-      button;
-      players_in;
-      bet;
-      avail_action;
-    } -> t.participants
-  in
-
-  let p_in = match st with
-    | {
-      game_type;
-      num_players;
-      table;
-      player_turn;
-      button;
-      players_in = ls;
-      bet;
-      avail_action;
-    } -> ls
-  in
+  let board = st.table.board in
+  let all_part = st.table.participants in
+  let p_in = st.players_in in
 
   (** ranks returns a list of ranks of the hands of the list players*)
   let rec ranks participants (board : Deck.card list) lst =

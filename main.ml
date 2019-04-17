@@ -159,6 +159,7 @@ let init_game num_players =
   print_endline "Starting stack amount?";
   ANSITerminal.(print_string [blue] "> ");
   let money = read_int () in
+  print_newline ();
   print_endline "Blind amount?";
   ANSITerminal.(print_string [blue] "> ");
   let blind = read_int () in
@@ -180,9 +181,20 @@ let main (() : unit) : unit =
   print_endline "How many (human) players are there?";
   ANSITerminal.(print_string [blue] "> ");
 
-  match read_int () with
-  | exception End_of_file -> ()
-  | num -> (init_game num)
+  (
+    try
+      read_int ()
+    with
+    | Failure _ ->
+      print_newline ();
+      print_endline "Please do not make a mockery of the institution \
+                     of poker by inputting such values.";
+      print_newline ();
+      print_endline "Shutting down....";
+      exit 0
+  )
+
+  |> init_game
 
 (* Execute the game engine. *)
 let () = main ()
