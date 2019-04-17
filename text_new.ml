@@ -447,15 +447,30 @@ let hearts =
   |]
 
 let card_printer cardlist =
+  let rank_to_int rank = match rank with
+    | Two -> 0
+    | Three -> 1
+    | Four -> 2
+    | Five -> 3
+    | Six -> 4
+    | Seven -> 5
+    | Eight -> 6
+    | Nine -> 7
+    | Ten -> 8
+    | Jack -> 9
+    | Queen -> 10
+    | King -> 11
+    | Ace -> 12 in
   let element card = match card with
-    | (Diamonds, rank) -> diamonds.(rank - 1)
-    | (Hearts, rank) -> hearts.(rank - 1)
-    | (Spades, rank) -> spades.(rank - 1)
-    | (Clubs, rank) -> clubs.(rank - 1) in
+    | (Diamonds, rank) -> diamonds.((rank_to_int rank) -1)
+    | (Hearts, rank) -> hearts.((rank_to_int rank) -1)
+    | (Spades, rank) -> spades.((rank_to_int rank) -1)
+    | (Clubs, rank) -> clubs.((rank_to_int rank) -1) in
   let string_list = List.map element cardlist in
   let rec printer card_list = match card_list with
     | [] -> ()
-    | h :: t -> ANSITerminal.(print_string [white] h);
+    | h :: t -> ANSITerminal.(print_string [white] (h ^"\n"));
       let current_cursor = ANSITerminal.pos_cursor () in
-      ANSITerminal.move_cursor (fst current_cursor - 10) (snd current_cursor + 3) in
+      ANSITerminal.move_cursor (fst current_cursor - 20) (snd current_cursor + 15);
+      printer t in
   printer string_list

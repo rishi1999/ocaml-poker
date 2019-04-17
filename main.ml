@@ -147,7 +147,7 @@ let play_game st =
           print_endline (Command.command_to_string comm);
           print_newline ();
           keep_playing (State.get_avail_action t)
-        | Illegal str ->
+        | Illegal str->
           print_newline ();
           print_endline str;
           print_newline ();
