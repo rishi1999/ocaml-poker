@@ -2,13 +2,11 @@ open Deck
 open Player
 
 type table = {
-  dealer: int;
   blind: int;
   participants: Player.player list;
   board: (Deck.suit * Deck.rank) list;
 }
 
-let dealer tb = tb.dealer
 let blind tb = tb.blind
 let participants tb = tb.participants
 let board tb = tb.board
@@ -16,7 +14,6 @@ let board tb = tb.board
 let next_round_players (tab:table) = match tab with
   |
     {
-      dealer = d;
       blind;
       participants;
       board;
@@ -24,31 +21,18 @@ let next_round_players (tab:table) = match tab with
     ->
     {
       tab with
-      dealer = d + 1; blind = 1;
+      blind = 1;
     }
   |
     {
-      dealer;
+
       blind;
       participants;
       board;
-    } as tab when dealer = List.length participants + 1
+    } as tab
     ->
     {
       tab with
-      dealer = 1;
-      blind = 2;
-    }
-  | {
-    dealer = d;
-    blind = b;
-    participants;
-    board;
-  } as tab
-    ->
-    {
-      tab with
-      dealer = d+1;
       blind = b+1;
     }
 
@@ -76,7 +60,6 @@ let deal (table : table) : table =
   match table with
   |
     {
-      dealer;
       blind;
       participants;
       board;
@@ -91,7 +74,6 @@ let add_to_hole table =
   match table with
   |
     {
-      dealer;
       blind;
       participants;
       board;
@@ -99,28 +81,24 @@ let add_to_hole table =
     -> failwith "too many hole cards"
   |
     {
-      dealer;
       blind;
       participants;
       board = h;
     } when List.length h = 0
     ->
     {
-      dealer;
       blind;
       participants;
       board = Deck.pick_cards 3 @ h;
     }
   |
     {
-      dealer;
       blind;
       participants;
       board = h;
     }
     ->
     {
-      dealer;
       blind;
       participants;
       board = Deck.pick_cards 1 @ h;
@@ -142,7 +120,6 @@ let rec clear_players (p:player list) list = match p with
 let rec clear_round table = match table with
   |
     {
-      dealer;
       blind;
       participants;
       board;
