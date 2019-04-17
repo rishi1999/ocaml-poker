@@ -87,3 +87,5 @@ val command_to_function : Command.command -> (t -> move_result)
     throws "cannot determine winner" exception if called on 
     list of empty players or hole cards less than 5*)
 val winner : t -> Player.player
+
+val get_avail_action : t -> t

@@ -317,7 +317,6 @@ let fold st =
   else Illegal
 
 let stack st =
-  if List.mem "stack" st.avail_action then
     let players = List.sort compare st.players_in in
     let rec find_stack player = function
       | [] -> 0
@@ -330,7 +329,6 @@ let stack st =
       print_endline ". "; in
     List.iter print_stack players;
     Legal st
-  else Illegal
 
 let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
