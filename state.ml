@@ -194,7 +194,7 @@ let are_all_bets_equal st = List.for_all
 
 let has_everyone_played st = List.sort compare st.players_in = List.sort_uniq compare st.players_played
 
-let print_that_list lst = List.iter (fun x -> print_int x) lst
+(* let print_that_list lst = List.iter (fun x -> print_int x) lst *)
 
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
