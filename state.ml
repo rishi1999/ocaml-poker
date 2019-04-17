@@ -391,12 +391,17 @@ let call st =
 let fold st =
   if List.mem "fold" st.avail_action then
     let remove target lst = List.filter (fun x -> not (x = target)) lst in
+    let pl = st.player_turn in
     let t =
       {
         st with
-        players_in = remove st.player_turn st.players_in;
+        players_in = remove pl st.players_in;
         player_turn = get_next_player st;
-        bet = st.bet;
+        bet =
+          {
+            st.bet with
+            bet_paid_amt = (List.remove_assoc pl st.bet.bet_paid_amt);
+          };
       } in
 
     if is_round_complete t || is_hand_complete t then
