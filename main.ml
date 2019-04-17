@@ -115,10 +115,10 @@ let play_game st =
   keep_playing st
 
 let init_game num_players =
-  print_endline "starting stack?";
+  print_endline "Starting stack amount?";
   print_string  "> ";
   let money = read_int () in
-  print_endline "blinds?";
+  print_endline "Blind amount?";
   print_string  "> ";
   let blind = read_int () in
   let st = match num_players with
