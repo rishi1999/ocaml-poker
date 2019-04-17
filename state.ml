@@ -267,7 +267,9 @@ let is_hand_complete st =
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
 let is_round_complete st =
-  (st.player_turn = st.bet.bet_player && check_all_bet_equal st)
+  let everyone_checked = (st.bet.bet_amount = 0 && st.bet.new_round = false &&
+  st.player_turn = List.nth st.players_in 0) in
+  everyone_checked || (check_all_bet_equal st && st.bet.new_round = false)
 
 let calculate_pay_amt st =
   let cur_bet_size = st.bet.bet_amount in
@@ -292,7 +294,10 @@ let check st =
       Legal
         {
           st with
-          player_turn = get_next_player st
+          player_turn = get_next_player st;
+          bet = {st.bet with 
+            new_round = false;
+          };
         }
   else Illegal
 
@@ -313,6 +318,9 @@ let fold st =
         st with
         players_in = remove st.player_turn st.players_in;
         player_turn = get_next_player st;
+        bet = {st.bet with 
+            new_round = false;
+          };
       } in
 
     if is_round_complete t then
