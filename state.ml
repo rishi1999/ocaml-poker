@@ -201,7 +201,8 @@ let is_hand_complete st =
   everyone_folded || after_river && is_round_complete st
 
 let rec get_players_in part players_in ls = match players_in with
-  | a::b -> ((List.nth part (a-1)) :: ls)
+  | a :: t when List.mem a.id part -> get_players_in part t (a :: ls)
+  | a :: t -> get_players_in part t ls 
   | [] -> List.rev ls
 
 let winner st =
@@ -264,7 +265,8 @@ let winner st =
     | a :: b when a = target -> acc
     | a :: b -> get_player_int target b (acc + 1)
     | [] -> failwith "not in list" in
-  let part = get_players_in all_part p_in [] in
+
+  let part = get_players_in p_in all_part [] in
   let rlist = ranks part board [] in
   let num_winner = get_player_int (best_player rlist 7463) rlist 0 in
   List.nth part num_winner
@@ -272,7 +274,7 @@ let winner st =
 let go_next_round st =
   if is_hand_complete st then
     (* everyone folded *)
-    let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else (winner st).id in
+    let winner_player = (* if List.length st.players_in = 1 then List.hd st.players_in else *) (winner st).id in
     let win_amount = st.table.dealer in
     let player_won = find_participant st winner_player in
     let player_paid = {player_won with money = player_won.money + win_amount} in
