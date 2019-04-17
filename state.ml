@@ -217,7 +217,7 @@ let is_hand_complete st =
   everyone_folded || after_river && is_round_complete st
 
 let rec get_players_in part players_in ls = match players_in with
-  | a::b -> (List.nth part (a-1)) :: ls
+  | a::b -> List.rev ((List.nth part (a-1)) :: ls)
   | [] -> ls
 
 let winner st =
@@ -267,22 +267,22 @@ let winner st =
   in
 
   (** best_rank gets the best rank in the list of hands*)
-  let rec best_rank (ls: int list) (acc: int) = match ls with
+  let rec best_player ls acc = match ls with
     | [] -> acc
-    | a :: b when a < acc -> best_rank b a
-    | a :: b when a > acc -> best_rank b acc
+    | a :: t when a < acc -> best_player t a
+    | a :: t when a > acc -> best_player t acc
     | _ -> failwith "cannot find best"
   in
 
   (** [get_player_in target ls acc] is the integer position
       of the list of the best player. *)
-  let rec get_player_int (target:int) ls acc = match ls with
+  let rec get_player_int target ls acc = match ls with
     | a :: b when a = target -> acc
     | a :: b -> get_player_int target b (acc + 1)
     | [] -> failwith "not in list" in
   let part = get_players_in all_part p_in [] in
   let rlist = ranks part board [] in
-  let num_winner = get_player_int (best_rank rlist 7463) rlist 0 in
+  let num_winner = get_player_int (best_player rlist 7463) rlist 0 in
   List.nth part num_winner
 
 let go_next_round st =
