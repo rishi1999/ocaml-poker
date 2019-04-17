@@ -112,7 +112,7 @@ let play_game st =
   let rec keep_playing st =
     let winning_id = State.winning_player st in
     if winning_id >= 0 then
-      let string = "The winner is " ^ string_of_int winning_id  in 
+      let string = "The winner is " ^ string_of_int winning_id  in
       print_endline string;
       exit 0
         keep_playing (State.continue_game st)
@@ -145,9 +145,9 @@ let play_game st =
           print_endline (Command.command_to_string comm);
           print_newline ();
           keep_playing (State.get_avail_action t)
-        | Illegal ->
+        | Illegal str ->
           print_newline ();
-          print_endline "You can't do that right now!";
+          print_endline str;
           print_newline ();
           keep_playing (State.get_avail_action st)
   in

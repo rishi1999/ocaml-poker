@@ -365,10 +365,13 @@ let calculate_pay_amt st =
 
   Pervasives.abs(cur_bet_size - get_bet_amt st.player_turn st.bet.bet_paid_amt)
 
+let rec find_stack player = function
+  | [] -> 0
+  | h::t -> if h.id = player then h.money else find_stack player t
 
 type move_result =
   | Legal of t
-  | Illegal
+  | Illegal of string
 
 let check st =
   if List.mem "check" st.avail_action then
@@ -383,16 +386,19 @@ let check st =
     else
       Legal
         checked
-  else Illegal
+  else Illegal "You can't do that right now!"
 
 let call st =
   if List.mem "call" st.avail_action then
-    let t = money_to_pot st (calculate_pay_amt st) in
-    if is_round_complete t || is_hand_complete t then
-      Legal (go_next_round t)
-    else
-      Legal t
-  else Illegal
+    if calculate_pay_amt st <=
+       (find_stack st.player_turn st.table.participants) then
+      let t = money_to_pot st (calculate_pay_amt st) in
+      if is_round_complete t || is_hand_complete t then
+        Legal (go_next_round t)
+      else
+        Legal t
+    else Illegal "You are out of money!"
+  else Illegal "You can't do that right now!"
 
 let fold st =
   if List.mem "fold" st.avail_action then
@@ -414,13 +420,10 @@ let fold st =
       Legal (go_next_round t)
     else
       Legal t
-  else Illegal
+  else Illegal "You can't do that right now!"
 
 let stack st =
   let players = List.sort compare st.players_in in
-  let rec find_stack player = function
-    | [] -> 0
-    | h::t -> if h.id = player then h.money else find_stack player t in
   let print_stack player =
     print_string "Player ";
     print_int player;
@@ -432,9 +435,11 @@ let stack st =
 
 let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
-    if amt >= st.table.blind then Legal (money_to_pot st amt)
-    else Illegal
-  else Illegal
+    if amt >= st.table.blind &&
+       amt <= (find_stack st.player_turn st.table.participants) then
+      Legal (money_to_pot st amt)
+    else Illegal "You are out of money!"
+  else Illegal "You can't do that right now!"
 
 let bet' amt st = bet_or_raise amt st "bet"
 let raise' amt st = bet_or_raise amt st "raise"
