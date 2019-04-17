@@ -60,7 +60,7 @@ let deal (table : table) : table =
       id;
       cards = c;
       money;
-    } when List.length c <> 0 -> failwith "player issue"
+    } when List.length c <> 0 -> failwith "player has non 0 cards"
     | pl ->
       {
         pl with
