@@ -37,7 +37,7 @@ let print_string_list = print_list print_string
 let print_int_list = print_list print_int
 
 let print_players_in st =
-  let lst = (State.players_in st) in
+  let lst = State.players_in st in
   ANSITerminal.(
     List.iter
       (fun x ->
@@ -156,6 +156,7 @@ let play_game st =
   keep_playing st
 
 let init_game num_players =
+  print_newline ();
   print_endline "Starting stack amount?";
   ANSITerminal.(print_string [blue] "> ");
   let money = read_int () in
@@ -172,7 +173,7 @@ let init_game num_players =
 
 (** [main ()] prompts the user for the number of players,
     then starts the game. *)
-let main (() : unit) : unit =
+let main () =
   print_newline ();
   print_newline ();
   ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
