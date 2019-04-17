@@ -6,9 +6,11 @@ let rec get_and_read_input expected_output =
   else raise Wrong_Input
 
 let print_hline =
-  for i = 1 to 100 do
-    print_char '-'
-  done;
+  let rec print_hline' n =
+    print_char '-';
+    if n > 0 then
+      print_hline' (n - 1) in
+  print_hline' 100;
   print_newline ()
 
 let print_intro =
@@ -80,7 +82,7 @@ let print_current_state st =
     print_string [yellow] (string_of_int (State.player_turn st));
     print_string [yellow] "'s turn"
   );
-  print_hline;
+  print_newline ();
   print_newline ();
   print_string "Cards on the board: ";
   print_int_list (List.map Deck.int_converter
@@ -131,9 +133,11 @@ let play_game st =
         match func st with
         | Legal t ->
           print_endline (Command.command_to_string comm);
+          print_newline ();
           keep_playing (State.get_avail_action t)
         | Illegal ->
           print_endline "You can't do that right now!";
+          print_newline ();
           keep_playing (State.get_avail_action st)
   in
 
