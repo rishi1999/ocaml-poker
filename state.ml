@@ -273,7 +273,13 @@ let is_hand_complete st =
 let is_round_complete st =
   let everyone_checked = (st.bet.bet_amount = 0 && st.bet.new_round = false &&
   st.player_turn = List.nth st.players_in 0) in
-  everyone_checked || (check_all_bet_equal st && st.bet.new_round = false)
+  (* NEEDS WORK *)
+  if List.length st.table.board = 0 then
+    let big_blind = List.nth st.players_in 1 in
+    let bb = (st.player_turn = big_blind) in
+    check_all_bet_equal st 
+  else
+    everyone_checked || (check_all_bet_equal st && st.bet.new_round = false)
 
 let calculate_pay_amt st =
   let cur_bet_size = st.bet.bet_amount in
