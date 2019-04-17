@@ -69,7 +69,7 @@ val bet_paid_amt : t -> (int*int) list
 
 type move_result =
   | Legal of t
-  | Illegal
+  | Illegal of string
 
 val check : t -> move_result
 
