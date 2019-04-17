@@ -98,6 +98,7 @@ let money_to_pot st amount =
       bet_amount = if st.bet.bet_amount > amount then st.bet.bet_amount else amount;
       bet_paid_amt = if not (exist st.bet.bet_paid_amt st.player_turn) then ((st.player_turn, amount)::st.bet.bet_paid_amt)
         else bet_paid_helper [] st.player_turn amount st.bet.bet_paid_amt;
+      new_round = false;
     } in
 
   {
@@ -149,6 +150,7 @@ let init_bet =
     bet_player = 0;
     bet_amount = 0;
     bet_paid_amt = [];
+    new_round = true;
   }
 
 (** [list_remove_element] returns a list with all the elements of [list]
