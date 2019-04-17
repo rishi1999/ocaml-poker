@@ -3,28 +3,12 @@ open Table
 open Player
 open Hand_evaluator
 
-(** [bet] is the bet situation of the current round:
-    [bet_player] : the player that has bet / raised the last
-    [bet_amount] : the current bet amount that the next player has to match
-    [bet_paid_amt] : the current bet situation in form (player, bet_amount) list
-*)
 type bet = {
   bet_player: int;
   bet_amount: int;
   bet_paid_amt: (int*int) list;
 }
 
-(** [t] is the state of the game described using the following information:
-    [game_type] : an integer representin a game type
-      0 if it is a multiplayer game, 1 if it is against the AI
-    [num_players] : the number of players in the game
-    [table] : type Table.table that represents the table
-    [player_turn] : the player that has the action
-    [button] : the person that goes last in the hand
-    [players_in] : the list of players that are currently playing the hand
-    [bet] : current bet situation in this round
-    [avail_action] : the available actions that the current player can act
-*)
 type t = {
   game_type: int;
   num_players: int;
