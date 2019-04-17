@@ -2,13 +2,13 @@ open Deck
 open Player
 
 type table = {
-  dealer: int;
+  pot: int;
   blind: int;
   participants: Player.player list;
   board: (Deck.card) list;
 }
 
-val dealer : table -> int
+val pot : table -> int
 
 val blind : table -> int
 

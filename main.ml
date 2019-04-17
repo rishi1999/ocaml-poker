@@ -37,7 +37,7 @@ let print_string_list = print_list print_string
 let print_int_list = print_list print_int
 
 let print_players_in st =
-  let lst = (State.players_in st) in
+  let lst = State.players_in st in
   ANSITerminal.(
     List.iter
       (fun x ->
@@ -112,10 +112,12 @@ let play_game st =
   let rec keep_playing st =
     let winning_id = State.winning_player st in
     if winning_id >= 0 then
-      let string = "The winner is " ^ string_of_int winning_id  in 
-      print_endline string;
+      let string = "The winner is player " ^ string_of_int winning_id ^ "!" in
+      ANSITerminal.(print_string [yellow] string);
+      print_newline ();
+      print_newline ();
       exit 0
-        keep_playing (State.continue_game st)
+      (*keep_playing (State.continue_game st)*)
     else
       print_hline ();
     print_current_state st;
@@ -145,18 +147,20 @@ let play_game st =
           print_endline (Command.command_to_string comm);
           print_newline ();
           keep_playing (State.get_avail_action t)
-        | Illegal ->
+        | Illegal str ->
           print_newline ();
-          print_endline "You can't do that right now!";
+          print_endline str;
           print_newline ();
           keep_playing (State.get_avail_action st)
   in
   keep_playing st
 
 let init_game num_players =
+  print_newline ();
   print_endline "Starting stack amount?";
   ANSITerminal.(print_string [blue] "> ");
   let money = read_int () in
+  print_newline ();
   print_endline "Blind amount?";
   ANSITerminal.(print_string [blue] "> ");
   let blind = read_int () in
@@ -169,7 +173,7 @@ let init_game num_players =
 
 (** [main ()] prompts the user for the number of players,
     then starts the game. *)
-let main (() : unit) : unit =
+let main () =
   print_newline ();
   print_newline ();
   ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
@@ -178,9 +182,20 @@ let main (() : unit) : unit =
   print_endline "How many (human) players are there?";
   ANSITerminal.(print_string [blue] "> ");
 
-  match read_int () with
-  | exception End_of_file -> ()
-  | num -> (init_game num)
+  (
+    try
+      read_int ()
+    with
+    | Failure _ ->
+      print_newline ();
+      print_endline "Please do not make a mockery of the institution \
+                     of poker by inputting such values.";
+      print_newline ();
+      print_endline "Shutting down....";
+      exit 0
+  )
+
+  |> init_game
 
 (* Execute the game engine. *)
 let () = main ()

@@ -3,28 +3,12 @@ open Table
 open Player
 open Hand_evaluator
 
-(** [bet] is the bet situation of the current round:
-    [bet_player] : the player that has bet / raised the last
-    [bet_amount] : the current bet amount that the next player has to match
-    [bet_paid_amt] : the current bet situation in form (player, bet_amount) list
-*)
 type bet = {
   bet_player: int;
   bet_amount: int;
   bet_paid_amt: (int*int) list;
 }
 
-(** [t] is the state of the game described using the following information:
-    [game_type] : an integer representin a game type
-      0 if it is a multiplayer game, 1 if it is against the AI
-    [num_players] : the number of players in the game
-    [table] : type Table.table that represents the table
-    [player_turn] : the player that has the action
-    [button] : the person that goes last in the hand
-    [players_in] : the list of players that are currently playing the hand
-    [bet] : current bet situation in this round
-    [avail_action] : the available actions that the current player can act
-*)
 type t = {
   game_type: int;
   num_players: int;
@@ -37,6 +21,7 @@ type t = {
   avail_action: string list;
   winner : int;
 }
+exception Tie
 
 (** [get_next_player] st returns the number of the player that has
     to act next. *)
@@ -73,7 +58,6 @@ let money_to_pot st amount =
   let table =
     {
       st.table with
-      dealer = st.table.dealer + amount;
       participants = participants';
     } in
 
@@ -122,7 +106,7 @@ let init_players num_players money =
 
 let init_table num_players money blind =
   Table.deal {
-    dealer = 0;
+    pot = 0;
     blind;
     participants = init_players num_players money;
     board = [];
@@ -217,47 +201,14 @@ let is_hand_complete st =
   everyone_folded || after_river && is_round_complete st
 
 let rec get_players_in part players_in ls = match players_in with
-  | a::b -> (List.nth part (a-1)) :: ls
-  | [] -> ls
+  | a :: t when List.mem a.id part -> get_players_in part t (a :: ls)
+  | a :: t -> get_players_in part t ls 
+  | [] -> List.rev ls
 
 let winner st =
-  let board = match st with
-    | {
-      game_type;
-      num_players;
-      table = t;
-      player_turn;
-      button;
-      players_in;
-      bet;
-      avail_action;
-    } -> t.board
-  in
-  let all_part = match st with
-    | {
-      game_type;
-      num_players;
-      table = t;
-      player_turn;
-      button;
-      players_in;
-      bet;
-      avail_action;
-    } -> t.participants
-  in
-
-  let p_in = match st with
-    | {
-      game_type;
-      num_players;
-      table;
-      player_turn;
-      button;
-      players_in = ls;
-      bet;
-      avail_action;
-    } -> ls
-  in
+  let board = st.table.board in
+  let all_part = st.table.participants in
+  let p_in = st.players_in in
 
   (** ranks returns a list of ranks of the hands of the list players*)
   let rec ranks participants (board : Deck.card list) lst =
@@ -267,29 +218,32 @@ let winner st =
   in
 
   (** best_rank gets the best rank in the list of hands*)
-  let rec best_rank (ls: int list) (acc: int) = match ls with
+  let rec best_player ls acc = match ls with
     | [] -> acc
-    | a :: b when a < acc -> best_rank b a
-    | a :: b when a > acc -> best_rank b acc
-    | _ -> failwith "cannot find best"
+    | a :: t when a < acc -> best_player t a
+    | a :: t when a > acc -> best_player t acc
+    | _ -> raise Tie
   in
 
   (** [get_player_in target ls acc] is the integer position
       of the list of the best player. *)
-  let rec get_player_int (target:int) ls acc = match ls with
+  let rec get_player_int target ls acc = match ls with
     | a :: b when a = target -> acc
     | a :: b -> get_player_int target b (acc + 1)
     | [] -> failwith "not in list" in
-  let part = get_players_in all_part p_in [] in
+
+  let part = get_players_in p_in all_part [] in
   let rlist = ranks part board [] in
-  let num_winner = get_player_int (best_rank rlist 7463) rlist 0 in
+  let num_winner = get_player_int (best_player rlist 7463) rlist 0 in
   List.nth part num_winner
 
 let go_next_round st =
   if is_hand_complete st then
     (* everyone folded *)
-    let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else (winner st).id in
-    let win_amount = st.table.dealer in
+    let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else 
+        try (winner st).id with Tie -> -2
+    in
+    let win_amount = st.table.pot in
     let player_won = find_participant st winner_player in
     let player_paid = {player_won with money = player_won.money + win_amount} in
     let rec update_parcipant target player outlst = function
@@ -365,10 +319,13 @@ let calculate_pay_amt st =
 
   Pervasives.abs(cur_bet_size - get_bet_amt st.player_turn st.bet.bet_paid_amt)
 
+let rec find_stack player = function
+  | [] -> 0
+  | h::t -> if h.id = player then h.money else find_stack player t
 
 type move_result =
   | Legal of t
-  | Illegal
+  | Illegal of string
 
 let check st =
   if List.mem "check" st.avail_action then
@@ -383,16 +340,19 @@ let check st =
     else
       Legal
         checked
-  else Illegal
+  else Illegal "You can't do that right now!"
 
 let call st =
   if List.mem "call" st.avail_action then
-    let t = money_to_pot st (calculate_pay_amt st) in
-    if is_round_complete t || is_hand_complete t then
-      Legal (go_next_round t)
-    else
-      Legal t
-  else Illegal
+    if calculate_pay_amt st <=
+       (find_stack st.player_turn st.table.participants) then
+      let t = money_to_pot st (calculate_pay_amt st) in
+      if is_round_complete t || is_hand_complete t then
+        Legal (go_next_round t)
+      else
+        Legal t
+    else Illegal "You are out of money!"
+  else Illegal "You can't do that right now!"
 
 let fold st =
   if List.mem "fold" st.avail_action then
@@ -414,13 +374,10 @@ let fold st =
       Legal (go_next_round t)
     else
       Legal t
-  else Illegal
+  else Illegal "You can't do that right now!"
 
 let stack st =
   let players = List.sort compare st.players_in in
-  let rec find_stack player = function
-    | [] -> 0
-    | h::t -> if h.id = player then h.money else find_stack player t in
   let print_stack player =
     print_string "Player ";
     print_int player;
@@ -432,9 +389,11 @@ let stack st =
 
 let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
-    if amt >= st.table.blind then Legal (money_to_pot st amt)
-    else Illegal
-  else Illegal
+    if amt >= st.table.blind &&
+       amt <= (find_stack st.player_turn st.table.participants) then
+      Legal (money_to_pot st amt)
+    else Illegal "You are out of money!"
+  else Illegal "You can't do that right now!"
 
 let bet' amt st = bet_or_raise amt st "bet"
 let raise' amt st = bet_or_raise amt st "raise"
