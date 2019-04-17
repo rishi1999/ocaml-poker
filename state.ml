@@ -12,7 +12,6 @@ type bet = {
   bet_player: int;
   bet_amount: int;
   bet_paid_amt: (int*int) list;
-  new_round: bool;
 }
 
 (** [t] is the state of the game described using the following information:
@@ -90,7 +89,6 @@ let money_to_pot st amount =
         else amount;
       bet_paid_amt = bet_paid_helper []
           st.player_turn amount st.bet.bet_paid_amt;
-      new_round = false;
     } in
 
   {
@@ -143,7 +141,6 @@ let init_bet =
     bet_player = 0;
     bet_amount = 0;
     bet_paid_amt = [];
-    new_round = true;
   }
 
 let init_players_in num_players =
@@ -209,13 +206,12 @@ let is_round_complete st =
 
 (** [is_hand_complete st] is true if hand is complete. *)
 let is_hand_complete st =
-  let everyone_checked = (st.bet.bet_amount = 0 && st.bet.new_round = false &&
+  let everyone_checked = (st.bet.bet_amount = 0 &&
                           st.player_turn = List.nth st.players_in 0) in
   let everyone_folded = (List.length st.players_in < 2) in
   let after_river = (List.length st.table.board = 5) in
 
-  everyone_folded || (after_river && are_all_bets_equal st
-                      && st.bet.new_round = false)
+  everyone_folded || (after_river && are_all_bets_equal st)
   || (after_river && everyone_checked)
 
 let rec get_players_in part players_in ls = match players_in with
@@ -290,31 +286,36 @@ let winner st =
 let go_next_round st =
   if is_hand_complete st then
     (* everyone folded *)
-    let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else (winner st).id in
-    let win_amount = st.table.dealer in
-    let player_won = find_participant st winner_player in
-    let player_paid = {player_won with money = player_won.money + win_amount} in
+    (* let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else (winner st).id in
+       let win_amount = st.table.dealer in
+       let player_won = find_participant st winner_player in
+       let player_paid = {player_won with money = player_won.money + win_amount} in
 
-    let rec update_parcipant target player outlst = function
-      | [] -> outlst
-      | h::t -> if h.id = target then update_parcipant target player (player::outlst) t
+       let rec update_parcipant target player outlst = function
+       | [] -> outlst
+       | h::t -> if h.id = target then update_parcipant target player (player::outlst) t
         else update_parcipant target player (h::outlst) t in
 
-    let updated_participants = update_parcipant winner_player player_paid [] st.table.participants in
+       let updated_participants = update_parcipant winner_player player_paid [] st.table.participants in
 
-    let updated_table = {
-      st.table with
-      participants = updated_participants;
-    } in
+       let updated_table = {
+       st.table with
+       participants = updated_participants;
+       } in *)
 
-    let cleared = Table.clear_round updated_table in
+    (* let cleared = Table.clear_round updated_table in *)
+    let cleared = Table.clear_round st.table in
+    let button_updated = if st.button + 1 > st.num_players then 1 else st.button + 1 in
+    let players_in_updated = hand_order st.num_players button_updated in
     {
       st with
       table = Table.deal (cleared);
       bet = init_bet;
-      player_turn = List.nth st.players_in 0;
+      player_turn = List.nth players_in_updated 0;
+      button = button_updated;
+      players_in = players_in_updated;
       players_played = [];
-    }
+    } |> pay_blinds
   else
     let card_added = Table.add_to_hole st.table in
     {
@@ -328,29 +329,29 @@ let go_next_round st =
 (* need to call get_avail_action before each turn to get the proper actions*)
 let get_avail_action st =
   (* preflop *)
-  if List.length st.table.board = 0 then
-    let big_blind_player = List.nth st.players_in 1 in
-    if st.player_turn = big_blind_player && st.bet.bet_amount = st.table.blind then
+  (* if List.length st.table.board = 0 then
+     let big_blind_player = List.nth st.players_in 1 in
+     if st.player_turn = big_blind_player && st.bet.bet_amount = st.table.blind then
       {
         st with
         avail_action = ["check"; "bet"; "fold"];
       }
-    else
+     else
       {
         st with
         avail_action = ["call"; "raise"; "fold"];
       }
       (* flop *)
-  else
+     else *)
   if st.bet.bet_amount = 0 then
     {
       st with
-      avail_action = ["check"; "bet"; "fold"]
+      avail_action = ["check"; "bet"; "fold"; "stack"]
     }
   else
     {
       st with
-      avail_action = ["call"; "raise"; "fold"]
+      avail_action = ["call"; "raise"; "fold"; "stack"]
     }
 
 let calculate_pay_amt st =
@@ -372,13 +373,9 @@ let check st =
       st with
       player_turn = get_next_player st;
       players_played = st.player_turn :: st.players_played;
-      bet =
-        {
-          st.bet with
-          new_round = false;
-        }
+      bet = st.bet;
     } in
-    if is_round_complete checked then
+    if is_round_complete checked || is_hand_complete checked then
       Legal (go_next_round checked)
     else
       Legal
@@ -388,7 +385,7 @@ let check st =
 let call st =
   if List.mem "call" st.avail_action then
     let t = money_to_pot st (calculate_pay_amt st) in
-    if is_round_complete t then
+    if is_round_complete t || is_hand_complete t then
       Legal (go_next_round t)
     else
       Legal t
@@ -402,14 +399,10 @@ let fold st =
         st with
         players_in = remove st.player_turn st.players_in;
         player_turn = get_next_player st;
-        bet =
-          {
-            st.bet with
-            new_round = false;
-          };
+        bet = st.bet;
       } in
 
-    if is_round_complete t then
+    if is_round_complete t || is_hand_complete t then
       Legal (go_next_round t)
     else
       Legal t
@@ -426,7 +419,7 @@ let stack st =
     print_string " has $";
     print_int (find_stack player st.table.participants);
     print_endline ". "; in
-  List.iter print_stack players;
+  List.iter print_stack (List.sort compare players);
   Legal st
 
 let bet_or_raise amt st comm_str =
