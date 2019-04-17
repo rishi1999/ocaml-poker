@@ -4,6 +4,7 @@ open Player
 open Hand_evaluator
 open Deck
 open State
+open Text_new
 
 (**Deck Tests*)
 let make_new_deck =
@@ -18,18 +19,18 @@ let deck_tests =
   ]
 let james:player = {id = 0; cards = []; money = 32}
 let bob:player = {id = 1; cards = []; money = 32}
-let table1: table = {dealer = 0; blind = 1; participants = [james;bob]; board= []}
+let table1: table = {pot = 0; blind = 1; participants = [james;bob]; board= []}
 let table2: table = deal table1
 
 
 let table2_players table2 =  match table2 with 
-    { dealer = d ; blind = b; participants = p ; _ } -> p
+    { pot = money ; blind = b; participants = p ; _ } -> p
 let james_cards_2 table2_players = match table2_players with 
   | {id = s; cards = c; money = m}::t -> c
   | _ -> failwith "table2 not dealt"
 
 let table1_players=  match table1 with 
-    { dealer = d ; blind = b; participants = p ; _ } -> p
+    { pot = money ; blind = b; participants = p ; _ } -> p
 let james_cards= match table1_players with
   | {id = s; cards = c; money = m}::t -> c
   | _ -> failwith "table2 not dealt"
@@ -40,7 +41,7 @@ let jimmy:player = {id = 1; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
 let bobby:player = {id = 2; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
 let alice:player = {id = 3; cards = [(Spades, Three); (Hearts, Four)]; money = 42}
 
-let state_table_1 = {dealer = 1; blind = 2; participants = [jimmy;bobby;alice];
+let state_table_1 = {pot = 0; blind = 2; participants = [jimmy;bobby;alice];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
 let state_bet_1 = {
@@ -114,6 +115,11 @@ let hand_evaluator_tests =
 
     "9_full_house" >:: (fun _->
         assert_equal 236 (seven_eval a b c d e h i ));
+
+  ]
+
+let text_new_tests = 
+  [
 
   ]
 
