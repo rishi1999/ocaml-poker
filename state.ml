@@ -7,7 +7,7 @@ open Hand_evaluator
     [bet_player] : the player that has bet / raised the last
     [bet_amount] : the current bet amount that the next player has to match
     [bet_paid_amt] : the current bet situation in form (player, bet_amount) list
-    *)
+*)
 type bet = {
   bet_player: int;
   bet_amount: int;
@@ -25,7 +25,7 @@ type bet = {
     [bet] : current bet situation in this round
     [avail_action] : the available actions that the current player can act
     [is_new_round] : 
-    *)
+*)
 type t = {
   game_type: int;
   num_players: int;
@@ -233,22 +233,22 @@ let get_avail_action st =
         avail_action = ["check"; "bet"; "fold"];
       }
     else
+      {
+        st with
+        avail_action = ["call"; "raise"; "fold"];
+      }
+      (* flop *)
+  else
+  if st.bet.bet_amount = 0 then
     {
       st with
-      avail_action = ["call"; "raise"; "fold"];
+      avail_action = ["check"; "bet"; "fold"]
     }
-  (* flop *)
   else
-    if st.bet.bet_amount = 0 then
-      {
-        st with
-        avail_action = ["check"; "bet"; "fold"]
-      }
-    else
-      {
-        st with
-        avail_action = ["call"; "raise"; "fold"]
-      }
+    {
+      st with
+      avail_action = ["call"; "raise"; "fold"]
+    }
 
 let check_all_bet_equal st = 
   let rec bets_helper = function
@@ -365,7 +365,7 @@ let command_to_function = Command.(function
 
 
 let rec get_players_in part players_in ls= match players_in with
-  | a::b -> (List.nth part a) :: ls
+  | a::b -> (List.nth part (a-1)) :: ls
   | [] -> ls
 
 let winner st =
@@ -412,7 +412,7 @@ let winner st =
 
   (** ranks returns a list of ranks of the hands of the list players*)
   let rec ranks (participants:player list) (hole_cards:(Deck.suit*Deck.rank) list) (lst:int list) = match participants with
-    | a::b -> ranks b hole_cards ((seven_list_eval (a.cards@hole_cards))::lst)
+    | a::b -> print_int (seven_list_eval (a.cards@hole)); print_string ("yuh"); ranks b hole_cards ((seven_list_eval (a.cards@hole))::lst)
     | [] -> lst
   in
 
