@@ -43,7 +43,8 @@ let print_player_bets st =
       print_int b;
       print_newline ();
       helper t in
-  helper lst;
+  let sorted = List.sort compare lst in
+  helper sorted;
   print_newline ()
 
 let find_participant st target =
