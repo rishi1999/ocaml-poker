@@ -21,7 +21,6 @@ type t = {
   avail_action: string list;
   winners : int list;
 }
-exception Tie
 
 (** [get_next_player] st returns the number of the player that has
     to act next. *)
@@ -31,14 +30,15 @@ let get_next_player st =
       if List.mem guess st.players_in then guess else helper (guess) in
   helper st.player_turn
 
-(** [find_participant] st target returns a type Player.player of a player that
+(** [find_participant st target] returns a type Player.player of a player that
     has an id of target. *)
 let find_participant st target =
-  let rec helper target = function
+  let rec fp' target = function
     | [] -> failwith "No match"
-    | [h] -> h
-    | h :: t -> if (Player.id h) = target then h else helper target t in
-  helper target (Table.participants (st.table))
+    | h :: t -> if Player.id h = target then
+        h
+      else fp' target t in
+  fp' target (Table.participants st.table)
 
 let money_to_pot st amount =
   let player = find_participant st st.player_turn in
@@ -49,42 +49,40 @@ let money_to_pot st amount =
     } in
 
   let rec helper outlst = function
-    | [] -> outlst
+    | [] -> List.rev outlst
     | h::t -> if h.id = st.player_turn then helper (player'::outlst) t
       else helper (h::outlst) t in
 
-  let participants' = List.rev(helper [] st.table.participants) in
+  let participants = helper [] st.table.participants in
 
   let table =
     {
       st.table with
       dealer = st.table.dealer + amount;
-      participants = participants';
+      participants;
     } in
 
-  let rec update_bet_paid acc target bet = function
-    | [] -> acc
-    | (pl, money) :: t ->
-      let x =
-        if pl = target
-        then (pl, money + bet)
-        else (pl, money) in
-      update_bet_paid (x :: acc) target bet t in
+  let update_bet_paid =
+    let rec update_bet_paid' acc target bet = function
+      | [] -> acc
+      | (pl, money) :: t ->
+        let increment = if pl = target then bet else 0 in
+        update_bet_paid' ((pl, money + increment) :: acc) target bet t in
+    update_bet_paid' [] in
 
-  let bet' =
+  let bet =
     {
       bet_player = st.player_turn;
       bet_amount = if st.bet.bet_amount > amount then st.bet.bet_amount
         else amount;
-      bet_paid_amt = update_bet_paid
-          [] st.player_turn amount st.bet.bet_paid_amt;
+      bet_paid_amt = update_bet_paid st.player_turn amount st.bet.bet_paid_amt;
     } in
 
   {
     st with
     table;
     player_turn = get_next_player st;
-    bet = bet';
+    bet;
     avail_action = ["call"; "raise"; "fold";];
     players_played = st.player_turn :: st.players_played;
   }
@@ -170,11 +168,10 @@ let bet st = st.bet
 let avail_action st = st.avail_action
 let bet_paid_amt st = st.bet.bet_paid_amt
 
-
 (** [are_all_bets_equal] is true if all bets made
     in the current round are equal. *)
 let are_all_bets_equal st = List.for_all
-    (fun (_,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt
+    (fun (_,amt) -> amt = st.bet.bet_amount) st.bet.bet_paid_amt
 
 let has_everyone_played st =
   let rec check_subset set subset =
@@ -184,22 +181,17 @@ let has_everyone_played st =
       else false in
   check_subset st.players_played st.players_in
 
-(* let print_that_list lst = List.iter (fun x -> print_int x) lst *)
-
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
 let is_round_complete st =
-  (*print_that_list st.players_in; print_newline (); print_that_list st.players_played;*)
   are_all_bets_equal st &&
   has_everyone_played st
 
-
 (** [is_hand_complete st] is true if hand is complete. *)
 let is_hand_complete st =
-  let everyone_folded = (List.length st.players_in < 2) in
+  let one_player_left = (List.length st.players_in < 2) in
   let after_river = (List.length st.table.board = 5) in
-
-  everyone_folded || after_river && is_round_complete st
+  one_player_left || (after_river && is_round_complete st)
 
 let rec get_players_in part players_in ls = match players_in with
   | [] -> List.rev ls

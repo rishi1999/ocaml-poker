@@ -82,6 +82,16 @@ let tied_state = {
   avail_action = ["fold"];
   winners = [-1];
 }
+
+let my_res st =
+  let res =
+    winners st in
+  print_endline "YOOOOO";
+  print_endline (string_of_int ((List.length res)));
+  print_endline (string_of_int ((List.hd res).id));
+  print_endline (string_of_int ((List.hd (List.rev res)).id));
+  res
+
 (** State Tests*)
 let state_tests =
 
@@ -90,22 +100,16 @@ let state_tests =
         assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
 
     "winner_test_1" >:: (fun _ ->
-        assert_equal [jimmy] (winners state1));
+        assert_equal [jimmy] (my_res state1));
     "winner_test_2" >:: (fun _ ->
-        assert_equal [bobby] (winners state2));
+        assert_equal [bobby] (my_res state2));
     "winner_test_3" >:: (fun _ ->
-        assert_equal [alice] (winners state3));
+        assert_equal [alice] (my_res state3));
     "winner_test_4" >:: (fun _ ->
-        assert_equal [alice] (winners state3));
+        assert_equal [alice] (my_res state3));
     "winner_test_tie" >:: (fun _ ->
         assert_equal [tie1; tie2] (
-          let res =
-            winners tied_state in
-          print_endline "YOOOOO";
-          print_endline (string_of_int ((List.length res)));
-          print_endline (string_of_int ((List.hd res).id));
-          print_endline (string_of_int ((List.hd (List.rev res)).id));
-          res
+          my_res tied_state
         ));
     (*  "get_players_in_test" >:: (fun _->
           assert_equal [bobby;alice] (get_players_in state4)); *)

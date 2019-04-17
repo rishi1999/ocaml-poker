@@ -114,7 +114,7 @@ val stack : t -> move_result
     Requires: valid command [comm]. *)
 val command_to_function : Command.command -> (t -> move_result)
 
-(** [winners st] are the players that win the round
+(** [winners st] are the players that win the round.
     Requires that state has a nonempty list of players
     Requries there are 5 hole cards
     throws "cannot determine winner" exception if called on
