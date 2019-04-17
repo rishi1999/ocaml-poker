@@ -370,12 +370,12 @@ let get_avail_action st =
   if st.bet.bet_amount = 0 then
     {
       st with
-      avail_action = ["check"; "bet"; "fold"]
+      avail_action = ["check"; "bet"; "fold"; "stack"]
     }
   else
     {
       st with
-      avail_action = ["call"; "raise"; "fold"]
+      avail_action = ["call"; "raise"; "fold"; "stack"]
     }
 
 let calculate_pay_amt st =
@@ -447,7 +447,7 @@ let stack st =
     print_string " has $";
     print_int (find_stack player st.table.participants);
     print_endline ". "; in
-  List.iter print_stack players;
+  List.iter print_stack (List.sort compare players);
   Legal st
 
 let bet_or_raise amt st comm_str =
