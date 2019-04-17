@@ -285,7 +285,8 @@ let is_round_complete st =
     let bb = (st.player_turn = big_blind) in
     are_all_bets_equal st
   else
-    everyone_checked || (are_all_bets_equal st && st.bet.new_round = false)
+    everyone_checked || (are_all_bets_equal st && st.bet.new_round = false
+    && st.bet.bet_amount != 0)
 
 let calculate_pay_amt st =
   let cur_bet_size = st.bet.bet_amount in
