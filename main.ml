@@ -5,12 +5,26 @@ let rec get_and_read_input expected_output =
   if List.mem (input) expected_output then input
   else raise Wrong_Input
 
-let print_list func = function
-  | h :: t ->
-    func h;
-    List.iter (fun x -> print_string ", "; func x) t;
-    print_newline ()
-  | _ -> print_endline "none"
+let print_intro =
+  print_endline "Tips:";
+  print_string "    The player whose turn it is is shown in ";
+  ANSITerminal.(print_string [green] "green");
+  print_endline ".";
+  print_string "    The button is shown in ";
+  ANSITerminal.(print_string [red] "red");
+  print_endline ".";
+  print_newline ();
+  ANSITerminal.(print_string [yellow] "LET'S PLAY!");
+  print_newline ();
+  print_newline ();
+  print_newline ();
+
+  let print_list func = function
+    | h :: t ->
+      func h;
+      List.iter (fun x -> print_string ", "; func x) t;
+      print_newline ()
+    | _ -> print_endline "none"
 
 let print_string_list = print_list print_string
 let print_int_list = print_list print_int
@@ -77,20 +91,12 @@ let print_current_state st =
   done;
   print_newline ()
 
+
+
+
+
 let play_game st =
-  print_newline ();
-  print_endline "Tips:";
-  print_string "    The player whose turn it is is shown in ";
-  ANSITerminal.(print_string [green] "green");
-  print_endline ".";
-  print_string "    The button is shown in ";
-  ANSITerminal.(print_string [red] "red");
-  print_endline ".";
-  print_newline ();
-  ANSITerminal.(print_string [yellow] "LET'S PLAY!");
-  print_newline ();
-  print_newline ();
-  print_newline ();
+  print_intro;
 
   let rec keep_playing st =
     print_current_state st;
@@ -134,6 +140,7 @@ let init_game num_players =
   let st = match num_players with
     | 1 -> State.init_state 1 2 money blind
     | _ -> State.init_state 0 num_players money blind in
+  print_newline ();
   print_newline ();
   play_game st
 
