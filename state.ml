@@ -58,7 +58,6 @@ let money_to_pot st amount =
   let table =
     {
       st.table with
-      dealer = st.table.dealer + amount;
       participants = participants';
     } in
 
@@ -107,7 +106,7 @@ let init_players num_players money =
 
 let init_table num_players money blind =
   Table.deal {
-    dealer = 0;
+    pot = 0;
     blind;
     participants = init_players num_players money;
     board = [];
@@ -244,7 +243,7 @@ let go_next_round st =
     let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else 
         try (winner st).id with Tie -> -2
     in
-    let win_amount = st.table.dealer in
+    let win_amount = st.table.pot in
     let player_won = find_participant st winner_player in
     let player_paid = {player_won with money = player_won.money + win_amount} in
     let rec update_parcipant target player outlst = function
