@@ -81,7 +81,7 @@ let money_to_pot st amount =
     | (pl, money) :: t ->
       let x =
         if pl = target
-        then (pl, (*money +*) bet)
+        then (pl, money + bet)
         else (pl, money) in
       update_bet_paid (x :: acc) target bet t in
 
@@ -129,8 +129,8 @@ let init_table num_players money blind =
 
 let init_bet_paid_amt players_in =
   let rec helper lst = function
-  | [] -> lst
-  | h::t -> helper ((h,0)::lst) t in
+    | [] -> lst
+    | h::t -> helper ((h,0)::lst) t in
   helper [] players_in
 
 let init_players_in num_players =
