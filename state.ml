@@ -56,7 +56,7 @@ let find_participant st target =
 
 let money_to_pot st amount =
   let player = find_participant st st.player_turn in
-  let player =
+  let player' =
     {
       player with
       money = player.money - amount;
@@ -64,7 +64,7 @@ let money_to_pot st amount =
 
   let rec helper outlst = function
     | [] -> outlst
-    | h::t -> if h.id = st.player_turn then helper (player::outlst) t
+    | h::t -> if h.id = st.player_turn then helper (player'::outlst) t
       else helper (h::outlst) t in
 
   let participants' = List.rev(helper [] st.table.participants) in
@@ -76,19 +76,22 @@ let money_to_pot st amount =
       participants = participants';
     } in
 
-  let rec bet_paid_helper outlst target bet = function
-    | [] -> outlst
-    | (player, amount)::t -> if player = target then bet_paid_helper
-          ((player, amount + bet)::outlst) target bet t
-      else bet_paid_helper ((player, amount)::outlst) target bet t in
+  let rec update_bet_paid acc target bet = function
+    | [] -> acc
+    | (pl, amount) :: t ->
+      let x =
+        if pl = target
+        then (pl, amount + bet)
+        else (pl, amount) in
+      update_bet_paid (x :: acc) target bet t in
 
   let bet' =
     {
       bet_player = st.player_turn;
       bet_amount = if st.bet.bet_amount > amount then st.bet.bet_amount
         else amount;
-      bet_paid_amt = bet_paid_helper []
-          st.player_turn amount st.bet.bet_paid_amt;
+      bet_paid_amt = update_bet_paid
+          [] st.player_turn amount st.bet.bet_paid_amt;
     } in
 
   {
@@ -100,16 +103,10 @@ let money_to_pot st amount =
     players_played = st.player_turn :: st.players_played;
   }
 
-(** [list_remove_element] returns a list with all the elements of [list]
-    except for [element].
-    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let pay_blinds st =
   let small_blind = money_to_pot st (st.table.blind / 2) in
   money_to_pot small_blind st.table.blind
 
-(** [list_remove_element] returns a list with all the elements of [list]
-    except for [element].
-    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let init_players num_players money =
   let rec init_players' acc money = function
     | 0 -> acc
@@ -122,9 +119,6 @@ let init_players num_players money =
       init_players' (curr_player :: acc) money (id - 1) in
   init_players' [] money num_players
 
-(** [list_remove_element] returns a list with all the elements of [list]
-    except for [element].
-    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let init_table num_players money blind =
   Table.deal {
     dealer = 0;
@@ -133,9 +127,6 @@ let init_table num_players money blind =
     board = [];
   }
 
-(** [list_remove_element] returns a list with all the elements of [list]
-    except for [element].
-    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let init_bet =
   {
     bet_player = 0;
@@ -163,9 +154,6 @@ let hand_order num_players button =
   let first = list_builder (button + 1) num_players [] in
   first @ second
 
-(** [list_remove_element] returns a list with all the elements of [list]
-    except for [element].
-    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let init_state game_type num_players money blind =
   {
     game_type;
