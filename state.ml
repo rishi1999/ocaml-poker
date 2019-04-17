@@ -339,7 +339,7 @@ let go_next_round st =
       player_turn = List.nth st.players_in 0;
       button = button_updated;
       players_in = hand_order st.num_players button_updated;
-    }
+    } |> pay_blinds
   else
     let card_added = Table.add_to_hole st.table in
     {
