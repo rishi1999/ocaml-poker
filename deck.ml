@@ -44,7 +44,9 @@ let deck_init =
     deck *)
 let deck_size = List.length !current_deck
 
-
+(** [update_state lst] is the deck with all cards played
+    since the last update, [lst],
+    removed from the deck and included in the cards-played list.  *)
 let update_state card_list =
   played_cards := card_list @ !played_cards;
   current_deck := List.filter (fun x -> not (List.mem x card_list)) !current_deck
