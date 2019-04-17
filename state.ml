@@ -248,16 +248,16 @@ let get_avail_action st =
 
 let check_all_bet_equal st = 
   let rec bets_helper = function
-      | [] -> true
-      | (p, amt)::t ->
-        if List.mem p st.players_in then
-          if amt = st.bet.bet_amount then bets_helper t
-          else false
-        else bets_helper t in
+    | [] -> true
+    | (p, amt)::t ->
+      if List.mem p st.players_in then
+        if amt = st.bet.bet_amount then bets_helper t
+        else false
+      else bets_helper t in
   bets_helper st.bet.bet_paid_amt
 
 (* true if hand is complete *)
-let is_hand_compete st = 
+let is_hand_compete st =
   st
 
 (** [is_round_complete st] is true if the game is
@@ -359,7 +359,7 @@ let command_to_function = Command.(function
   )
 
 
-let rec get_players_in part players_in ls= match players_in with
+let rec get_players_in part players_in ls = match players_in with
   | a::b -> (List.nth part (a-1)) :: ls
   | [] -> ls
 

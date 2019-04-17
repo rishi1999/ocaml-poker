@@ -47,7 +47,7 @@ let print_player_bets st =
 
 let find_participant st target =
   let rec find_participant' target = function
-    | [h] -> h
+    | [] -> failwith "PLAYER DOES NOT EXIST"
     | h :: t -> if (Player.id h) = target then h
       else find_participant' target t in
   find_participant' target (Table.participants (State.table st))
@@ -116,10 +116,10 @@ let play_game st =
 
 let init_game num_players =
   print_endline "Starting stack amount?";
-  print_string  "> ";
+  print_string "> ";
   let money = read_int () in
   print_endline "Blind amount?";
-  print_string  "> ";
+  print_string "> ";
   let blind = read_int () in
   let st = match num_players with
     | 1 -> State.init_state 1 2 money blind
