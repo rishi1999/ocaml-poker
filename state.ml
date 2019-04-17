@@ -205,11 +205,12 @@ let winners st =
     | p :: t -> hand_ranks brd ((seven_list_eval (p.cards @ brd), p) :: acc) t in
 
   let winning_hands lst =
-    let winning_hand_rank = List.hd lst in
-    let rec winning_hands' acc = function
-      | h :: t when h = winning_hand_rank -> winning_hands' (h :: acc) t
-      | _ -> acc in
-    List.rev (winning_hands' [] lst) in
+    if List.length lst = 0 then [] else
+      let winning_hand_rank = List.hd lst in
+      let rec winning_hands' acc = function
+        | h :: t when h = winning_hand_rank -> winning_hands' (h :: acc) t
+        | _ -> acc in
+      List.rev (winning_hands' [] lst) in
 
   winning_hands (hand_ranks st.table.board [] st.table.participants) |>
 
