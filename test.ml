@@ -79,6 +79,8 @@ let state_tests =
         assert_equal alice (winner state3));
     "winner_test_4" >:: (fun _ ->
         assert_equal alice (winner state3));
+    (*  "get_players_in_test" >:: (fun _->
+          assert_equal [bobby;alice] (get_players_in state4)); *)
 
   ]
 
