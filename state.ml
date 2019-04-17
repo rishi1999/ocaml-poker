@@ -78,11 +78,11 @@ let money_to_pot st amount =
 
   let rec update_bet_paid acc target bet = function
     | [] -> acc
-    | (pl, amount) :: t ->
+    | (pl, money) :: t ->
       let x =
         if pl = target
-        then (pl, amount + bet)
-        else (pl, amount) in
+        then (pl, (*money +*) bet)
+        else (pl, money) in
       update_bet_paid (x :: acc) target bet t in
 
   let bet' =
