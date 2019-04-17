@@ -110,7 +110,14 @@ let play_game st =
   print_intro ();
 
   let rec keep_playing st =
-    print_hline ();
+    let winning_id = State.winning_player st in
+    if winning_id >= 0 then
+      let string = "The winner is " ^ string_of_int winning_id  in 
+      print_endline string;
+      exit 0
+        keep_playing (State.continue_game st)
+    else
+      print_hline ();
     print_current_state st;
     print_newline ();
     ANSITerminal.(print_string [blue] "> ");
@@ -144,12 +151,7 @@ let play_game st =
           print_newline ();
           keep_playing (State.get_avail_action st)
   in
-  if st.winner >= 0 then
-    let string = "The winner is " ^ string_of_int st.winner in 
-    print_endline string;
-    keep_playing st
-  else
-    keep_playing st
+  keep_playing st
 
 let init_game num_players =
   print_endline "Starting stack amount?";

@@ -214,7 +214,7 @@ let is_hand_complete st =
   let everyone_folded = (List.length st.players_in < 2) in
   let after_river = (List.length st.table.board = 5) in
 
-  everyone_folded || (after_river && is_round_complete st)
+  everyone_folded || after_river && is_round_complete st
 
 let rec get_players_in part players_in ls = match players_in with
   | a::b -> (List.nth part (a-1)) :: ls
@@ -301,11 +301,10 @@ let go_next_round st =
       st.table with
       participants = updated_participants;
     } in
-
     let cleared = Table.clear_round updated_table in
     let button_updated = if st.button + 1 > st.num_players then 1 else st.button + 1 in
     let players_in_updated = hand_order st.num_players button_updated in
-    let interm_state = {
+    let interim_state = {
       st with
       table = Table.deal (cleared);
       bet = init_bet players_in_updated;
@@ -315,7 +314,7 @@ let go_next_round st =
       players_played = [];
       winner = winner_player;
     } in
-    let updated_state = pay_blinds interm_state in updated_state
+    let updated_state = pay_blinds interim_state in updated_state
   else
     let card_added = Table.add_to_hole st.table in
     {
@@ -328,7 +327,7 @@ let go_next_round st =
 
 let continue_game st = {st with winner = -1}
 
-let winner st = st.winner
+let winning_player st = st.winner
 
 (* need to call get_avail_action before each turn to get the proper actions*)
 let get_avail_action st =

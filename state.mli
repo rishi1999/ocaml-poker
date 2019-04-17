@@ -46,7 +46,7 @@ val button : t -> int
 
 val continue_game : t -> t
 
-val winner : t -> int
+val winning_player : t -> int
 
 (** [bet st] is the amount currently being bet
     in the game being played in [st].
