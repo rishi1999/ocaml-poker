@@ -106,10 +106,10 @@ let play_game st =
         match func st with
         | Legal t ->
           print_endline (Command.command_to_string comm);
-          keep_playing t
+          keep_playing (State.get_avail_action t)
         | Illegal ->
           print_endline "You can't do that right now!";
-          keep_playing st
+          keep_playing (State.get_avail_action st)
   in
 
   keep_playing st
