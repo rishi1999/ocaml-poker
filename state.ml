@@ -206,13 +206,10 @@ let is_round_complete st =
 
 (** [is_hand_complete st] is true if hand is complete. *)
 let is_hand_complete st =
-  let everyone_checked = (st.bet.bet_amount = 0 &&
-                          st.player_turn = List.nth st.players_in 0) in
   let everyone_folded = (List.length st.players_in < 2) in
   let after_river = (List.length st.table.board = 5) in
 
-  everyone_folded || (after_river && are_all_bets_equal st)
-  || (after_river && everyone_checked)
+  everyone_folded || (after_river && is_round_complete st)
 
 let rec get_players_in part players_in ls = match players_in with
   | a::b -> (List.nth part (a-1)) :: ls
