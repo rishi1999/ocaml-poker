@@ -38,15 +38,15 @@ let empty: (Deck.suit * Deck.rank) list = []
 
 let jimmy:player = {id = 1; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
 let bobby:player = {id = 2; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
+let alice:player = {id = 3; cards = [(Spades, Three); (Hearts, Four)]; money = 42}
 
-let state_table_1 = {dealer = 1; blind = 2; participants = [jimmy;bobby];
+let state_table_1 = {dealer = 1; blind = 2; participants = [jimmy;bobby;alice];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
 let state_bet_1 = {
   bet_player = 1;
   bet_amount = 0;
   bet_paid_amt = [(0,0)];
-  new_round = true;
 }
 
 let state1:State.t = {
@@ -56,8 +56,10 @@ let state1:State.t = {
   player_turn = 0;
   button = 0;
   players_in = [1;2];
+  players_played = [];
   bet = state_bet_1;
   avail_action = ["fold"];
+  winner = -1;
 }
 let state2 = {state1 with players_in = [0]}
 let state3 = {state1 with players_in = [1]}
