@@ -19,7 +19,7 @@ type t = {
   players_played: int list;
   bet: bet;
   avail_action: string list;
-  winner : int;
+  winners : int list;
 }
 exception Tie
 
@@ -157,7 +157,7 @@ let init_state game_type num_players money blind =
     players_played = [];
     bet = init_bet (init_players_in num_players);
     avail_action = ["bet"; "check"; "fold"];
-    winner = -1;
+    winners = [-1];
   } |> pay_blinds
 
 let game_type st = st.game_type
@@ -202,62 +202,58 @@ let is_hand_complete st =
   everyone_folded || after_river && is_round_complete st
 
 let rec get_players_in part players_in ls = match players_in with
-  | a :: t when List.mem a.id part -> get_players_in part t (a :: ls)
-  | a :: t -> get_players_in part t ls 
   | [] -> List.rev ls
+  | a :: t when List.mem a.id part -> get_players_in part t (a :: ls)
+  | a :: t -> get_players_in part t ls
 
-let winner st =
-  let board = st.table.board in
-  let all_part = st.table.participants in
-  let p_in = st.players_in in
+let winners st =
+  let compare_tuples (x1,_) (y1,_) = x1 - y1 in
+  let rec hand_ranks (brd : Deck.card list) acc = function
+    | [] -> List.sort compare_tuples acc
+    | p :: t -> hand_ranks brd ((seven_list_eval (p.cards @ brd), p) :: acc) t in
 
-  (** ranks returns a list of ranks of the hands of the list players*)
-  let rec ranks participants (board : Deck.card list) lst =
-    match participants with
-    | [] -> List.rev lst
-    | p :: t -> ranks t board ((seven_list_eval (p.cards @ board)) :: lst)
-  in
+  let winning_hands lst =
+    let winning_hand_rank = List.hd lst in
+    let rec winning_hands' acc = function
+      | h :: t when h = winning_hand_rank -> winning_hands' (h :: acc) t
+      | _ -> acc in
+    List.rev (winning_hands' [] lst) in
 
-  (** best_rank gets the best rank in the list of hands*)
-  let rec best_player ls acc = match ls with
-    | [] -> acc
-    | a :: t when a < acc -> best_player t a
-    | a :: t when a > acc -> best_player t acc
-    | _ -> raise Tie
-  in
+  winning_hands (hand_ranks st.table.board [] st.table.participants) |>
 
-  (** [get_player_in target ls acc] is the integer position
-      of the list of the best player. *)
-  let rec get_player_int target ls acc = match ls with
-    | a :: b when a = target -> acc
-    | a :: b -> get_player_int target b (acc + 1)
-    | [] -> failwith "not in list" in
+  List.map (fun (_,p) -> p) |>
 
-  let part = get_players_in p_in all_part [] in
-  let rlist = ranks part board [] in
-  let num_winner = get_player_int (best_player rlist 7463) rlist 0 in
-  List.nth part num_winner
+  List.filter (fun x ->
+      not (List.for_all (fun y -> not (x.id = y)) st.players_in))
 
 let go_next_round st =
   if is_hand_complete st then
-    (* everyone folded *)
-    let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else 
-        try (winner st).id with Tie -> -2
-    in
+    let players_won = winners st in
+    let winner_ids = List.map (fun x -> x.id) players_won in
     let win_amount = st.table.dealer in
-    let player_won = find_participant st winner_player in
-    let player_paid = {player_won with money = player_won.money + win_amount} in
-    let rec update_parcipant target player outlst = function
+    let players_paid = List.map (fun x ->
+        {
+          x with
+          money = x.money + win_amount
+        }
+      ) players_won
+    in
+    let rec update_participant target player outlst = function
       | [] -> outlst
-      | h::t -> if h.id = target then update_parcipant target player (player::outlst) t
-        else update_parcipant target player (h::outlst) t in
-    let updated_participants = update_parcipant winner_player player_paid [] st.table.participants in
+      | h::t -> if h.id = target then
+          update_participant target player (player::outlst) t
+        else update_participant target player (h::outlst) t in
+    let updated_participants = List.fold_left2
+        (fun a b c -> update_participant b c [] a)
+        st.table.participants winner_ids players_paid in
     let updated_table = {
       st.table with
       participants = updated_participants;
     } in
     let cleared = Table.clear_round updated_table in
-    let button_updated = if st.button + 1 > st.num_players then 1 else st.button + 1 in
+    let button_updated = if st.button + 1 > st.num_players then
+        1
+      else st.button + 1 in
     let players_in_updated = hand_order st.num_players button_updated in
     let interim_state = {
       st with
@@ -267,7 +263,7 @@ let go_next_round st =
       button = button_updated;
       players_in = players_in_updated;
       players_played = [];
-      winner = winner_player;
+      winners = winner_ids;
     } in
     let updated_state = pay_blinds interim_state in updated_state
   else
@@ -280,9 +276,9 @@ let go_next_round st =
       players_played = [];
     }
 
-let continue_game st = {st with winner = -1}
+let continue_game st = {st with winners = [-1]}
 
-let winning_player st = st.winner
+let winning_players st = st.winners
 
 (* need to call get_avail_action before each turn to get the proper actions*)
 let get_avail_action st =
@@ -378,6 +374,7 @@ let fold st =
   else Illegal "You can't do that right now!"
 
 let stack st =
+  print_newline ();
   let players = List.sort compare st.players_in in
   let print_stack player =
     print_string "Player ";

@@ -17,7 +17,7 @@ let command_to_string = function
   | Call -> "called!"
   | Bet _ -> "bet!"
   | Raise _ -> "raised!"
-  | Stack -> "looked at stack!"
+  | Stack -> ""
   | Quit -> "quit!"
 
 let rec remove_emp_str outlist = function

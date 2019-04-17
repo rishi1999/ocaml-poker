@@ -9,11 +9,11 @@ open State
 let make_new_deck =
   Deck.deck_init
 
-let deck_tests = 
+let deck_tests =
   [
-    "pick first card" >:: (fun _ -> 
+    "pick first card" >:: (fun _ ->
         assert_equal [] []);
-    "convert 9C" >:: (fun _ -> 
+    "convert 9C" >:: (fun _ ->
         assert_equal 28 (int_converter (Clubs, Nine)));
   ]
 let james:player = {id = 0; cards = []; money = 32}
@@ -22,13 +22,13 @@ let table1: table = {dealer = 0; blind = 1; participants = [james;bob]; board= [
 let table2: table = deal table1
 
 
-let table2_players table2 =  match table2 with 
+let table2_players table2 =  match table2 with
     { dealer = d ; blind = b; participants = p ; _ } -> p
-let james_cards_2 table2_players = match table2_players with 
+let james_cards_2 table2_players = match table2_players with
   | {id = s; cards = c; money = m}::t -> c
   | _ -> failwith "table2 not dealt"
 
-let table1_players=  match table1 with 
+let table1_players=  match table1 with
     { dealer = d ; blind = b; participants = p ; _ } -> p
 let james_cards= match table1_players with
   | {id = s; cards = c; money = m}::t -> c
@@ -36,20 +36,26 @@ let james_cards= match table1_players with
 
 let empty: (Deck.suit * Deck.rank) list = []
 
-let jimmy:player = {id = 1; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
-let bobby:player = {id = 2; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
-let alice:player = {id = 3; cards = [(Spades, Three); (Hearts, Four)]; money = 42}
+let jimmy = {id = 1; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
+let bobby = {id = 2; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
+let alice = {id = 3; cards = [(Spades, Three); (Hearts, Four)]; money = 42}
+
+let tie1 = {id = 1; cards = [(Clubs, Two);(Clubs, Five)]; money = 50}
+let tie2 = {id = 2; cards = [(Clubs, Four);(Hearts, Five)]; money = 50}
 
 let state_table_1 = {dealer = 1; blind = 2; participants = [jimmy;bobby;alice];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
+let tie_table = {dealer = 1; blind = 5; participants = [tie1;tie2];
+                 board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
+                          (Hearts, King); (Hearts, Three)]}
 let state_bet_1 = {
   bet_player = 1;
   bet_amount = 0;
   bet_paid_amt = [(0,0)];
 }
 
-let state1:State.t = {
+let state1 = {
   game_type = 0;
   num_players = 2;
   table = state_table_1;
@@ -59,11 +65,23 @@ let state1:State.t = {
   players_played = [];
   bet = state_bet_1;
   avail_action = ["fold"];
-  winner = -1;
+  winners = [-1];
 }
 let state2 = {state1 with players_in = [2]}
 let state3 = {state1 with players_in = [3]}
 let state4 = {state1 with players_in = [2;3]}
+let tied_state = {
+  game_type = 0;
+  num_players = 2;
+  table = tie_table;
+  player_turn = 1;
+  button = 2;
+  players_in = [1;2];
+  players_played = [];
+  bet = state_bet_1;
+  avail_action = ["fold"];
+  winners = [-1];
+}
 (** State Tests*)
 let state_tests =
 
@@ -72,13 +90,23 @@ let state_tests =
         assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
 
     "winner_test_1" >:: (fun _ ->
-        assert_equal jimmy (winner state1));
+        assert_equal [jimmy] (winners state1));
     "winner_test_2" >:: (fun _ ->
-        assert_equal bobby (winner state2));
+        assert_equal [bobby] (winners state2));
     "winner_test_3" >:: (fun _ ->
-        assert_equal alice (winner state3));
+        assert_equal [alice] (winners state3));
     "winner_test_4" >:: (fun _ ->
-        assert_equal alice (winner state3));
+        assert_equal [alice] (winners state3));
+    "winner_test_tie" >:: (fun _ ->
+        assert_equal [tie1; tie2] (
+          let res =
+            winners tied_state in
+          print_endline "YOOOOO";
+          print_endline (string_of_int ((List.length res)));
+          print_endline (string_of_int ((List.hd res).id));
+          print_endline (string_of_int ((List.hd (List.rev res)).id));
+          res
+        ));
     (*  "get_players_in_test" >:: (fun _->
           assert_equal [bobby;alice] (get_players_in state4)); *)
 

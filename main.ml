@@ -110,14 +110,16 @@ let play_game st =
   print_intro ();
 
   let rec keep_playing st =
-    let winning_id = State.winning_player st in
-    if winning_id >= 0 then
-      let string = "The winner is player " ^ string_of_int winning_id ^ "!" in
-      ANSITerminal.(print_string [yellow] string);
-      print_newline ();
-      print_newline ();
-      exit 0
-      (*keep_playing (State.continue_game st)*)
+    let winning_ids = (State.winning_players st) in
+    if (List.for_all (fun id -> id >= 0) winning_ids) then
+      (List.iter (fun id ->
+           ANSITerminal.(print_string [yellow]
+                           ("The winner is player " ^ string_of_int id ^ "!"));
+           print_newline ()
+         ) winning_ids;
+       print_newline ();
+       exit 0
+       (*keep_playing (State.continue_game st)*))
     else
       print_hline ();
     print_current_state st;
