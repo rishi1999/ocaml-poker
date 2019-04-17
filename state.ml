@@ -21,6 +21,7 @@ type t = {
   avail_action: string list;
   winner : int;
 }
+exception Tie
 
 (** [get_next_player] st returns the number of the player that has
     to act next. *)
@@ -222,7 +223,7 @@ let winner st =
     | [] -> acc
     | a :: t when a < acc -> best_player t a
     | a :: t when a > acc -> best_player t acc
-    | _ -> failwith "cannot find best"
+    | _ -> raise Tie
   in
 
   (** [get_player_in target ls acc] is the integer position
@@ -240,7 +241,9 @@ let winner st =
 let go_next_round st =
   if is_hand_complete st then
     (* everyone folded *)
-    let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else (winner st).id in
+    let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else 
+        try (winner st).id with Tie -> -2
+    in
     let win_amount = st.table.dealer in
     let player_won = find_participant st winner_player in
     let player_paid = {player_won with money = player_won.money + win_amount} in
