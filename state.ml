@@ -220,9 +220,9 @@ let hand_order num_players button =
 
 (* need to call get_avail_action before each turn to get the proper actions*)
 let get_avail_action st =
-  let big_blind_player = List.nth st.players_in 2 in
   (* preflop *)
   if List.length st.table.hole_cards = 0 then
+    let big_blind_player = List.nth st.players_in 2 in
     if st.player_turn = big_blind_player && st.bet.bet_amount = st.table.blind then
       {
         st with
@@ -245,6 +245,20 @@ let get_avail_action st =
       st with
       avail_action = ["call"; "raise"; "fold"]
     }
+
+let check_all_bet_equal st = 
+  let rec bets_helper = function
+      | [] -> true
+      | (p, amt)::t ->
+        if List.mem p st.players_in then
+          if amt = st.bet.bet_amount then bets_helper t
+          else false
+        else bets_helper t in
+  bets_helper st.bet.bet_paid_amt
+
+(* true if hand is complete *)
+let is_hand_compete st = 
+  st
 
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
