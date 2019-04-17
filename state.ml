@@ -251,14 +251,24 @@ let get_avail_action st =
     }
 
 let check_all_bet_equal st =
-  let rec bets_helper = function
-    | [] -> true
-    | (p, amt)::t ->
-      if List.mem p st.players_in then
-        if amt = st.bet.bet_amount then bets_helper t
-        else false
-      else bets_helper t in
-  bets_helper st.bet.bet_paid_amt
+
+  let rec players_all_paid = function
+  | [] -> true
+  | h :: t -> if exist st.bet.bet_paid_amt h then players_all_paid t
+    else false in
+
+  if players_all_paid st.players_in then
+
+    let rec bets_helper = function
+      | [] -> true
+      | (p, amt)::t ->
+        if List.mem p st.players_in then
+          if amt = st.bet.bet_amount then bets_helper t
+          else false
+        else bets_helper t in
+    bets_helper st.bet.bet_paid_amt
+  
+  else false
 
 (* true if hand is complete *)
 let is_hand_complete st = 
