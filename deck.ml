@@ -13,8 +13,9 @@ let suits = [Clubs; Diamonds; Hearts; Spades]
 type card = suit * rank
 
 (* decks are maintained as lists*)
-let played_cards : (card list) ref = ref []
-let current_deck : (card list) ref = ref []
+let played_cards = ref []
+let current_deck = ref []
+let deck_size = ref 0
 
 let all_ranks (suit:suit) = List.map (fun rank -> (suit,rank)) ranks
 
@@ -29,40 +30,43 @@ let shuffle_list compare list =
   List.map fst sorted_tags
 
 (** [shuffle_deck] shuffles the cards currently in the deck *)
-let shuffle_deck =
+let shuffle_deck () =
   Random.self_init();
   let compare_second a b = Pervasives.compare (snd a) (snd b) in
   let shuffled = shuffle_list compare_second !current_deck in
   current_deck := shuffled
 
 (** [deck_init] initializes the deck all 52 cards *)
-let deck_init =
+let deck_init () =
   current_deck := deck;
-  played_cards := []
+  played_cards := [];
+  deck_size := 52
 
+(*
 (** [deck_size] returns the number of cards remaining in the current
     deck *)
-let deck_size = List.length !current_deck
+let deck_size = List.length (!current_deck) *)
 
 (** [update_state lst] is the deck with all cards played
     since the last update, [lst],
     removed from the deck and included in the cards-played list.  *)
 let update_state card_list =
   played_cards := card_list @ !played_cards;
-  current_deck := List.filter (fun x -> not (List.mem x card_list)) !current_deck
+  current_deck := List.filter (fun x -> not (List.mem x card_list)) !current_deck;
+  deck_size := List.length !current_deck
 
 (** [pick_cards num] returns a list of [num] cards from the top of the deck.
     Raises: Failure "Insufficient Cards" if you attempt to pick more cards
     than currently available in the deck. *)
 let pick_cards num =
-  if deck_size < num then failwith  "Insufficient Cards"
+  if !deck_size < num then failwith  "Insufficient Cards"
   else
     let rec list_builder count outlist a = match a with
       | [] -> outlist
       | h :: t when count = 0 -> outlist
       | h :: t -> list_builder (count - 1) (h :: outlist) t in
     let cards = List.rev (list_builder num [] !current_deck) in
-    let _state_update = update_state cards in
+    update_state cards;
     cards
 
 (* [int_converter card] returns an integer representation of the card
