@@ -153,9 +153,6 @@ let init_bet =
     new_round = true;
   }
 
-(** [list_remove_element] returns a list with all the elements of [list]
-    except for [element].
-    Example: [list_remove_element] 1 [1;2;3] is [2;3]. *)
 let init_players_in num_players =
   let rec init_players_in' acc = function
     | 0 -> acc
