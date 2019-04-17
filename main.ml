@@ -5,15 +5,14 @@ let rec get_and_read_input expected_output =
   if List.mem (input) expected_output then input
   else raise Wrong_Input
 
-let print_hline =
-  let rec print_hline' n =
-    print_char '-';
-    if n > 0 then
-      print_hline' (n - 1) in
-  print_hline' 100;
+let print_hline () =
+  for i = 1 to 100 do
+    print_char '-'
+  done;
+  print_newline ();
   print_newline ()
 
-let print_intro =
+let print_intro () =
   print_endline "Tips:";
   print_string "    The player whose turn it is is shown in ";
   ANSITerminal.(print_string [green] "green");
@@ -101,28 +100,31 @@ let print_current_state st =
   print_newline ();
   print_player_bets st;
   print_string "Available actions: ";
-  print_string_list ("quit" :: "stack" :: (State.avail_action st));
-  print_hline
+  print_string_list ("quit" :: "stack" :: (State.avail_action st))
 
 
 
 
 
 let play_game st =
-  print_intro;
+  print_intro ();
 
   let rec keep_playing st =
+    print_hline ();
     print_current_state st;
-    print_string "> ";
+    print_newline ();
+    ANSITerminal.(print_string [blue] "> ");
 
     match read_line () with
     | curr_cmd ->
       match Command.parse curr_cmd with
       | exception Command.Malformed ->
+        print_newline ();
         print_endline "Not a valid command.";
         keep_playing st
 
       | exception Command.Empty ->
+        print_newline ();
         print_endline "Please enter a command.";
         keep_playing st
 
@@ -132,10 +134,12 @@ let play_game st =
         let func = State.command_to_function comm in
         match func st with
         | Legal t ->
+          print_newline ();
           print_endline (Command.command_to_string comm);
           print_newline ();
           keep_playing (State.get_avail_action t)
         | Illegal ->
+          print_newline ();
           print_endline "You can't do that right now!";
           print_newline ();
           keep_playing (State.get_avail_action st)
@@ -145,13 +149,11 @@ let play_game st =
 
 let init_game num_players =
   print_endline "Starting stack amount?";
-  print_string  "> ";
-  (* let money = read_int () in *)
-  let money = 500 in
+  ANSITerminal.(print_string [blue] "> ");
+  let money = read_int () in
   print_endline "Blind amount?";
-  print_string  "> ";
-  (* let blind = read_int () in *)
-  let blind = 5 in
+  ANSITerminal.(print_string [blue] "> ");
+  let blind = read_int () in
   let st = match num_players with
     | 1 -> State.init_state 1 2 money blind
     | _ -> State.init_state 0 num_players money blind in
@@ -168,7 +170,7 @@ let main (() : unit) : unit =
   print_newline ();
   print_newline ();
   print_endline "How many (human) players are there?";
-  print_string  "> ";
+  ANSITerminal.(print_string [blue] "> ");
 
   match read_int () with
   | exception End_of_file -> ()
