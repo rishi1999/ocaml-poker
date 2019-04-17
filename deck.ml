@@ -36,7 +36,7 @@ let shuffle_deck () =
   let shuffled = shuffle_list compare_second !current_deck in
   current_deck := shuffled
 
-(** [deck_init] initializes the deck all 52 cards *)
+(** [deck_init] initializes the deck with all 52 cards *)
 let deck_init () =
   current_deck := deck;
   played_cards := [];
