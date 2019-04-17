@@ -13,8 +13,8 @@ let suits = [Clubs; Diamonds; Hearts; Spades]
 type card = suit * rank
 
 (* decks are maintained as lists*)
-let played_cards = ref []
-let current_deck = ref []
+let played_cards : (card list) ref = ref []
+let current_deck : (card list) ref = ref []
 
 let all_ranks (suit:suit) = List.map (fun rank -> (suit,rank)) ranks
 
@@ -22,7 +22,6 @@ let deck = List.concat (List.map (fun suit -> all_ranks suit) suits)
 
 (** [shuffle_deck] returns a list of the full 52 card deck with the cards in
     a randomized order *)
-
 let shuffle_list compare list =
   Random.self_init();
   let tagged_list = List.map (fun card -> (card, Random.bits())) deck in
@@ -54,7 +53,7 @@ let update_state card_list =
     Raises: Failure "Deck is empty" if there are no cards in the deck*)
 let pick_card =
   if deck_size = 0 then failwith "Deck is empty"
-  else 
+  else
     let card = List.hd !current_deck in
     let _state_update = update_state [card] in
     card
@@ -62,7 +61,7 @@ let pick_card =
 (** [pick_cards num] returns a list of [num] cards from the top of the deck.
     Raises: Failure "Insufficient Cards" if you attempt to pick more cards
     than currently available in the deck. *)
-let pick_cards num = 
+let pick_cards num =
   if deck_size < num then failwith  "Insufficient Cards"
   else
     let rec list_builder count outlist a = match a with
@@ -73,7 +72,7 @@ let pick_cards num =
     let _state_update = update_state cards in
     cards
 
-(* [int_convereter card] returns an integer representation of the card
+(* [int_converter card] returns an integer representation of the card
    such that the card is in the range 0 to 52. The integer is calculcated by
    taking the rank of the card and mapping it from 0 to 12 such that Two maps
    to 0 and Ace to 12 and the suit of the card (0 for Clubs, 1 for Diamonds,
@@ -81,7 +80,7 @@ let pick_cards num =
    Rank * 4 + Suit.
    Example int_converter (Clubs, Nine) = 28
    Requires: card is a valid (suit, rank) tuple  *)
-let int_converter card = 
+let int_converter card =
   let offset = match card with
     | Clubs, _-> 0
     | (Diamonds, _) -> 1
@@ -108,7 +107,7 @@ let update_state card_list =
   match card_list with
   | [] -> ()
   | None :: t -> ()
-  | Some a :: t -> 
+  | Some a :: t ->
     let extract_cards = List.map (fun x -> match x with | None -> (Clubs,Two) | Some a -> a) card_list in
 *)
   current_deck := List.filter (fun x -> not (List.mem x extract_cards)) !current_deck
