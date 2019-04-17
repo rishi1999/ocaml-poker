@@ -41,7 +41,7 @@ let hand_evaluator card_ranks card_suits =
 let dp = Constantarrays.dp
 let suits = Constantarrays.suits
 
-(* *)
+(** [hash_quinary] *)
 let hash_quinary q len k =
   let rec loop i len sum k =
     if i = len then sum
