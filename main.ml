@@ -43,7 +43,8 @@ let print_player_bets st =
       print_int b;
       print_newline ();
       helper t in
-  helper lst
+  helper lst;
+  print_newline ()
 
 let find_participant st target =
   let rec find_participant' target = function
@@ -53,11 +54,12 @@ let find_participant st target =
   find_participant' target (Table.participants (State.table st))
 
 let print_current_state st =
-  print_string "The board is: ";
+  print_string "Cards on the board: ";
   print_int_list (List.map Deck.int_converter
                     (Table.board (State.table st)));
   print_string "Players in: ";
   print_players_in st;
+  print_newline ();
   print_string "Your hand is: ";
   print_int_list (List.map Deck.int_converter
                     (Player.cards (find_participant st
@@ -66,22 +68,28 @@ let print_current_state st =
   print_int (Player.money
                (find_participant st (State.player_turn st)));
   print_newline ();
+  print_newline ();
   print_player_bets st;
   print_string "Available actions: ";
   print_string_list ("quit" :: "stack" :: (State.avail_action st));
-  print_endline "------------------------------------"
+  for i = 1 to 100 do
+    print_char '-'
+  done;
+  print_newline ()
 
 let play_game st =
-  (*match State.game_type st with
-    | 0 -> print_endline "Starting multiplayer game..."
-    | 1 -> print_endline "Starting singleplayer game...";*)
   print_newline ();
-  print_string "The player whose turn it is is shown in ";
+  print_endline "Tips:";
+  print_string "    The player whose turn it is is shown in ";
   ANSITerminal.(print_string [green] "green");
   print_endline ".";
-  print_string "The button is shown in ";
+  print_string "    The button is shown in ";
   ANSITerminal.(print_string [red] "red");
   print_endline ".";
+  print_newline ();
+  ANSITerminal.(print_string [yellow] "LET'S PLAY!");
+  print_newline ();
+  print_newline ();
   print_newline ();
 
   let rec keep_playing st =
