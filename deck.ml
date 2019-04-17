@@ -51,15 +51,6 @@ let update_state card_list =
   played_cards := card_list @ !played_cards;
   current_deck := List.filter (fun x -> not (List.mem x card_list)) !current_deck
 
-(** [pick_card] returns the card at the top of the deck.
-    Raises: Failure "Deck is empty" if there are no cards in the deck*)
-let pick_card =
-  if deck_size = 0 then failwith "Deck is empty"
-  else
-    let card = List.hd !current_deck in
-    let _state_update = update_state [card] in
-    card
-
 (** [pick_cards num] returns a list of [num] cards from the top of the deck.
     Raises: Failure "Insufficient Cards" if you attempt to pick more cards
     than currently available in the deck. *)

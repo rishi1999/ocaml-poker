@@ -12,8 +12,6 @@ val shuffle_deck : unit
 
 val shuffle_list : (card * int -> card * int -> int) -> 'a -> card list
 
-val pick_card : card
-
 val pick_cards : int -> card list
 
 val update_state : card list -> unit
