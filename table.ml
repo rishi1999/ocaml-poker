@@ -109,7 +109,7 @@ let add_to_hole table =
       dealer;
       blind;
       participants;
-      board = Deck.pick_card :: Deck.pick_card :: Deck.pick_card :: h;
+      board = Deck.pick_cards 3 @ h;
     }
   |
     {

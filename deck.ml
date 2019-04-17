@@ -46,8 +46,8 @@ let deck_size = List.length !current_deck
 
 
 let update_state card_list =
-  played_cards := card_list :: !played_cards;
-  current_deck := List.filter (fun x -> not (List.mem x card_list)) !current_deck 
+  played_cards := card_list @ !played_cards;
+  current_deck := List.filter (fun x -> not (List.mem x card_list)) !current_deck
 
 (** [pick_card] returns the card at the top of the deck.
     Raises: Failure "Deck is empty" if there are no cards in the deck*)
