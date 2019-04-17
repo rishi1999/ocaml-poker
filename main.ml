@@ -55,7 +55,7 @@ let find_participant st target =
 let print_current_state st =
   print_string "The board is: ";
   print_int_list (List.map Deck.int_converter
-                    (Table.hole_cards (State.table st)));
+                    (Table.board (State.table st)));
   print_string "Players in: ";
   print_players_in st;
   print_string "Your hand is: ";
@@ -115,11 +115,11 @@ let play_game st =
   keep_playing st
 
 let init_game num_players =
-  print_endline "starting stack?";
+  print_endline "Starting stack amount?";
   print_string  "> ";
   (* let money = read_int () in *)
   let money = 500 in
-  print_endline "blinds?";
+  print_endline "Blind amount?";
   print_string  "> ";
   (* let blind = read_int () in *)
   let blind = 5 in
@@ -140,10 +140,9 @@ let main (() : unit) : unit =
   print_endline "How many (human) players are there?";
   print_string  "> ";
 
-  (* match read_int () with
+  match read_int () with
   | exception End_of_file -> ()
-  | num -> (init_game num) *)
-  init_game 2
+  | num -> (init_game num)
 
 (* Execute the game engine. *)
 let () = main ()

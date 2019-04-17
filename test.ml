@@ -18,7 +18,7 @@ let deck_tests =
   ]
 let james:player = {id = 0; cards = []; money = 32}
 let bob:player = {id = 1; cards = []; money = 32}
-let table1: table = {dealer = 0; blind = 1; participants = [james;bob]; hole_cards= []}
+let table1: table = {dealer = 0; blind = 1; participants = [james;bob]; board= []}
 let table2: table = deal table1
 
 
@@ -30,7 +30,7 @@ let james_cards_2 table2_players = match table2_players with
 
 let table1_players=  match table1 with 
     { dealer = d ; blind = b; participants = p ; _ } -> p
-let james_cards= match table1_players with 
+let james_cards= match table1_players with
   | {id = s; cards = c; money = m}::t -> c
   | _ -> failwith "table2 not dealt"
 
@@ -39,12 +39,14 @@ let empty: (Deck.suit * Deck.rank) list = []
 let jimmy:player = {id = 1; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
 let bobby:player = {id = 2; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
 
-let state_table_1 = {dealer = 1; blind = 2; participants = [jimmy;bobby]; 
-                     hole_cards = [(Hearts, Ace);(Diamonds, Ace);(Spades, King); (Hearts, King); (Hearts, Three)]}
-let state_bet_1:bet = {
+let state_table_1 = {dealer = 1; blind = 2; participants = [jimmy;bobby];
+                     board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
+                              (Hearts, King); (Hearts, Three)]}
+let state_bet_1 = {
   bet_player = 1;
   bet_amount = 0;
   bet_paid_amt = [(0,0)];
+  new_round = true;
 }
 
 let state1:State.t = {
@@ -56,7 +58,6 @@ let state1:State.t = {
   players_in = [1;2];
   bet = state_bet_1;
   avail_action = ["fold"];
-  is_new_round = true;
 }
 let state2 = {state1 with players_in = [0]}
 let state3 = {state1 with players_in = [1]}
@@ -64,7 +65,7 @@ let state3 = {state1 with players_in = [1]}
 let state_tests =
 
   [
-    "hand_order_test1" >:: (fun _ -> 
+    "hand_order_test1" >:: (fun _ ->
         assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
 
     "winner_test_1" >:: (fun _ ->
@@ -83,7 +84,7 @@ let table_tests =
     "deal_test_2" >:: (fun _->
         assert_equal james_cards empty);
     "deal_failure_test_1" >:: (fun _->
-        assert_raises (Failure "player issue") (fun () -> deal table2));
+        assert_raises (Failure "player has non 0 cards") (fun () -> deal table2));
     "add_to_hole_test_1" >:: (fun _->
         assert (table1 <> (add_to_hole (table1))));
   ]
@@ -99,7 +100,7 @@ let g = 4*4+0
 let h = 0 * 4 + 0
 let i = 7 * 4 +2
 
-let hand_evaluator_tests = 
+let hand_evaluator_tests =
   [
     "4_full_house" >:: (fun _->
         assert_equal 292 (seven_eval a b c d e f g ));
@@ -109,7 +110,7 @@ let hand_evaluator_tests =
 
   ]
 
-let suite = 
+let suite =
   "test suite for A6"  >::: List.flatten [
     deck_tests;
     table_tests;

@@ -139,7 +139,7 @@ let init_table num_players money blind =
     dealer = 0;
     blind;
     participants = init_players num_players money;
-    hole_cards = [];
+    board = [];
   }
 
 (** [list_remove_element] returns a list with all the elements of [list]
@@ -188,7 +188,7 @@ let avail_action st = st.avail_action
 let bet_paid_amt st = st.bet.bet_paid_amt
 
 let go_next_round st =
-  if List.length st.table.hole_cards = 5 then
+  if List.length st.table.board = 5 then
     let cleared = Table.clear_round st.table in
     {
       st with
@@ -225,7 +225,7 @@ let hand_order num_players button =
 (* need to call get_avail_action before each turn to get the proper actions*)
 let get_avail_action st =
   (* preflop *)
-  if List.length st.table.hole_cards = 0 then
+  if List.length st.table.board = 0 then
     let big_blind_player = List.nth st.players_in 1 in
     if st.player_turn = big_blind_player && st.bet.bet_amount = st.table.blind then
       {
@@ -250,7 +250,7 @@ let get_avail_action st =
       avail_action = ["call"; "raise"; "fold"]
     }
 
-let check_all_bet_equal st = 
+let check_all_bet_equal st =
   let rec bets_helper = function
     | [] -> true
     | (p, amt)::t ->
@@ -261,7 +261,7 @@ let check_all_bet_equal st =
   bets_helper st.bet.bet_paid_amt
 
 (* true if hand is complete *)
-let is_hand_complete st = 
+let is_hand_complete st =
   st
 
 (** [is_round_complete st] is true if the game is
@@ -370,7 +370,7 @@ let winner st =
       players_in;
       bet;
       avail_action;
-    } -> t.hole_cards
+    } -> t.board
   in
   let all_part = match st with
     | {
@@ -399,8 +399,8 @@ let winner st =
   in
 
   (** ranks returns a list of ranks of the hands of the list players*)
-  let rec ranks (participants:player list) (hole_cards:(Deck.suit*Deck.rank) list) (lst:int list) = match participants with
-    | a::b -> print_int (seven_list_eval (a.cards@hole)); print_string ("yuh"); ranks b hole_cards ((seven_list_eval (a.cards@hole))::lst)
+  let rec ranks participants (board : Deck.card list) lst = match participants with
+    | a::b -> print_int (seven_list_eval (a.cards@hole)); print_string ("yuh"); ranks b board ((seven_list_eval (a.cards@hole))::lst)
     | [] -> lst
   in
 

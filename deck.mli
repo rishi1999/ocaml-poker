@@ -6,21 +6,20 @@ type rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack
 type suit = Clubs | Diamonds | Hearts | Spades
 
 (**Type representing a card*)
-type card
+type card = suit * rank
 
 val shuffle_deck : unit
 
-val shuffle_list : ((suit * rank) * int -> (suit * rank) * int -> int) -> 'a -> (suit * rank) list
+val shuffle_list : (card * int -> card * int -> int) -> 'a -> card list
 
-val pick_card : suit * rank
+val pick_card : card
 
-val pick_cards : int -> (suit * rank) list
+val pick_cards : int -> card list
 
-val update_state : (suit * rank) list -> unit
+val update_state : card list -> unit
 
 val deck_size : int
 
 val deck_init : unit
 
-val int_converter : suit * rank -> int
-
+val int_converter : card -> int

@@ -5,13 +5,13 @@ type table = {
   dealer: int;
   blind: int;
   participants: Player.player list;
-  hole_cards: (Deck.suit * Deck.rank) list;
+  board: (Deck.suit * Deck.rank) list;
 }
 
 let dealer tb = tb.dealer
 let blind tb = tb.blind
 let participants tb = tb.participants
-let hole_cards tb = tb.hole_cards
+let board tb = tb.board
 
 let next_round_players (tab:table) = match tab with
   |
@@ -19,7 +19,7 @@ let next_round_players (tab:table) = match tab with
       dealer = d;
       blind;
       participants;
-      hole_cards;
+      board;
     } as tab when blind = List.length participants + 1
     ->
     {
@@ -31,7 +31,7 @@ let next_round_players (tab:table) = match tab with
       dealer;
       blind;
       participants;
-      hole_cards;
+      board;
     } as tab when dealer = List.length participants + 1
     ->
     {
@@ -43,7 +43,7 @@ let next_round_players (tab:table) = match tab with
     dealer = d;
     blind = b;
     participants;
-    hole_cards;
+    board;
   } as tab
     ->
     {
@@ -79,7 +79,7 @@ let deal (table : table) : table =
       dealer;
       blind;
       participants;
-      hole_cards;
+      board;
     } as tab
     ->
     {
@@ -94,36 +94,36 @@ let add_to_hole table =
       dealer;
       blind;
       participants;
-      hole_cards;
-    } when List.length hole_cards > 5
+      board;
+    } when List.length board > 5
     -> failwith "too many hole cards"
   |
     {
       dealer;
       blind;
       participants;
-      hole_cards = h;
+      board = h;
     } when List.length h = 0
     ->
     {
       dealer;
       blind;
       participants;
-      hole_cards = Deck.pick_card :: Deck.pick_card :: Deck.pick_card :: h;
+      board = Deck.pick_card :: Deck.pick_card :: Deck.pick_card :: h;
     }
-  | 
+  |
     {
       dealer;
       blind;
       participants;
-      hole_cards = h;
+      board = h;
     }
     ->
     {
       dealer;
       blind;
       participants;
-      hole_cards = Deck.pick_card :: h;
+      board = Deck.pick_card :: h;
     }
 
 
@@ -145,11 +145,11 @@ let rec clear_round table = match table with
       dealer;
       blind;
       participants;
-      hole_cards;
+      board;
     } as tab
     ->
     {
       tab with
       participants = clear_players participants [];
-      hole_cards = [];
+      board = [];
     }
