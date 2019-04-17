@@ -5,6 +5,12 @@ let rec get_and_read_input expected_output =
   if List.mem (input) expected_output then input
   else raise Wrong_Input
 
+let print_hline =
+  for i = 1 to 100 do
+    print_char '-'
+  done;
+  print_newline ()
+
 let print_intro =
   print_endline "Tips:";
   print_string "    The player whose turn it is is shown in ";
@@ -69,6 +75,13 @@ let find_participant st target =
   find_participant' target (Table.participants (State.table st))
 
 let print_current_state st =
+  ANSITerminal.(
+    print_string [yellow] "Player ";
+    print_string [yellow] (string_of_int (State.player_turn st));
+    print_string [yellow] "'s turn"
+  );
+  print_hline;
+  print_newline ();
   print_string "Cards on the board: ";
   print_int_list (List.map Deck.int_converter
                     (Table.board (State.table st)));
@@ -87,10 +100,7 @@ let print_current_state st =
   print_player_bets st;
   print_string "Available actions: ";
   print_string_list ("quit" :: "stack" :: (State.avail_action st));
-  for i = 1 to 100 do
-    print_char '-'
-  done;
-  print_newline ()
+  print_hline
 
 
 
