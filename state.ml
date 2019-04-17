@@ -250,47 +250,45 @@ let get_avail_action st =
       avail_action = ["call"; "raise"; "fold"]
     }
 
+(** [are_all_bets_equal] is true if all bets made
+    in the current round are equal. *)
+let are_all_bets_equal st = List.for_all
+    (fun (_,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt
+
 (* (** [are_all_bets_equal] is true if all bets made
     in the current round are equal. *)
    let are_all_bets_equal st = List.for_all
     (fun (player,paid) -> paid = st.bet.bet_amount) st.bet.bet_paid_amt *)
 let check_all_bet_equal st =
-
   let rec players_all_paid = function
   | [] -> true
   | h :: t -> if exist st.bet.bet_paid_amt h then players_all_paid t
     else false in
-
-    let rec bets_helper = function
-      | [] -> true
-      | (p, amt)::t ->
-        if List.mem p st.players_in then
-          if amt = st.bet.bet_amount then bets_helper t
-          else false
-        else bets_helper t in
   
-  players_all_paid st.players_in && bets_helper st.bet.bet_paid_amt
+  players_all_paid st.players_in && are_all_bets_equal st
 
-(* true if hand is complete *)
-let is_hand_complete st = 
+
+
+(** [is_hand_complete st] is true if hand is complete. *)
+let is_hand_complete st =
   let everyone_folded = (List.length st.players_in < 2) in
   let after_river = (List.length st.table.board = 5) in
 
-  everyone_folded || (after_river && check_all_bet_equal st 
-                                  && st.bet.new_round = false)
+  everyone_folded || (after_river && are_all_bets_equal st
+                      && st.bet.new_round = false)
 
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
 let is_round_complete st =
   let everyone_checked = (st.bet.bet_amount = 0 && st.bet.new_round = false &&
-  st.player_turn = List.nth st.players_in 0) in
+                          st.player_turn = List.nth st.players_in 0) in
   (* NEEDS WORK *)
   if List.length st.table.board = 0 then
     let big_blind = List.nth st.players_in 1 in
     let bb = (st.player_turn = big_blind) in
-    check_all_bet_equal st 
+    are_all_bets_equal st
   else
-    everyone_checked || (check_all_bet_equal st && st.bet.new_round = false)
+    everyone_checked || (are_all_bets_equal st && st.bet.new_round = false)
 
 let calculate_pay_amt st =
   let cur_bet_size = st.bet.bet_amount in
@@ -339,9 +337,9 @@ let fold st =
         st with
         players_in = remove st.player_turn st.players_in;
         player_turn = get_next_player st;
-        bet = {st.bet with 
-            new_round = false;
-          };
+        bet = {st.bet with
+               new_round = false;
+              };
       } in
 
     if is_round_complete t then
@@ -441,18 +439,13 @@ let winner st =
     | _ -> failwith "cannot find best"
   in
 
-  (** get_player_in gets the integer position of the list of the best player*)
+  (** [get_player_in target ls acc] is the integer position
+      of the list of the best player. *)
   let rec get_player_int (target:int) ls acc = match ls with
     | a::b when a = target -> acc
     | a::b -> get_player_int target b (acc+1)
-    | [] -> failwith "not in list"
-
-  in
-  let part = get_players_in all_part p_in []
-  in
-  let rlist = ranks part hole []
-  in
-  let num_winner = get_player_int (best_rank rlist 0) rlist 0
-  in
-
+    | [] -> failwith "not in list" in
+  let part = get_players_in all_part p_in [] in
+  let rlist = ranks part hole [] in
+  let num_winner = get_player_int (best_rank rlist 0) rlist 0 in
   List.nth part num_winner
