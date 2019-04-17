@@ -98,6 +98,28 @@ let int_converter card =
     | (_, King) -> 11
     | (_, Ace) -> 12 in
   rank * 4 + offset
+
+let card_printer card =
+  let suit = match card with
+    | Clubs, _-> "Clubs"
+    | (Diamonds, _) -> "Diamonds"
+    | (Hearts, _) -> "Hearts"
+    | (Spades, _) -> "Spades" in
+  let rank = match card with
+    | (_, Two) -> "Two"
+    | (_, Three) -> "Three"
+    | (_, Four) -> "Four"
+    | (_, Five) -> "Five"
+    | (_, Six) -> "Six"
+    | (_, Seven) -> "Seven"
+    | (_, Eight) -> "Eight"
+    | (_, Nine) -> "Nine"
+    | (_, Ten) -> "Ten"
+    | (_, Jack) -> "Jack"
+    | (_, Queen) -> "Queen"
+    | (_, King) -> "King"
+    | (_, Ace) -> "Ace" in
+  rank ^ " of " ^ suit
 (*
 let update_state card_list =
 (*

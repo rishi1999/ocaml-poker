@@ -14,6 +14,7 @@ type t = {
   players_played: int list;
   bet: bet;
   avail_action: string list;
+  winner: int;
 }
 (** [game_type st] is the type of the game being played in [st].
     Requires: valid state [st]. *)
@@ -42,6 +43,10 @@ val players_in : t -> int list
     in the game being played in [st].
     Requires: valid state [st]. *)
 val button : t -> int
+
+val continue_game : t -> t
+
+val winner : t -> int
 
 (** [bet st] is the amount currently being bet
     in the game being played in [st].

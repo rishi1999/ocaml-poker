@@ -84,15 +84,15 @@ let print_current_state st =
   print_newline ();
   print_newline ();
   print_string "Cards on the board: ";
-  print_int_list (List.map Deck.int_converter
-                    (Table.board (State.table st)));
+  print_string_list (List.map Deck.card_printer
+                       (Table.board (State.table st)));
   print_string "Players in: ";
   print_players_in st;
   print_newline ();
   print_string "Your hand is: ";
-  print_int_list (List.map Deck.int_converter
-                    (Player.cards (find_participant st
-                                     (State.player_turn st))));
+  print_string_list (List.map Deck.card_printer
+                       (Player.cards (find_participant st
+                                        (State.player_turn st))));
   print_string "You have: $";
   print_int (Player.money
                (find_participant st (State.player_turn st)));
@@ -144,8 +144,12 @@ let play_game st =
           print_newline ();
           keep_playing (State.get_avail_action st)
   in
-
-  keep_playing st
+  if st.winner >= 0 then
+    let string = "The winner is " ^ string_of_int st.winner in 
+    print_endline string;
+    keep_playing st
+  else
+    keep_playing st
 
 let init_game num_players =
   print_endline "Starting stack amount?";

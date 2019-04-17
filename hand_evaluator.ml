@@ -122,7 +122,8 @@ let seven_eval a b c d e f g =
     let hash = hash_quinary quinary 13 7 in
     noflush.(hash)
 
-
+(*REWRITE THIS FOR EFFICIENCY. NO NEED TO ITERATE AGAIN AND AGAIN OVER
+  THE SAME LIST. USE RECURSION. *)
 let seven_list_eval (hand:(Deck.suit * Deck.rank) list) = 
   if List.length hand <> 7 then failwith "not 7 cards";
   let a = Deck.int_converter (List.nth hand 0) in
