@@ -156,6 +156,7 @@ let play_game st =
   keep_playing st
 
 let init_game num_players =
+  print_newline ();
   print_endline "Starting stack amount?";
   ANSITerminal.(print_string [blue] "> ");
   let money = read_int () in
