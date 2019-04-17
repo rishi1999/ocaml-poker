@@ -13,7 +13,6 @@ type t = {
   players_in: int list;
   bet: bet;
   avail_action: string list;
-  is_new_round : bool;
 }
 (** [game_type st] is the type of the game being played in [st].
     Requires: valid state [st]. *)
@@ -53,11 +52,6 @@ val bet : t -> bet
     Requires: valid state [st]. *)
 val avail_action : t -> string list
 
-(** [button st] is true if a round has just started
-    in the game being played in [st].
-    Requires: valid state [st]. *)
-val is_new_round : t -> bool
-
 (** [button st] is the initial state
     of the game being played in [st].
     Requires: valid state [st]. *)
@@ -84,7 +78,7 @@ val command_to_function : Command.command -> (t -> move_result)
 (** [winner st] is the player that wins the round
     Requires that state has a nonempty list of players
     Requries there are 5 hole cards
-    throws "cannot determine winner" exception if called on 
+    throws "cannot determine winner" exception if called on
     list of empty players or hole cards less than 5*)
 val winner : t -> Player.player
 

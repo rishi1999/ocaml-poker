@@ -24,7 +24,6 @@ type bet = {
     [players_in] : the list of players that are currently playing the hand
     [bet] : current bet situation in this round
     [avail_action] : the available actions that the current player can act
-    [is_new_round] : 
 *)
 type t = {
   game_type: int;
@@ -35,10 +34,9 @@ type t = {
   players_in: int list;
   bet: bet;
   avail_action: string list;
-  is_new_round: bool;
 }
 
-(** [get_next_player] st returns the number of the player that has 
+(** [get_next_player] st returns the number of the player that has
     to act next. *)
 let get_next_player st =
   let rec helper = function
@@ -173,7 +171,6 @@ let init_state game_type num_players money blind =
     players_in = init_players_in num_players;
     bet = init_bet;
     avail_action = ["bet"; "check"; "fold"];
-    is_new_round = true;
   } |> pay_blinds
 
 let game_type st = st.game_type
@@ -184,7 +181,6 @@ let button st = st.button
 let players_in st = st.players_in
 let bet st = st.bet
 let avail_action st = st.avail_action
-let is_new_round st = st.is_new_round
 let bet_paid_amt st = st.bet.bet_paid_amt
 
 let go_next_round st =
@@ -261,8 +257,7 @@ let is_round_complete st =
         else false
       else bets_helper t in
 
-  (st.is_new_round && bets_helper st.bet.bet_paid_amt) ||
-  List.length st.players_in = 0
+  (st.player_turn = st.bet.bet_player && bets_helper st.bet.bet_paid_amt)
 
 let calculate_pay_amt st =
   let cur_bet_size = st.bet.bet_amount in
@@ -317,18 +312,18 @@ let fold st =
   else Illegal
 
 let stack st =
-    let players = List.sort compare st.players_in in
-    let rec find_stack player = function
-      | [] -> 0
-      | h::t -> if h.id = player then h.money else find_stack player t in
-    let print_stack player =
-      print_string "Player ";
-      print_int player;
-      print_string " has $";
-      print_int (find_stack player st.table.participants);
-      print_endline ". "; in
-    List.iter print_stack players;
-    Legal st
+  let players = List.sort compare st.players_in in
+  let rec find_stack player = function
+    | [] -> 0
+    | h::t -> if h.id = player then h.money else find_stack player t in
+  let print_stack player =
+    print_string "Player ";
+    print_int player;
+    print_string " has $";
+    print_int (find_stack player st.table.participants);
+    print_endline ". "; in
+  List.iter print_stack players;
+  Legal st
 
 let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
@@ -365,7 +360,6 @@ let winner st =
       players_in;
       bet;
       avail_action;
-      is_new_round;
     } -> t.hole_cards
   in
   let all_part = match st with
@@ -378,7 +372,6 @@ let winner st =
       players_in;
       bet;
       avail_action;
-      is_new_round;
     } -> t.participants
   in
 
@@ -392,7 +385,6 @@ let winner st =
       players_in = ls;
       bet;
       avail_action;
-      is_new_round;
     } -> ls
   in
 
