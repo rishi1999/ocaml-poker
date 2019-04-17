@@ -332,13 +332,14 @@ let go_next_round st =
     (* let cleared = Table.clear_round updated_table in *)
     let cleared = Table.clear_round st.table in
     let button_updated = if st.button + 1 > st.num_players then 1 else st.button + 1 in
+    let players_in_updated = hand_order st.num_players button_updated in
     {
       st with
       table = Table.deal (cleared);
       bet = init_bet;
-      player_turn = List.nth st.players_in 0;
+      player_turn = List.nth players_in_updated 0;
       button = button_updated;
-      players_in = hand_order st.num_players button_updated;
+      players_in = players_in_updated;
     } |> pay_blinds
   else
     let card_added = Table.add_to_hole st.table in
