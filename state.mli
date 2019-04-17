@@ -2,7 +2,6 @@ type bet = {
   bet_player: int;
   bet_amount: int;
   bet_paid_amt: (int*int) list;
-  new_round: bool;
 }
 
 type t = {
