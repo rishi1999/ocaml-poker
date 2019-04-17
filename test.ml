@@ -86,10 +86,16 @@ let tied_state = {
 let my_res st =
   let res =
     winners st in
-  print_endline "YOOOOO";
+  print_newline ();
+  print_endline "The Begin";
+  print_string "length: ";
   print_endline (string_of_int ((List.length res)));
+  print_string "head: ";
   print_endline (string_of_int ((List.hd res).id));
+  print_string "last elem: ";
   print_endline (string_of_int ((List.hd (List.rev res)).id));
+  print_endline "The The End";
+  print_newline ();
   res
 
 (** State Tests*)
