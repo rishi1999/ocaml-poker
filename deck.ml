@@ -50,8 +50,7 @@ let update_state card_list =
   played_cards := card_list :: !played_cards;
   current_deck := List.filter (fun x -> not (List.mem x card_list)) !current_deck 
 
-(** [pick_card] returns None if the current deck is empty and Some card 
-    if the deck is non empty and card is at the top of the deck.
+(** [pick_card] returns the card at the top of the deck.
     Raises: Failure "Deck is empty" if there are no cards in the deck*)
 let pick_card =
   if deck_size = 0 then failwith "Deck is empty"
@@ -112,9 +111,9 @@ let update_state card_list =
   | Some a :: t -> 
     let extract_cards = List.map (fun x -> match x with | None -> (Clubs,Two) | Some a -> a) card_list in
 *)
-  current_deck := List.filter (fun x -> not (List.mem x extract_cards)) !current_deck 
+  current_deck := List.filter (fun x -> not (List.mem x extract_cards)) !current_deck
 
-(** [pick_card] returns None if the current deck is empty and Some card 
+(** [pick_card] returns None if the current deck is empty and Some card
     if the deck is non empty and card is at the top of the deck*)
 let pick_card =
   let temp = !current_deck in
