@@ -47,7 +47,7 @@ let print_player_bets st =
 
 let find_participant st target =
   let rec find_participant' target = function
-    | [h] -> h
+    | [] -> failwith "PLAYER DOES NOT EXIST"
     | h :: t -> if (Player.id h) = target then h
       else find_participant' target t in
   find_participant' target (Table.participants (State.table st))
@@ -117,10 +117,12 @@ let play_game st =
 let init_game num_players =
   print_endline "starting stack?";
   print_string  "> ";
-  let money = read_int () in
+  (* let money = read_int () in *)
+  let money = 500 in
   print_endline "blinds?";
   print_string  "> ";
-  let blind = read_int () in
+  (* let blind = read_int () in *)
+  let blind = 5 in
   let st = match num_players with
     | 1 -> State.init_state 1 2 money blind
     | _ -> State.init_state 0 num_players money blind in
@@ -138,10 +140,10 @@ let main (() : unit) : unit =
   print_endline "How many (human) players are there?";
   print_string  "> ";
 
-  match read_int () with
+  (* match read_int () with
   | exception End_of_file -> ()
-  | num -> (init_game num)
-
+  | num -> (init_game num) *)
+  init_game 2
 
 (* Execute the game engine. *)
 let () = main ()

@@ -12,6 +12,7 @@ type bet = {
   bet_player: int;
   bet_amount: int;
   bet_paid_amt: (int*int) list;
+  new_round: bool;
 }
 
 (** [t] is the state of the game described using the following information:
@@ -48,6 +49,7 @@ let get_next_player st =
     has an id of target. *)
 let find_participant st target =
   let rec helper target = function
+    | [] -> failwith "No match"
     | [h] -> h
     | h :: t -> if (Player.id h) = target then h else helper target t in
   helper target (Table.participants (st.table))
@@ -222,7 +224,7 @@ let hand_order num_players button =
 let get_avail_action st =
   (* preflop *)
   if List.length st.table.hole_cards = 0 then
-    let big_blind_player = List.nth st.players_in 2 in
+    let big_blind_player = List.nth st.players_in 1 in
     if st.player_turn = big_blind_player && st.bet.bet_amount = st.table.blind then
       {
         st with
@@ -257,21 +259,13 @@ let check_all_bet_equal st =
   bets_helper st.bet.bet_paid_amt
 
 (* true if hand is complete *)
-let is_hand_compete st = 
+let is_hand_complete st = 
   st
 
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
 let is_round_complete st =
-  let rec bets_helper = function
-    | [] -> true
-    | (p, amt)::t ->
-      if List.mem p st.players_in then
-        if amt = st.bet.bet_amount then bets_helper t
-        else false
-      else bets_helper t in
-
-  (st.player_turn = st.bet.bet_player && bets_helper st.bet.bet_paid_amt)
+  (st.player_turn = st.bet.bet_player && check_all_bet_equal st)
 
 let calculate_pay_amt st =
   let cur_bet_size = st.bet.bet_amount in
