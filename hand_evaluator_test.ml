@@ -1,4 +1,5 @@
 (* the flush hash table *)
+open Deck
 
 let dp = [|
   [|

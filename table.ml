@@ -72,7 +72,7 @@ let deal (table : table) : table =
       participants = deal_to_each participants [];
     }
 
-let add_to_hole table =
+let add_to_board table =
   match table with
   |
     {

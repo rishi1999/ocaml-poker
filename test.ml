@@ -96,6 +96,7 @@ let table_tests =
         assert (table1 <> (add_to_hole (table1))));
   ]
 
+
 let a = 7*4+0
 let b = 2*4+0
 let c = 2*4+3
@@ -107,6 +108,14 @@ let g = 4*4+0
 let h = 0 * 4 + 0
 let i = 7 * 4 +2
 
+let cards_1 = [(Spades, Two);(Clubs, Two)] @ [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
+                                              (Hearts, King); (Hearts, Three)];;
+
+let cards_2 = [(Spades, Two);(Clubs, Two)] @ [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
+                                              (Hearts, King); (Hearts, Three)];;
+let cards_3 = [(Spades, Three); (Hearts, Four)] @ [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
+                                                   (Hearts, King); (Hearts, Three)];;
+
 let hand_evaluator_tests =
   [
     "4_full_house" >:: (fun _->
@@ -114,6 +123,17 @@ let hand_evaluator_tests =
 
     "9_full_house" >:: (fun _->
         assert_equal 236 (seven_eval a b c d e h i ));
+
+    "seven_list_eval_test1" >:: (fun _ ->
+        assert_equal 2477 (seven_list_eval cards_1));
+
+    "seven_list_eval_test2" >:: (fun _ ->
+        assert_equal 2477 (seven_list_eval cards_2));
+
+    "seven_list_eval_test3" >:: (fun _ ->
+        assert_equal 2476 (seven_list_eval cards_3));
+
+
 
   ]
 
