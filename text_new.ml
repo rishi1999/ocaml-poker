@@ -1,4 +1,3 @@
-(* *)
 open Deck
 
 let diamonds=
@@ -334,7 +333,7 @@ let spades =
 │        A│
 └─────────┘"
   |]
-let hearts = 
+let hearts =
   [|
     "┌─────────┐
 │2        │
