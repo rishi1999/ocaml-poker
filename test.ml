@@ -15,6 +15,8 @@ let deck_tests =
         assert_equal [] []);
     "convert 9C" >:: (fun _ -> 
         assert_equal 28 (int_converter (Clubs, Nine)));
+    "pick_card_test" >:: (fun _ -> 
+        assert_equal 4 (List.length (pick_cards 4)));
   ]
 let james : player = {id = 0; cards = []; money = 32}
 let bob : player = {id = 1; cards = []; money = 32}
