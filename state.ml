@@ -216,8 +216,10 @@ let winners st =
 
   List.map (fun (_,p) -> p) |>
 
-  List.filter (fun x ->
-      not (List.for_all (fun y -> x.id <> y) st.players_in))
+  List.filter (fun x -> true ||
+                        List.exists (fun p_in ->
+                            p_in = x.id)
+                          st.players_in)
 
 let go_next_round st =
   if is_hand_complete st then
