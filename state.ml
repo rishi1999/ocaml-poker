@@ -221,7 +221,7 @@ let winners st =
 
 let go_next_round st =
   if is_hand_complete st then
-    let players_won = winners st in
+    let players_won = if List.length st.players_in = 1 then [find_participant st (List.hd st.players_in)] else winners st in
     let winner_ids = List.map (fun x -> x.id) players_won in
     let win_amount = st.table.dealer in
     let players_paid = List.map (fun x ->
