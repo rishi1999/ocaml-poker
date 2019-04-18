@@ -19,6 +19,9 @@ type bet = {
     [players_in] : the list of players that are currently playing the hand
     [bet] : current bet situation in this round
     [avail_action] : the available actions that the current player can act
+    [winner] : is a tuple of (player_id, rank) where player_id is the player
+    with the winning hand and the rank is the rank of the hand evaluated by
+    hand evaluator.
 *)
 type t = {
   game_type: int;
@@ -30,7 +33,7 @@ type t = {
   players_played: int list;
   bet: bet;
   avail_action: string list;
-  winner: int;
+  winner: (int*int);
 }
 (** [game_type st] is the type of the game being played in [st].
     Requires: valid state [st].
@@ -84,14 +87,12 @@ val button : t -> int
 val continue_game : t -> t
 
 (** [winning_player st] is the player that has won the hand in state [st].
-    Requires: valid state [st]. 
-    Example: [winning_player st] is 2 in a three-player game
-    if the second player had the best hand. *)
-val winning_player : t -> int
+    Requires: valid state [st]. *)
+val winning_player : t -> (int*int)
 
 (** [bet st] is the amount currently being bet
     in the game being played in [st].
-    Requires: valid state [st]. 
+    Requires: valid state [st].
     Example: [bet st] is $10 after the big blind goes
     if the blind is set to 10. *)
 val bet : t -> bet
@@ -152,12 +153,13 @@ val stack : t -> move_result
     Requires: valid command [comm]. *)
 val command_to_function : Command.command -> (t -> move_result)
 
-(** [winner st] is the player that wins the round
-    Requires that state has a nonempty list of players
-    Requries there are 5 hole cards
+(** [winner st] is the player that wins the round and the rank of
+    the winning hand, in the form (player, rank)
+    Requires: state has a nonempty list of players
+    Requries: there are 5 hole cards
     throws "cannot determine winner" exception if called on
     list of empty players or hole cards less than 5*)
-val winner : t -> Player.player
+val winner : t -> (Player.player*int)
 
 (** [get_avail_action st] is the list of valid commands
     the player can currently execute.

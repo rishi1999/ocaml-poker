@@ -1,4 +1,6 @@
-(* the flush hash table *)
+(* The hashes here were taken from the following source as we adapted
+   and improved their algorithm. *
+   Original Source: https://github.com/HenryRLee/PokerHandEvaluator *)
 let flush = [|
   0;	0;	0;	0;	0;	0;	0;	0;
   0;	0;	0;	0;	0;	0;	0;	0;

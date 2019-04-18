@@ -20,7 +20,7 @@ type t = {
   players_played: int list;
   bet: bet;
   avail_action: string list;
-  winner : int;
+  winner : (int*int);
 }
 exception Tie
 
@@ -59,6 +59,7 @@ let money_to_pot st amount =
   let table =
     {
       st.table with
+      pot = st.table.pot + amount;
       participants = participants';
     } in
 
@@ -151,7 +152,7 @@ let init_state game_type num_players money blind =
     players_played = [];
     bet = init_bet (init_players_in num_players);
     avail_action = ["bet"; "check"; "fold"];
-    winner = -1;
+    winner = (-1,0);
   } |> pay_blinds
 
 let game_type st = st.game_type
@@ -226,13 +227,15 @@ let winner st =
 
   let part = get_players_in p_in all_part [] in
   let rlist = ranks part board [] in
-  let num_winner = get_player_int (best_player rlist 7463) rlist 0 in
-  List.nth part num_winner
+  let best_rank = (best_player rlist 7463) in 
+  let num_winner = get_player_int best_rank rlist 0 in
+
+  (List.nth part num_winner, best_rank)
 
 let go_next_round st =
   if is_hand_complete st then
     let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else 
-        try (winner st).id with Tie -> -2
+        try (fst (winner st)).id with Tie -> -2
     in
     let win_amount = st.table.pot in
     let player_won = find_participant st winner_player in
@@ -249,19 +252,32 @@ let go_next_round st =
     let cleared = Table.clear_round updated_table in
     let button_updated = if st.button + 1 > st.num_players then 1 else st.button + 1 in
     let players_in_updated = hand_order st.num_players button_updated in
-    let interim_state = {
-      st with
-      table = Table.deal (cleared);
-      bet = init_bet players_in_updated;
-      player_turn = List.nth players_in_updated 0;
-      button = button_updated;
-      players_in = players_in_updated;
-      players_played = [];
-      winner = winner_player;
-    } in
-    let updated_state = pay_blinds interim_state in updated_state
+    if List.length st.players_in = 1 then
+      let interim_state = {
+        st with
+        table = Table.deal (cleared);
+        bet = init_bet players_in_updated;
+        player_turn = List.nth players_in_updated 0;
+        button = button_updated;
+        players_in = players_in_updated;
+        players_played = [];
+        winner = (winner_player, 0);
+      } in
+      pay_blinds interim_state
+    else 
+      let interim_state = {
+        st with
+        table = Table.deal (cleared);
+        bet = init_bet players_in_updated;
+        player_turn = List.nth players_in_updated 0;
+        button = button_updated;
+        players_in = players_in_updated;
+        players_played = [];
+        winner = (winner_player, (snd (winner st)));
+      } in
+      pay_blinds interim_state
   else
-    let card_added = Table.add_to_hole st.table in
+    let card_added = Table.add_to_board st.table in
     {
       st with
       table = card_added;
@@ -270,7 +286,7 @@ let go_next_round st =
       players_played = [];
     }
 
-let continue_game st = {st with winner = -1}
+let continue_game st = {st with winner = (-1,0)}
 
 let winning_player st = st.winner
 
@@ -381,7 +397,17 @@ let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
     if amt >= st.table.blind &&
        amt <= (find_stack st.player_turn st.table.participants) then
-      Legal (money_to_pot st amt)
+      if comm_str = "bet" then
+        Legal (money_to_pot st amt)
+      else
+        let rec get_paid_amt = function
+          | [] -> 0
+          | (player,amt)::t -> if st.player_turn = player then amt
+            else get_paid_amt t in
+        let curr_paid_amt = get_paid_amt st.bet.bet_paid_amt in
+        let temp_state =  (money_to_pot st amt) in
+        let updated_bet = {temp_state.bet with bet_amount = curr_paid_amt + amt;} in
+        Legal {temp_state with bet = updated_bet}
     else Illegal "You are out of money!"
   else Illegal "You can't do that right now!"
 
@@ -489,7 +515,7 @@ Legal st *)
    let rec intlist outlst =
    function
    | [] -> outlst
-   | h::t -> intlist (to_int h::outlst) t in
+   | h::t -> intlist (to_int h::outlst) t in 
 
    (* let keys_of_json json = {
     key_id = json |> member "id" |> to_string;

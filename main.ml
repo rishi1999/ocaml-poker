@@ -1,4 +1,5 @@
 open Card
+open Hand_evaluator
 
 exception Wrong_Input
 
@@ -11,7 +12,7 @@ let print_hline () =
   for i = 1 to 100 do
     print_char '-'
   done;
-  print_newline ();
+  print_newline (); 
   print_newline ()
 
 let print_intro () =
@@ -113,13 +114,14 @@ let play_game st =
 
   let rec keep_playing st =
     let winning_id = State.winning_player st in
-    if winning_id >= 0 then
-      let string = "The winner is player " ^ string_of_int winning_id ^ "!" in
+    if (fst winning_id) >= 0 then
+      let string = "The winner is player " ^ string_of_int (fst winning_id) 
+      ^ " with " ^ Hand_evaluator.rank_mapper (snd winning_id) ^ "!" in
       ANSITerminal.(print_string [yellow] string);
       print_newline ();
       print_newline ();
-      exit 0
-      (*keep_playing (State.continue_game st)*)
+      (* exit 0 *)
+      keep_playing (State.continue_game st)
     else
       print_hline ();
     print_current_state st;
@@ -182,8 +184,8 @@ let main () =
   print_newline ();
   print_newline ();
   (
-  print_endline "How many (human) players are there?";
-  ANSITerminal.(print_string [blue] "> ");
+    print_endline "How many (human) players are there?";
+    ANSITerminal.(print_string [blue] "> ");
 
     try
       read_int ()
