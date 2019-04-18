@@ -85,15 +85,16 @@ let print_current_state st =
   );
   print_newline ();
   print_newline ();
-  print_string "Cards on the board: ";
+  print_endline "Cards on the board: ";
   (Card.card_printer (Table.board (State.table st)));
   print_newline ();
   print_string "Players in: ";
   print_players_in st;
   print_newline ();
-  print_string "Your hand is: ";
+  print_endline "Your hand is: ";
   Card.card_printer (Player.cards (find_participant st
                                      (State.player_turn st)));
+  print_newline ();
   print_string "You have: $";
   print_int (Player.money
                (find_participant st (State.player_turn st)));
