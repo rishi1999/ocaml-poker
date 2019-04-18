@@ -5,7 +5,7 @@ type table = {
   dealer: int;
   blind: int;
   participants: Player.player list;
-  board: (Deck.suit * Deck.rank) list;
+  board: Deck.card list;
 }
 
 let dealer tb = tb.dealer
@@ -13,7 +13,7 @@ let blind tb = tb.blind
 let participants tb = tb.participants
 let board tb = tb.board
 
-let next_round_players (tab:table) = match tab with
+let next_round_players = function
   |
     {
       dealer = d;
@@ -24,7 +24,8 @@ let next_round_players (tab:table) = match tab with
     ->
     {
       tab with
-      dealer = d + 1; blind = 1;
+      dealer = d + 1;
+      blind = 1;
     }
   |
     {
@@ -48,11 +49,11 @@ let next_round_players (tab:table) = match tab with
     ->
     {
       tab with
-      dealer = d+1;
-      blind = b+1;
+      dealer = d + 1;
+      blind = b + 1;
     }
 
-let deal (table : table) : table =
+let deal table =
   Deck.deck_init ();
   Deck.shuffle_deck ();
   let deal_helper (player:player) = match player with

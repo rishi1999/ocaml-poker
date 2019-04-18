@@ -155,7 +155,7 @@ let init_state game_type num_players money blind =
     players_played = [];
     bet = init_bet (init_players_in num_players);
     avail_action = ["bet"; "check"; "fold"];
-    winners = [-1];
+    winners = [];
   } |> pay_blinds
 
 let game_type st = st.game_type
@@ -217,7 +217,7 @@ let winners st =
   List.map (fun (_,p) -> p) |>
 
   List.filter (fun x ->
-      not (List.for_all (fun y -> not (x.id = y)) st.players_in))
+      not (List.for_all (fun y -> x.id <> y) st.players_in))
 
 let go_next_round st =
   if is_hand_complete st then
@@ -269,7 +269,7 @@ let go_next_round st =
       players_played = [];
     }
 
-let continue_game st = {st with winners = [-1]}
+let continue_game st = {st with winners = []}
 
 let winning_players st = st.winners
 
