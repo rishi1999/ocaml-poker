@@ -1,3 +1,5 @@
+open Card
+
 exception Wrong_Input
 
 let rec get_and_read_input expected_output =
@@ -83,16 +85,16 @@ let print_current_state st =
   );
   print_newline ();
   print_newline ();
-  print_string "Cards on the board: ";
-  print_string_list (List.map Deck.card_printer
-                       (Table.board (State.table st)));
+  print_endline "Cards on the board: ";
+  (Card.card_printer (Table.board (State.table st)));
+  print_newline ();
   print_string "Players in: ";
   print_players_in st;
   print_newline ();
-  print_string "Your hand is: ";
-  print_string_list (List.map Deck.card_printer
-                       (Player.cards (find_participant st
-                                        (State.player_turn st))));
+  print_endline "Your hand is: ";
+  Card.card_printer (Player.cards (find_participant st
+                                     (State.player_turn st)));
+  print_newline ();
   print_string "You have: $";
   print_int (Player.money
                (find_participant st (State.player_turn st)));
@@ -147,7 +149,7 @@ let play_game st =
           print_endline (Command.command_to_string comm);
           print_newline ();
           keep_playing (State.get_avail_action t)
-        | Illegal str ->
+        | Illegal str->
           print_newline ();
           print_endline str;
           print_newline ();
