@@ -65,7 +65,7 @@ let state1 = {
   players_played = [];
   bet = state_bet_1;
   avail_action = ["fold"];
-  winners = [-1];
+  winners = [];
 }
 let state2 = {state1 with players_in = [2]}
 let state3 = {state1 with players_in = [3]}
@@ -80,7 +80,7 @@ let tied_state = {
   players_played = [];
   bet = state_bet_1;
   avail_action = ["fold"];
-  winners = [-1];
+  winners = [];
 }
 
 let my_res st =
