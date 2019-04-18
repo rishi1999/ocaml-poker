@@ -1,7 +1,7 @@
-type player = 
+type player =
   {
     id: int;
-    cards: (Deck.suit * Deck.rank) list;
+    cards: Deck.card list;
     money: int;
   }
 

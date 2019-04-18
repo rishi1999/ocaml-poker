@@ -142,7 +142,8 @@ let get_avail_action st =
   (* preflop *)
   (* if List.length st.table.board = 0 then
      let big_blind_player = List.nth st.players_in 1 in
-     if st.player_turn = big_blind_player && st.bet.bet_amount = st.table.blind then
+     if st.player_turn = big_blind_player && 
+     st.bet.bet_amount = st.table.blind then
       {
         st with
         avail_action = ["check"; "bet"; "fold"];
@@ -259,23 +260,28 @@ let winner st =
 
 let go_next_round st =
   if is_hand_complete st then
-    let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else 
+    let winner_player = if List.length st.players_in = 1 then 
+        List.hd st.players_in else 
         try (fst (winner st)).id with Tie -> -2
     in
     let win_amount = st.table.pot in
     let player_won = find_participant st winner_player in
-    let player_paid = {player_won with money = player_won.money + win_amount} in
+    let player_paid = 
+      {player_won with money = player_won.money + win_amount} in
     let rec update_parcipant target player outlst = function
       | [] -> outlst
-      | h::t -> if h.id = target then update_parcipant target player (player::outlst) t
+      | h::t -> if h.id = target then 
+          update_parcipant target player (player::outlst) t
         else update_parcipant target player (h::outlst) t in
-    let updated_participants = update_parcipant winner_player player_paid [] st.table.participants in
+    let updated_participants = update_parcipant winner_player player_paid [] 
+        st.table.participants in
     let updated_table = {
       st.table with
       participants = updated_participants;
     } in
     let cleared = Table.clear_round updated_table in
-    let button_updated = if st.button + 1 > st.num_players then 1 else st.button + 1 in
+    let button_updated = if st.button + 1 > st.num_players then 1 
+      else st.button + 1 in
     let players_in_updated = hand_order st.num_players button_updated in
     if List.length st.players_in = 1 then
       let interim_state = {
@@ -393,11 +399,11 @@ let stack st =
 
 let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
-    if amt < st.table.blind then 
+    if amt < st.table.blind then
       Illegal "You have to bet at least the blind!"
-    else if amt > (find_stack st.player_turn st.table.participants) then 
+    else if amt > (find_stack st.player_turn st.table.participants) then
       Illegal "You're not very liquid at the moment...."
-    else if comm_str = "bet" then 
+    else if comm_str = "bet" then
       Legal (get_avail_action (money_to_pot st amt))
     else
       let rec get_paid_amt = function
