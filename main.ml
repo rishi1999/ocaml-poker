@@ -184,8 +184,8 @@ let main () =
   print_newline ();
   print_newline ();
   (
-  print_endline "How many (human) players are there?";
-  ANSITerminal.(print_string [blue] "> ");
+    print_endline "How many (human) players are there?";
+    ANSITerminal.(print_string [blue] "> ");
 
     try
       read_int ()

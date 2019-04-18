@@ -72,7 +72,7 @@ let deal (table : table) : table =
       participants = deal_to_each participants [];
     }
 
-let add_to_hole table =
+let add_to_board table =
   match table with
   |
     {
@@ -123,7 +123,7 @@ let rec clear_players (p:player list) list = match p with
            } :: list
          )
 
-(** [clear_round table x] is the table with the cards cleared. *)
+
 let rec clear_round table = match table with
   |
     {

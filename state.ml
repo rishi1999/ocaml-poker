@@ -287,7 +287,7 @@ let go_next_round st =
     } in
     pay_blinds interim_state
   else
-    let card_added = Table.add_to_hole st.table in
+    let card_added = Table.add_to_board st.table in
     {
       st with
       table = card_added;
@@ -412,9 +412,9 @@ let bet_or_raise amt st comm_str =
         Legal (money_to_pot st amt)
       else
         let rec get_paid_amt = function
-        | [] -> 0
-        | (player,amt)::t -> if st.player_turn = player then amt
-        else get_paid_amt t in
+          | [] -> 0
+          | (player,amt)::t -> if st.player_turn = player then amt
+            else get_paid_amt t in
         let curr_paid_amt = get_paid_amt st.bet.bet_paid_amt in
         let temp_state =  (money_to_pot st amt) in
         let updated_bet = {temp_state.bet with bet_amount = curr_paid_amt + amt;} in
@@ -428,36 +428,36 @@ let raise' amt st = bet_or_raise amt st "raise"
 (* SAVE / LOAD NEEDS IMPLEMENTATION *)
 
 
- (* game_type: int;
-  num_players: int;
-  table: Table.table;
-  player_turn: int;
-  button: int;
-  players_in: int list;
-  players_played: int list;
-  bet: bet;
-  avail_action: string list;
-  winner : int; *)
+(* game_type: int;
+   num_players: int;
+   table: Table.table;
+   player_turn: int;
+   button: int;
+   players_in: int list;
+   players_played: int list;
+   bet: bet;
+   avail_action: string list;
+   winner : int; *)
 
 (* type table = {
-  pot: int;
-  blind: int;
-  participants: Player.player list;
-  board: (Deck.suit * Deck.rank) list;
-} *)
+   pot: int;
+   blind: int;
+   participants: Player.player list;
+   board: (Deck.suit * Deck.rank) list;
+   } *)
 
 (* type player = 
-  {
+   {
     id: int;
     cards: (Deck.suit * Deck.rank) list;
     money: int;
-  } *)
+   } *)
 
-  (* type bet = {
-  bet_player: int;
-  bet_amount: int;
-  bet_paid_amt: (int*int) list;
-} *)
+(* type bet = {
+   bet_player: int;
+   bet_amount: int;
+   bet_paid_amt: (int*int) list;
+   } *)
 (* 
 let save st = 
 Yojson.to_file "saved_game.json" (
@@ -515,7 +515,7 @@ Yojson.to_file "saved_game.json" (
     ]);
   ("avail_action", `List[]);
   ("winner", `List[`Int (-1)]);
-          
+
   ]
 );
 exit 0;
@@ -523,42 +523,42 @@ Legal st *)
 
 (* let load json = 
 
-  let rec intlist outlst =
-  function
-  | [] -> outlst
-  | h::t -> intlist (to_int h::outlst) t in 
+   let rec intlist outlst =
+   function
+   | [] -> outlst
+   | h::t -> intlist (to_int h::outlst) t in 
 
-  (* let keys_of_json json = {
+   (* let keys_of_json json = {
     key_id = json |> member "id" |> to_string;
     description = json |> member "description" |> to_string;
     target_room_id = json |> member "target room" |> to_string;
     start_room_description =
       json |> member "start room description" |> to_string;
-  } in *)
+   } in *)
 
-  let bet_paid_of_json json =
+   let bet_paid_of_json json =
     let id = json |> member "id" |> to_int in
     let money = json |> member "paid" |> to_int in
     (id, money)
-  in
+   in
 
-  let bet_of_json json = {
+   let bet_of_json json = {
     bet_player = json |> member "bet_player" |> to_int;
     bet_amount = json |> member "bet_amount" |> to_int;
     bet_paid_amt = json |> member "bet_paid_amt" |> to_list 
     |> List.map bet_paid_of_json;
-  }
-  in
+   }
+   in
 
-  let table_of_json json = {
+   let table_of_json json = {
     pot = json |> member "pot" |> to_int;
     blind = json |> member "blind" |> to_int;
     participants = json |> member "participants" 
     |> to_list |> List.map participants_of_json;
     board = json |> member "board" |> to_list
-  } in
+   } in
 
-  let t_of_json json = {
+   let t_of_json json = {
     game_type = json |> member "game_type" |> to_int;
     num_players = json |> member "num_players" |> to_int;
     table = json |> member "table" |> table_of_json;
@@ -569,14 +569,14 @@ Legal st *)
     bet = json |> member "bet" |> bet_of_json;
     avail_action = [];
     winner = json |> member "winner" |> to_int;
-  } in
+   } in
 
-  let parse json = 
+   let parse json = 
     try t_of_json json
     with Type_error (s, _) -> failwith ("Parscing error: " ^ s) in
 
-  parse json
-  init_state 0 0 0 0 *)
+   parse json
+   init_state 0 0 0 0 *)
 
 let command_to_function = Command.(function
     | Check -> check
