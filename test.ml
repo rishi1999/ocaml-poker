@@ -88,7 +88,23 @@ let state2 = {state1 with players_in = [2]}
 let state3 = {state1 with players_in = [3]}
 let state4 = {state1 with players_in = [2; 3]}
 
+let get_state move_result =
+  match move_result with
+  | Legal t -> t
+  | Illegal failed -> failwith failed
+
+let state_1 = State.init_state 1 2 500 5
+let state_2 = get_state (State.call state_1)
+let state_3 = get_state (State.bet_or_raise 50 state_2 "bet")
+let state_4 = get_state (State.bet_or_raise 120 state_3 "raise")
+let state_5 = get_state (State.call state_4)
+let state_6 = get_state (State.check state_5)
+let state_7 = get_state (State.bet_or_raise 40 state_6 "bet")
+let state_8 = get_state (State.fold state_7)
+
+
 (* State Tests*)
+
 let state_tests =
 
   [
@@ -103,9 +119,27 @@ let state_tests =
         assert_equal alice (fst (winner state3)));
     "winner_test_4" >:: (fun _ ->
         assert_equal alice (fst (winner state3)));
-    (*  "get_players_in_test" >:: (fun _->
-          assert_equal [bobby;alice] (get_players_in state4)); *)
 
+    "simulation_1" >:: (fun _ ->
+        assert_equal 498 (State.find_participant state_1 1).money);
+    "simulation_2" >:: (fun _ ->
+        assert_equal 495 (State.find_participant state_1 2).money);
+    "simulation_3" >:: (fun _ ->
+        assert_equal 495 (State.find_participant state_2 1).money);
+    "simulation_4" >:: (fun _ ->
+        assert_equal 445 (State.find_participant state_3 1).money); 
+    "simulation_5" >:: (fun _ ->
+        assert_equal 375 (State.find_participant state_4 2).money); 
+    "simulation_6" >:: (fun _ ->
+        assert_equal 375 (State.find_participant state_5 1).money); 
+    "simulation_7" >:: (fun _ ->
+        assert_equal 335 (State.find_participant state_7 2).money); 
+    "simulation_8" >:: (fun _ ->
+        assert_equal 623 (State.find_participant state_8 2).money); 
+    "simulation_9" >:: (fun _ ->
+        assert_equal 370 (State.find_participant state_8 1).money); 
+
+    (* Also extensive testing done by play testing the engine *)
   ]
 
 let table_tests =
