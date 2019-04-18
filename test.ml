@@ -7,11 +7,8 @@ open State
 
 
 
-<<<<<<< HEAD
-=======
 let make_new_deck =
   Deck.deck_init
->>>>>>> ce93bc0ca39ceec2b3daba3caa788aa5ead5992c
 
 
 
@@ -26,18 +23,12 @@ let empty_table = {
 (**Deck Tests*)
 let deck_tests = 
   [
-<<<<<<< HEAD
     "pick first card" >:: (fun _ -> deck_init ();
                             assert_equal (pick_cards 1) [(Clubs, Two)]);
     "pick second card" >:: (fun _ -> deck_init();
                              assert_equal (pick_cards 2) [(Clubs, Two); (Clubs, Three)]);
 
     "convert 9C" >:: (fun _ -> 
-=======
-    "pick first card" >:: (fun _ -> 
-        assert_equal [] []);
-    "convert 9C" >:: (fun _ ->
->>>>>>> ce93bc0ca39ceec2b3daba3caa788aa5ead5992c
         assert_equal 28 (int_converter (Clubs, Nine)));
     "pick_card_test" >:: (fun _ ->
         assert_equal 4 (List.length (pick_cards 4)));
