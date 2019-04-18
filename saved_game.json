@@ -1,0 +1,1 @@
+{"game_type":0,"num_players":5,"table":[{"pot":0,"blind":2,"participants":[{"id":1,"1":[{"card1":5,"card2":5,"money":5}],"2":[{"card1":5,"card2":5,"money":5}]}],"board":[]}],"player_turn":3,"button":5,"players_in":[1,2],"players_played":[1,2],"bet":[{"bet_player":2,"bet_amount":2,"bet_paid_amt":[{"id":1,"paid":0},{"id":2,"paid":3}]}],"avail_action":[],"winner":[-1]}
