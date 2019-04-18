@@ -66,6 +66,8 @@ let command_tests = [
       assert_raises (Empty) (fun () -> parse "      "));
   "test parse quit malformed" >:: (fun _ -> 
       assert_raises (Malformed) (fun () -> parse "quit l"));
+  "test parse quit malformed with spaces" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "quit      l"));
   "test parse go malformed" >:: (fun _ -> 
       assert_raises (Malformed) (fun () -> parse "go "));
   "test parse different verb malformed" >:: (fun _ -> 
@@ -98,6 +100,8 @@ let command_tests = [
       assert_equal (Bet 10) (parse "bet 10"));
   "test command to string" >:: (fun command -> 
       assert_equal (Raise 10) (parse "raise 10"));
+  "test command to string with extra spaces" >:: (fun command -> 
+      assert_equal (Raise 10) (parse "raise     10"));
 
 ]
 
