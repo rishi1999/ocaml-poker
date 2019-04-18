@@ -80,7 +80,8 @@ let card_printer cardlist =
     | King -> 11
     | Ace -> 12 in
   let element card = match card with
-    | (Diamonds, rank) -> (card_builder 0 (rank_to_int rank) (diamonds) [], Diamonds)
+    | (Diamonds, rank) -> (card_builder 0 (rank_to_int rank) (diamonds) [],
+                           Diamonds)
     | (Hearts, rank) -> (card_builder 0 (rank_to_int rank) (hearts) [], Hearts)
     | (Spades, rank) -> (card_builder 0 (rank_to_int rank) (spades) [], Spades)
     | (Clubs, rank) -> (card_builder 0 (rank_to_int rank) (clubs) [], Clubs) in
