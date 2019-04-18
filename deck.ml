@@ -1,6 +1,7 @@
 (* Deck initialization and card choosing *)
 
-(** The type of a card's rank. *)
+(** [rank] is the rank of a card
+    [Two]: corresponds to a rank 2*)
 type rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack
           |Queen | King | Ace
 

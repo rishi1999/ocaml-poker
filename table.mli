@@ -1,6 +1,8 @@
 open Deck
 open Player
 
+(** [table] is a table:
+*)
 type table = {
   pot: int;
   blind: int;
