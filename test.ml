@@ -5,6 +5,8 @@ open Hand_evaluator
 open Deck
 open State
 
+
+
 (**Deck Tests*)
 let make_new_deck =
   Deck.deck_init
@@ -147,6 +149,9 @@ let cards_3 = [(Spades, Three); (Hearts, Four)] @ [(Hearts, Ace);
                                                    (Spades, King);
                                                    (Hearts, King); 
                                                    (Hearts, Three)];;
+let single_card = [(Spades, Ace)]
+
+
 
 let hand_evaluator_tests =
   [
