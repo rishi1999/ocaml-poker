@@ -10,13 +10,6 @@ open State
 let make_new_deck =
   Deck.deck_init
 
-<<<<<<< HEAD
-let deck_tests =
-  [
-    "pick first card" >:: (fun _ ->
-        assert_equal [] []);
-    "convert 9C" >:: (fun _ ->
-=======
 
 
 let empty_table = {
@@ -36,7 +29,6 @@ let deck_tests =
                              assert_equal (pick_cards 2) [(Clubs, Two); (Clubs, Three)]);
 
     "convert 9C" >:: (fun _ -> 
->>>>>>> refs/remotes/origin/master
         assert_equal 28 (int_converter (Clubs, Nine)));
     "pick_card_test" >:: (fun _ ->
         assert_equal 4 (List.length (pick_cards 4)));
