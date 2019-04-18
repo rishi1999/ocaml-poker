@@ -5,7 +5,10 @@ open Hand_evaluator
 open Deck
 open State
 
-(**Deck Tests*)
+
+
+(* Deck Tests*)
+
 let make_new_deck =
   Deck.deck_init
 
@@ -17,11 +20,15 @@ let deck_tests =
         assert_equal 28 (int_converter (Clubs, Nine)));
     "pick_card_test" >:: (fun _ -> 
         assert_equal 4 (List.length (pick_cards 4)));
+    "int_converter Test 1" >:: (fun _ -> 
+        assert_equal 4 (List.length (pick_cards 4)));
   ]
+
 let james : player = {id = 0; cards = []; money = 32}
-let bob : player = {id = 1; cards = []; money = 32}
+let bob : player = {id = 1; cards = []; money = 23}
 let julian : player = {id = 2; cards = [(Diamonds, Five)]; money = 32}
 
+(* Player Tests*)
 let player_tests = 
   [
     "ID Test1" >:: (fun _->
@@ -103,11 +110,10 @@ let state_tests =
         assert_equal alice (winner state3));
     "winner_test_4" >:: (fun _ ->
         assert_equal alice (winner state3));
-    (*  "get_players_in_test" >:: (fun _->
-          assert_equal [bobby;alice] (get_players_in state4)); *)
 
   ]
 
+(* Table Tests*)
 let table_tests =
   [
     "deal_test_1" >:: (fun _->
