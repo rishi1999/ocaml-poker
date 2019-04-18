@@ -86,7 +86,7 @@ let seven_eval c1 c2 c3 c4 c5 c6 c7 =
     let () = quinary.(c6 lsr 2) <- (quinary.(c6 lsr 2)) + 1 in  
     let () = quinary.(c7 lsr 2) <- (quinary.(c7 lsr 2)) + 1 in
     let hash = base_5_hash quinary 13 7 in
-    noflush.(hash)
+    noflush_hashes.(hash)
 
 
 (** [seven_list_eval hand] gives the ranking of [hand] in terms of which of
