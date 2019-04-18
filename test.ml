@@ -16,8 +16,26 @@ let deck_tests =
     "convert 9C" >:: (fun _ -> 
         assert_equal 28 (int_converter (Clubs, Nine)));
   ]
-let james:player = {id = 0; cards = []; money = 32}
-let bob:player = {id = 1; cards = []; money = 32}
+let james : player = {id = 0; cards = []; money = 32}
+let bob : player = {id = 1; cards = []; money = 32}
+let julian : player = {id = 2; cards = [(Diamonds, Five)]; money = 32}
+
+let player_tests = 
+  [
+    "ID Test1" >:: (fun _->
+        assert_equal 0  (id james));
+
+    "ID Test2" >:: (fun _->
+        assert_equal 1  (id bob));
+
+    "Card Test1" >:: (fun _->
+        assert_equal  [(Diamonds, Five)] (cards julian));
+
+    "Money Test1" >:: (fun _->
+        assert_equal  32 (money julian));
+
+  ]
+
 let table1: table = {dealer = 0; blind = 1; participants = [james;bob]; board= []}
 let table2: table = deal table1
 
@@ -64,7 +82,8 @@ let state1:State.t = {
 let state2 = {state1 with players_in = [2]}
 let state3 = {state1 with players_in = [3]}
 let state4 = {state1 with players_in = [2;3]}
-(** State Tests*)
+
+(* State Tests*)
 let state_tests =
 
   [
@@ -115,6 +134,9 @@ let hand_evaluator_tests =
     "9_full_house" >:: (fun _->
         assert_equal 236 (seven_eval a b c d e h i ));
 
+    "rank_mapper_test" >:: (fun _->
+        assert_equal "Royal Flush" (rank_mapper 1));
+
   ]
 
 let suite =
@@ -123,5 +145,6 @@ let suite =
     table_tests;
     hand_evaluator_tests;
     state_tests;
+    player_tests;
   ]
 let _ = run_test_tt_main suite

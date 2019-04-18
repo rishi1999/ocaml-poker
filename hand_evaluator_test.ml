@@ -1,6 +1,6 @@
 (* the flush hash table *)
 
-let dp = [|
+let dynamicProgram = [|
   [|
     [|0;	0;	0;	0;	0;	0;	0;	0|];
     [|0;	0;	0;	0;	0;	0;	0;	0|];
@@ -7785,10 +7785,10 @@ let hash_quinary q len k =
     if i = len then sum
     else if k <=0 then sum 
     else
-      let newk = k - (q.(i)) in (*print_string "k is "; print_int newk; print_endline "";*)
-      let index1array = dp.(q.(i)) in
+      let newk = k - (q.(i)) in
+      let index1array = dynamicProgram.(q.(i)) in
       let index2array = index1array.(len - i -1) in
-      let new_sum = sum + index2array.(k) in (*print_int new_sum; print_endline "";*) loop (i+1) len new_sum newk in
+      let new_sum = sum + index2array.(k) in loop (i+1) len new_sum newk in
 
   loop 0 len 0 k
 
@@ -7806,7 +7806,7 @@ let seven_eval c1 c2 c3 c4 c5 c6 c7 =
       else if k <=0 then sum 
       else
         let newk = k - (q.(i)) in
-        let index1array = dp.(q.(i)) in
+        let index1array = dynamicProgram.(q.(i)) in
         let index2array = index1array.(len - i -1) in
         let new_sum = sum + index2array.(k) in loop (i+1) len new_sum newk in
     loop 0 len 0 k in

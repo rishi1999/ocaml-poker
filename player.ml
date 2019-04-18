@@ -5,6 +5,6 @@ type player =
     money: int;
   }
 
-  let id player = player.id
-  let cards player = player.cards
-  let money player = player.money
+let id player = player.id
+let cards player = player.cards
+let money player = player.money

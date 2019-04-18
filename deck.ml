@@ -1,28 +1,37 @@
 (* Deck initialization and card choosing *)
 
+(** The type of a card's rank. *)
 type rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack
           |Queen | King | Ace
 
-let ranks = [Two; Three; Four; Five; Six; Seven; Eight; Nine; Ten; Jack; Queen;
-             King; Ace]
-
+(** The type of a card's suit. *)
 type suit = Clubs | Diamonds | Hearts | Spades
 
-let suits = [Clubs; Diamonds; Hearts; Spades]
-
+(** The type of a card in the Deck. *)
 type card = suit * rank
 
-(* decks are maintained as lists*)
+(* [played_cards] is a mutable (suit * rank) list ref that is used to track
+   which cards have been selected and used from the deck. *)
 let played_cards = ref []
+
+(* [current_deck] is a mutable (suit * rank) list ref that is used to track
+   which cards are currently in the deck and have not been used. The cards
+   at the front of the list are at the top of the deck and would be used
+   first. *)
 let current_deck = ref []
+
+(* [deck_size] is an int ref that tracks the number of cards currently in
+   the deck. *)
 let deck_size = ref 0
 
-let all_ranks (suit:suit) = List.map (fun rank -> (suit,rank)) ranks
+let deck = let ranks = [Two; Three; Four; Five; Six; Seven; Eight; Nine; Ten;
+                        Jack; Queen; King; Ace] in 
+  let all_ranks (suit:suit) = List.map (fun rank -> (suit,rank)) ranks in
+  let suits = [Clubs; Diamonds; Hearts; Spades] in
+  List.concat (List.map (fun suit -> all_ranks suit) suits)
 
-let deck = List.concat (List.map (fun suit -> all_ranks suit) suits)
-
-(** [shuffle_deck] returns a list of the full 52 card deck with the cards in
-    a randomized order *)
+(** [shuffle_list compare list] shuffles the elements that are currently 
+    present within deck *)
 let shuffle_list compare list =
   Random.self_init();
   let tagged_list = List.map (fun card -> (card, Random.bits())) deck in
@@ -36,23 +45,21 @@ let shuffle_deck () =
   let shuffled = shuffle_list compare_second !current_deck in
   current_deck := shuffled
 
-(** [deck_init] initializes the deck with all 52 cards *)
+(** [deck_init] initializes the deck with all 52 cards in the same order
+    each time.*)
 let deck_init () =
   current_deck := deck;
   played_cards := [];
   deck_size := 52
 
-(*
-(** [deck_size] returns the number of cards remaining in the current
-    deck *)
-let deck_size = List.length (!current_deck) *)
-
 (** [update_state lst] is the deck with all cards played
     since the last update, [lst],
-    removed from the deck and included in the cards-played list.  *)
+    removed from the deck and included in the cards-played list.
+    Example: update_state [(Club, Five)] removes (Club, Five) from the *)
 let update_state card_list =
   played_cards := card_list @ !played_cards;
-  current_deck := List.filter (fun x -> not (List.mem x card_list)) !current_deck;
+  current_deck := List.filter (fun x -> not (List.mem x card_list)) 
+      !current_deck;
   deck_size := List.length !current_deck
 
 (** [pick_cards num] returns a list of [num] cards from the top of the deck.
@@ -75,8 +82,8 @@ let pick_cards num =
    to 0 and Ace to 12 and the suit of the card (0 for Clubs, 1 for Diamonds,
    2 for Hearts and 3 for Spades). The card is then represented as
    Rank * 4 + Suit.
-   Example int_converter (Clubs, Nine) = 28
-   Requires: card is a valid (suit, rank) tuple  *)
+   Example: int_converter (Clubs, Nine) = 28
+   Requires: [card] is a valid (suit, rank) tuple  *)
 let int_converter card =
   let offset = match card with
     | Clubs, _-> 0
@@ -98,57 +105,3 @@ let int_converter card =
     | (_, King) -> 11
     | (_, Ace) -> 12 in
   rank * 4 + offset
-
-let card_printer card =
-  let suit = match card with
-    | Clubs, _-> "Clubs"
-    | (Diamonds, _) -> "Diamonds"
-    | (Hearts, _) -> "Hearts"
-    | (Spades, _) -> "Spades" in
-  let rank = match card with
-    | (_, Two) -> "Two"
-    | (_, Three) -> "Three"
-    | (_, Four) -> "Four"
-    | (_, Five) -> "Five"
-    | (_, Six) -> "Six"
-    | (_, Seven) -> "Seven"
-    | (_, Eight) -> "Eight"
-    | (_, Nine) -> "Nine"
-    | (_, Ten) -> "Ten"
-    | (_, Jack) -> "Jack"
-    | (_, Queen) -> "Queen"
-    | (_, King) -> "King"
-    | (_, Ace) -> "Ace" in
-  rank ^ " of " ^ suit
-(*
-let update_state card_list =
-(*
-  match card_list with
-  | [] -> ()
-  | None :: t -> ()
-  | Some a :: t ->
-    let extract_cards = List.map (fun x -> match x with | None -> (Clubs,Two) | Some a -> a) card_list in
-*)
-  current_deck := List.filter (fun x -> not (List.mem x extract_cards)) !current_deck
-
-(** [pick_card] returns None if the current deck is empty and Some card
-    if the deck is non empty and card is at the top of the deck*)
-let pick_card =
-  let temp = !current_deck in
-  let card = match temp with
-    | [] -> None
-    | h :: t -> Some h in
-  let state_update = update_state [card] in
-  card
-*)
-(*
-(** [pick_rand_card current_deck] returns a random card from current_deck] *)
-let pick_rand_card current_deck =
-
-  Random.self_init();
-  let rand_int = Random.int (List.length current_deck) - 1 in
-  List.nth current_deck rand_int
-*)
-
-(* [pick_cards num] returns [num] cards at the top of the current deck. If the
-   deck has insufficient cards then num_cards returns None *)
