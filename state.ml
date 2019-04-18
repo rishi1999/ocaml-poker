@@ -394,20 +394,29 @@ let stack st =
 
 let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
-    if amt >= st.table.blind &&
-       amt <= (find_stack st.player_turn st.table.participants) then
-      if comm_str = "bet" then
-        Legal (money_to_pot st amt)
-      else
-        let rec get_paid_amt = function
-          | [] -> 0
-          | (player,amt)::t -> if st.player_turn = player then amt
-            else get_paid_amt t in
-        let curr_paid_amt = get_paid_amt st.bet.bet_paid_amt in
-        let temp_state =  (money_to_pot st amt) in
-        let updated_bet = {temp_state.bet with bet_amount = curr_paid_amt + amt;} in
-        Legal {temp_state with bet = updated_bet}
-    else Illegal "You are out of money!"
+    if amt < st.table.blind then 
+      Illegal "You have to bet at least the blind!"
+    else if amt > (find_stack st.player_turn st.table.participants) then 
+      Illegal "You're not very liquid at the moment...."
+    else if comm_str = "bet" then 
+      Legal (money_to_pot st amt)
+    else
+      let rec get_paid_amt = function
+        | [] -> 0
+        | (player,amt)::t -> if st.player_turn = player then amt
+          else get_paid_amt t in
+      let curr_paid_amt = get_paid_amt st.bet.bet_paid_amt in
+      let temp_state =  (money_to_pot st amt) in
+      let updated_bet = 
+        {
+          temp_state.bet with 
+          bet_amount = curr_paid_amt + amt;
+        } in
+      Legal 
+        {
+          temp_state with 
+          bet = updated_bet;
+        }
   else Illegal "You can't do that right now!"
 
 let bet' amt st = bet_or_raise amt st "bet"
@@ -447,7 +456,7 @@ let raise' amt st = bet_or_raise amt st "raise"
    bet_paid_amt: (int*int) list;
    } *)
 (* 
-let save st = 
+let save st =
 Yojson.to_file "saved_game.json" (
   `Assoc
   [
@@ -458,8 +467,8 @@ Yojson.to_file "saved_game.json" (
       [`Assoc
          [("pot", `Int st.table.pot);
           ("blind", `Int st.table.blind);
-          ("participants", 
-          `List 
+          ("participants",
+          `List
             [ `List
               [`Assoc [
               ("id", `Int 1);
@@ -475,8 +484,8 @@ Yojson.to_file "saved_game.json" (
                 ]
               ]]);
             ]]);
-          ("board", 
-          `List 
+          ("board",
+          `List
              [
               `Int 20; `Int 3; `Int 50;
             ]);
@@ -485,7 +494,7 @@ Yojson.to_file "saved_game.json" (
   ("players_in", `List [`Int 1; `Int 2]);
   ("players_played", `List[`Int 1; `Int 2]);
   ("bet", `List
-    [ 
+    [
       `Assoc [
         ("bet_player", `Int st.bet.bet_player);
         ("bet_amount", `Int st.bet.bet_amount);
@@ -509,12 +518,12 @@ Yojson.to_file "saved_game.json" (
 exit 0;
 Legal st *)
 
-(* let load json = 
+(* let load json =
 
    let rec intlist outlst =
    function
    | [] -> outlst
-   | h::t -> intlist (to_int h::outlst) t in 
+   | h::t -> intlist (to_int h::outlst) t in
 
    (* let keys_of_json json = {
     key_id = json |> member "id" |> to_string;

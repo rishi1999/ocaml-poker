@@ -10,9 +10,9 @@ open State
 let make_new_deck =
   Deck.deck_init
 
-let deck_tests = 
+let deck_tests =
   [
-    "pick first card" >:: (fun _ -> 
+    "pick first card" >:: (fun _ ->
         assert_equal [] []);
     "convert 9C" >:: (fun _ ->
         assert_equal 28 (int_converter (Clubs, Nine)));
@@ -42,52 +42,57 @@ let player_tests =
 
   ]
 
-let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}
 let james = {id = 0; cards = []; money = 32}
 let bob = {id = 1; cards = []; money = 32}
 let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}
 let table2 = deal table1
 
 
-let table2_players table2 =  match table2 with
-    { pot = d ; blind = b; participants = p ; _ } -> p
+let table2_players table2 = table2.participants
 let james_cards_2 table2_players = match table2_players with
-  | {id = s; cards = c; money = m}::t -> c
+  | {
+    id = s;
+    cards = c;
+    money = m
+  } :: t -> c
   | _ -> failwith "table2 not dealt"
 
-let table1_players=  match table1 with
-    { pot = d ; blind = b; participants = p ; _ } -> p
-let james_cards= match table1_players with
-  | {id = s; cards = c; money = m}::t -> c
+let table1_players = table1.participants
+let james_cards = match table1_players with
+  | {
+    id = s;
+    cards = c;
+    money = m
+  } :: t -> c
   | _ -> failwith "table2 not dealt"
 
-let empty: (Deck.suit * Deck.rank) list = []
-
+let empty : Deck.card list = []
 let jimmy = {id = 1; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
 let bobby = {id = 2; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
 let alice = {id = 3; cards = [(Spades, Three); (Hearts, Four)]; money = 42}
-
 let state_table_1 = {pot = 0; blind = 2; participants = [jimmy; bobby; alice];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
-let state_bet_1 = {
-  bet_player = 1;
-  bet_amount = 0;
-  bet_paid_amt = [(0,0)];
-}
+let state_bet_1 =
+  {
+    bet_player = 1;
+    bet_amount = 0;
+    bet_paid_amt = [(0,0)];
+  }
 
-let state1 = {
-  game_type = 0;
-  num_players = 2;
-  table = state_table_1;
-  player_turn = 0;
-  button = 0;
-  players_in = [1;2;3];
-  players_played = [];
-  bet = state_bet_1;
-  avail_action = ["fold"];
-  winner = (-1,0);
-}
+let state1 =
+  {
+    game_type = 0;
+    num_players = 2;
+    table = state_table_1;
+    player_turn = 0;
+    button = 0;
+    players_in = [1;2;3];
+    players_played = [];
+    bet = state_bet_1;
+    avail_action = ["fold"];
+    winner = (-1,0);
+  }
 let state2 = {state1 with players_in = [2]}
 let state3 = {state1 with players_in = [3]}
 let state4 = {state1 with players_in = [2; 3]}
@@ -96,7 +101,6 @@ let state_tests =
   [
     "hand_order_test1" >:: (fun _ ->
         assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
-
     "winner_test_1" >:: (fun _ ->
         assert_equal jimmy (fst (winner state1)));
     "winner_test_2" >:: (fun _ ->
