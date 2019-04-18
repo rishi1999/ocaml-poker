@@ -7794,11 +7794,23 @@ let hash_quinary q len k =
 
 
 
-(* 7 card evaluator starts here *)
-
-let seven_eval a b c d e f g =
-
-  let binaries_by_id = [|
+(** [seven_eval c1 c2 c3 c4 c5 c6 c7] takes in a hand of cards [c1] to [c7] 
+    ,each in its integer representation returned by [int_converter] and returns 
+    the rank of the hand in terms of which of the 7462 poker equivalence
+    classes the hand maps to
+    Requires: All input parameters are integers between 1 and 52.*)
+let seven_eval c1 c2 c3 c4 c5 c6 c7 =
+  let base_5_hash q len k =
+    let rec loop i len sum k =
+      if i = len then sum
+      else if k <=0 then sum 
+      else
+        let newk = k - (q.(i)) in
+        let index1array = dp.(q.(i)) in
+        let index2array = index1array.(len - i -1) in
+        let new_sum = sum + index2array.(k) in loop (i+1) len new_sum newk in
+    loop 0 len 0 k in
+  let bin_id = [|
     0x1;	0x1;	0x1;	0x1;
     0x2;	0x2;	0x2;	0x2;
     0x4;	0x4;	0x4;	0x4;
@@ -7814,7 +7826,7 @@ let seven_eval a b c d e f g =
     0x1000;	0x1000;	0x1000;	0x1000;
   |] in
 
-  let suitbit_by_id = [|
+  let suit_bits_ids = [|
     0x1;	0x8;	0x40;	0x200;
     0x1;	0x8;	0x40;	0x200;
     0x1;	0x8;	0x40;	0x200;
@@ -7829,48 +7841,53 @@ let seven_eval a b c d e f g =
     0x1;	0x8;	0x40;	0x200;
     0x1;	0x8;	0x40;	0x200; |] in
 
-  let suit_hash = suitbit_by_id.(a) + suitbit_by_id.(b) + suitbit_by_id.(c) + 
-                  suitbit_by_id.(d) + suitbit_by_id.(e) + suitbit_by_id.(f) + 
-                  suitbit_by_id.(g) in
+  let suit_hash = suit_bits_ids.(c1) + suit_bits_ids.(c2) + suit_bits_ids.(c3) 
+                  + suit_bits_ids.(c4) + suit_bits_ids.(c5) 
+                  + suit_bits_ids.(c6) + suit_bits_ids.(c7) in
 
-  let suit_binary = Array.make 4 0 in
+  let suit_bin = Array.make 4 0 in
   let quinary = Array.make 13 0 in
 
   if (suits.(suit_hash)) <> 0 then
-    let () = suit_binary.(a land 0x3) <- suit_binary.(a land 0x3) lor binaries_by_id.(a) in
-    let () = suit_binary.(b land 0x3) <- suit_binary.(b land 0x3) lor binaries_by_id.(b) in
-    let () = suit_binary.(c land 0x3) <- suit_binary.(c land 0x3) lor binaries_by_id.(c) in
-    let () = suit_binary.(d land 0x3) <- suit_binary.(d land 0x3) lor binaries_by_id.(d) in
-    let () = suit_binary.(e land 0x3) <- suit_binary.(e land 0x3) lor binaries_by_id.(e) in
-    let () = suit_binary.(f land 0x3) <- suit_binary.(f land 0x3) lor binaries_by_id.(f) in
-    let () = suit_binary.(g land 0x3) <- suit_binary.(g land 0x3) lor binaries_by_id.(g) in
+    let () = suit_bin.(c1 land 0x3) <- 
+        suit_bin.(c1 land 0x3) lor bin_id.(c1) in
+    let () = suit_bin.(c2 land 0x3) <- 
+        suit_bin.(c2 land 0x3) lor bin_id.(c2) in
+    let () = suit_bin.(c3 land 0x3) <- 
+        suit_bin.(c3 land 0x3) lor bin_id.(c3) in
+    let () = suit_bin.(c4 land 0x3) <- 
+        suit_bin.(c4 land 0x3) lor bin_id.(c4) in
+    let () = suit_bin.(c5 land 0x3) <- 
+        suit_bin.(c5 land 0x3) lor bin_id.(c5) in
+    let () = suit_bin.(c6 land 0x3) <- 
+        suit_bin.(c6 land 0x3) lor bin_id.(c6) in
+    let () = suit_bin.(c7 land 0x3) <- 
+        suit_bin.(c7 land 0x3) lor bin_id.(c7) in
     let target_index = suits.(suit_hash) - 1 in
-    flush.(suit_binary.(target_index))
+    flush.(suit_bin.(target_index))
   else
-    let () = quinary.(a lsr 2) <- (quinary.(a lsr 2)) + 1 in
-    let () = quinary.(b lsr 2) <- (quinary.(b lsr 2)) + 1 in
-    let () = quinary.(c lsr 2) <- (quinary.(c lsr 2)) + 1 in
-    let () = quinary.(d lsr 2) <- (quinary.(d lsr 2)) + 1 in
-    let () = quinary.(e lsr 2) <- (quinary.(e lsr 2)) + 1 in
-    let () = quinary.(f lsr 2) <- (quinary.(f lsr 2)) + 1 in  
-    let () = quinary.(g lsr 2) <- (quinary.(g lsr 2)) + 1 in
-    let hash = hash_quinary quinary 13 7 in
+    let () = quinary.(c1 lsr 2) <- (quinary.(c1 lsr 2)) + 1 in
+    let () = quinary.(c2 lsr 2) <- (quinary.(c2 lsr 2)) + 1 in
+    let () = quinary.(c3 lsr 2) <- (quinary.(c3 lsr 2)) + 1 in
+    let () = quinary.(c4 lsr 2) <- (quinary.(c4 lsr 2)) + 1 in
+    let () = quinary.(c5 lsr 2) <- (quinary.(c5 lsr 2)) + 1 in
+    let () = quinary.(c6 lsr 2) <- (quinary.(c6 lsr 2)) + 1 in  
+    let () = quinary.(c7 lsr 2) <- (quinary.(c7 lsr 2)) + 1 in
+    let hash = base_5_hash quinary 13 7 in
     noflush.(hash)
 
 
-let rec get_nth : ((Deck.suit * Deck.rank) list * int
-                   -> (Deck.suit * Deck.rank))= function
-  | [], _ -> failwith "can't get nth from empty list"
-  | _, n when n < 0 -> failwith "can't get negative element from list"
-  | x::_, 0 -> x
-  | x::xs, n -> get_nth(xs, n-1)
-(*TODO *)
-let seven_list_eval (hand:(Deck.suit * Deck.rank) list) = 
-  let a = Deck.int_converter (get_nth (hand,0)) in
-  let b = Deck.int_converter (get_nth (hand,1)) in
-  let c = Deck.int_converter (get_nth (hand,2)) in
-  let d = Deck.int_converter (get_nth (hand,3)) in
-  let e = Deck.int_converter (get_nth (hand,4)) in
-  let f = Deck.int_converter (get_nth (hand,5)) in
-  let g = Deck.int_converter (get_nth (hand,6)) in
+(** [seven_list_eval hand] gives the ranking of [hand] in terms of which of
+    the 7462 equivalence classes of 7 card poker it corresponds to. 
+    Lower values denote a more powerful rank.
+    Requires: [hand] comprises 7 unique cards represented as (suit, rank)
+    tuples. *)
+let seven_list_eval hand = 
+  let a = Deck.int_converter (List.nth hand 0) in
+  let b = Deck.int_converter (List.nth hand 1) in
+  let c = Deck.int_converter (List.nth hand 2) in
+  let d = Deck.int_converter (List.nth hand 3) in
+  let e = Deck.int_converter (List.nth hand 4) in
+  let f = Deck.int_converter (List.nth hand 5) in
+  let g = Deck.int_converter (List.nth hand 6) in
   seven_eval a b c d e f g
