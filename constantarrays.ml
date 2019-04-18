@@ -1,3 +1,8 @@
+(* The arrays used for dynamic programming here were adapted from 
+   Henry R Lee's Poker Hand Evaluator Algorithm, initially written in C.
+   We translated and built upon his implementation. *
+   Original Source: https://github.com/HenryRLee/PokerHandEvaluator *)
+
 let dynamicProgram = [|
   [|
     [|0;	0;	0;	0;	0;	0;	0;	0|];

@@ -4,6 +4,11 @@ open Tableflush
 open Constantarrays
 open Deck
 
+
+(* The algorithm here was adapted and improved from the original authored
+   in C by Henry R Lee.
+   Original Source: https://github.com/HenryRLee/PokerHandEvaluator *)
+
 (** [seven_eval c1 c2 c3 c4 c5 c6 c7] takes in a hand of cards [c1] to [c7] 
     ,each in its integer representation returned by [int_converter] and returns 
     the rank of the hand in terms of which of the 7462 poker equivalence
@@ -86,7 +91,7 @@ let seven_eval c1 c2 c3 c4 c5 c6 c7 =
     let () = quinary.(c6 lsr 2) <- (quinary.(c6 lsr 2)) + 1 in  
     let () = quinary.(c7 lsr 2) <- (quinary.(c7 lsr 2)) + 1 in
     let hash = base_5_hash quinary 13 7 in
-    noflush.(hash)
+    noflush_hashes.(hash)
 
 
 (** [seven_list_eval hand] gives the ranking of [hand] in terms of which of
@@ -111,12 +116,12 @@ let seven_list_eval hand =
     of a suit.
     Requires: [rank_val] is between 1 and 7462)  *)
 let rank_mapper rank_val = if rank_val = 1 then "Royal Flush"
-  else if rank_val >= 10 then "Straight Flush"
-  else if rank_val >= 166 then "Four of a Kind"
-  else if rank_val >= 322 then "Full House"
-  else if rank_val >= 1599 then "Flush"
-  else if rank_val >= 1609 then "Straight"
-  else if rank_val >= 2467 then "Three of a Kind"
-  else if rank_val >= 3325 then "Two Pair"
-  else if rank_val >= 6185 then "One Pair"
+  else if rank_val <= 10 then "Straight Flush"
+  else if rank_val <= 166 then "Four of a Kind"
+  else if rank_val <= 322 then "Full House"
+  else if rank_val <= 1599 then "Flush"
+  else if rank_val <= 1609 then "Straight"
+  else if rank_val <= 2467 then "Three of a Kind"
+  else if rank_val <= 3325 then "Two Pair"
+  else if rank_val <= 6185 then "One Pair"
   else "High Card"

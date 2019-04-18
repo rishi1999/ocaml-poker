@@ -19,6 +19,9 @@ type bet = {
     [players_in] : the list of players that are currently playing the hand
     [bet] : current bet situation in this round
     [avail_action] : the available actions that the current player can act
+    [winner] : is a tuple of (player_id, rank) where player_id is the player
+    with the winning hand and the rank is the rank of the hand evaluated by
+    hand evaluator.
 *)
 type t = {
   game_type: int;
@@ -30,61 +33,97 @@ type t = {
   players_played: int list;
   bet: bet;
   avail_action: string list;
-  winner: int;
+  winner: (int*int);
 }
 (** [game_type st] is the type of the game being played in [st].
-    Requires: valid state [st]. *)
+    Requires: valid state [st].
+    Example: [game_type st] is 0 if [st] is a multiplayer game. *)
 val game_type : t -> int
 
 (** [num_players st] is the number of players in the game being played in [st].
-    Requires: valid state [st]. *)
+    Requires: valid state [st].
+    Example: [num_players st] is 3 if [st] has 3 players. *)
 val num_players : t -> int
 
 (** [table st] is the information about the table
     in the game being played in [st].
-    Requires: valid state [st]. *)
+    Requires: valid state [st].
+    Example: [table st] is
+    [{
+    pot = 500;
+    blind = 5;
+    participants = [1; 2; 3];
+    board = [(Hearts, Three); (Diamonds, Four)];
+    }]
+    in a game with a three total players and a blind of $5,
+    two cards currently on the board, and $500 in the pot.
+*)
 val table : t -> Table.table
 
 (** [player_turn st] is the type of the game being played in [st].
-    Requires: valid state [st]. *)
+    Requires: valid state [st].
+    Example: [player_turn st] is 3 after the first two moves of the game. *)
 val player_turn : t -> int
 
 (** [players_in st] is the list of players who are playing
     in the current round
     of the game being played in [st].
-    Requires: valid state [st]. *)
+    Requires: valid state [st].
+    Example: [players_in st] is [[1; 4]] if the game started
+    with four players and players 2 and 3 folded. *)
 val players_in : t -> int list
 
 (** [button st] is the player who is the button
     in the game being played in [st].
-    Requires: valid state [st]. *)
+    Requires: valid state [st].
+    Example: [button st] is 3 in the first hand of a game
+    with three players. *)
 val button : t -> int
 
+(** [continue_game st] is [st] with no winner set.
+    Requires: valid state [st].
+    Example: [continue_game st] is a state with winner set to -1
+    instead of the previous winner. *)
 val continue_game : t -> t
 
 (** [winning_player st] is the player that has won the hand in state [st].
     Requires: valid state [st]. *)
-val winning_player : t -> int
+val winning_player : t -> (int*int)
 
 (** [bet st] is the amount currently being bet
     in the game being played in [st].
-    Requires: valid state [st]. *)
+    Requires: valid state [st].
+    Example: [bet st] is $10 after the big blind goes
+    if the blind is set to 10. *)
 val bet : t -> bet
 
-(** [button st] is the list of available actions
+(** [avail_action st] is the list of available actions
     in the game being played in [st].
-    Requires: valid state [st]. *)
+    Requires: valid state [st].
+    Example: [avail_action st] is [[fold]] if the only possible action left
+    for the player is folding. *)
 val avail_action : t -> string list
 
-(** [button st] is the initial state
+(** [init_state st] is the initial state
     of the game being played in [st].
-    Requires: valid state [st]. *)
+    Requires: valid state [st].
+    Example: [init_state st] is a state with three players in
+    if the game has three players. *)
 val init_state : int -> int -> int -> int -> t
 
+(** [hand_order num_players button] is an integer list
+    containing integers from (button + 1) to num_players and then from 1
+    to button.
+    Requires: [button >= 1] and [num_players >= 1]
+    Requires: [button <= num_players]
+    Example:  [hand_order 5 3] is [[4; 5; 1; 2; 3]] *)
 val hand_order : int -> int -> int list
 
 (** [bet_paid_amt st] is the list of tuples of players
-    and how much money they have paid in state [st]. *)
+    and how much money they have paid in state [st].
+    Requires: valid state [st].
+    Example: [bet_paid_amt st] is [[(1,2); (2,5)]] in a two-player game
+    after both blinds go. *)
 val bet_paid_amt : t -> (int * int) list
 
 (** [move_result] is the type representing the result
@@ -114,12 +153,13 @@ val stack : t -> move_result
     Requires: valid command [comm]. *)
 val command_to_function : Command.command -> (t -> move_result)
 
-(** [winner st] is the player that wins the round
-    Requires that state has a nonempty list of players
-    Requries there are 5 hole cards
+(** [winner st] is the player that wins the round and the rank of
+    the winning hand, in the form (player, rank)
+    Requires: state has a nonempty list of players
+    Requries: there are 5 hole cards
     throws "cannot determine winner" exception if called on
     list of empty players or hole cards less than 5*)
-val winner : t -> Player.player
+val winner : t -> (Player.player*int)
 
 (** [get_avail_action st] is the list of valid commands
     the player can currently execute.
