@@ -418,6 +418,8 @@ let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
     if amt < st.table.blind then 
       Illegal "You have to bet at least the blind!"
+    else if comm_str = "raise" && amt < 2*st.bet.bet_amount then
+      Illegal "You have to raise at least twice the bet!"
     else if amt > (find_stack st.player_turn st.table.participants) then 
       Illegal "You're not very liquid at the moment...."
     else if comm_str = "bet" then 

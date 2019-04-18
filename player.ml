@@ -5,9 +5,6 @@ type player =
     money: int;
   }
 
-(** [id player] returns the id of the player.
-    Requires: [player] is a valid player.
-    Example: id {id = 0; cards = []; money = 5} is 0 *)
 let id player = player.id
 
 (** [id player] returns the id of the player.
