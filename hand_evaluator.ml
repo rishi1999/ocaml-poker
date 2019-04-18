@@ -4,6 +4,11 @@ open Tableflush
 open Constantarrays
 open Deck
 
+
+(* The algorithm here was adapted and improved from the original authored
+   in C by Henry R Lee.
+   Original Source: https://github.com/HenryRLee/PokerHandEvaluator *)
+
 (** [seven_eval c1 c2 c3 c4 c5 c6 c7] takes in a hand of cards [c1] to [c7] 
     ,each in its integer representation returned by [int_converter] and returns 
     the rank of the hand in terms of which of the 7462 poker equivalence

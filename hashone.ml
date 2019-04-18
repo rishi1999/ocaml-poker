@@ -1,3 +1,6 @@
+(* The hashes here were taken from the following source as we adapted
+   and improved their algorithm. 
+   Original Source: https://github.com/HenryRLee/PokerHandEvaluator *)
 
 let noflush_hashes = [|
   11;	23;	11;	167;	23;	11;	167;	179;
