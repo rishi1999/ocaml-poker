@@ -1,6 +1,3 @@
-
-
-
 module M = Authors
 
 let () =
