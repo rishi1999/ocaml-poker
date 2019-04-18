@@ -33,9 +33,8 @@ finalcheck: check
 bisect: clean bisect-test
 	bisect-report -I _build -html report bisect0001.out
 
-
-#zip:
-#	zip search_src.zip *.ml* _tags Makefile analysis.pdf
+zip:
+	zip final_submission.zip *.ml* _tags Makefile
 
 docs: docs-public docs-private
 
