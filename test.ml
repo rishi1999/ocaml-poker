@@ -18,18 +18,18 @@ let deck_tests =
   ]
 let james:player = {id = 0; cards = []; money = 32}
 let bob:player = {id = 1; cards = []; money = 32}
-let table1: table = {dealer = 0; blind = 1; participants = [james;bob]; board= []}
+let table1: table = {pot = 0; blind = 1; participants = [james;bob]; board= []}
 let table2: table = deal table1
 
 
 let table2_players table2 =  match table2 with 
-    { dealer = d ; blind = b; participants = p ; _ } -> p
+    { pot = d ; blind = b; participants = p ; _ } -> p
 let james_cards_2 table2_players = match table2_players with 
   | {id = s; cards = c; money = m}::t -> c
   | _ -> failwith "table2 not dealt"
 
 let table1_players=  match table1 with 
-    { dealer = d ; blind = b; participants = p ; _ } -> p
+    { pot = d ; blind = b; participants = p ; _ } -> p
 let james_cards= match table1_players with
   | {id = s; cards = c; money = m}::t -> c
   | _ -> failwith "table2 not dealt"
@@ -40,7 +40,7 @@ let jimmy:player = {id = 1; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
 let bobby:player = {id = 2; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
 let alice:player = {id = 3; cards = [(Spades, Three); (Hearts, Four)]; money = 42}
 
-let state_table_1 = {dealer = 1; blind = 2; participants = [jimmy;bobby;alice];
+let state_table_1 = {pot = 0; blind = 2; participants = [jimmy;bobby;alice];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
 let state_bet_1 = {
@@ -93,7 +93,7 @@ let table_tests =
     "deal_failure_test_1" >:: (fun _->
         assert_raises (Failure "player has non 0 cards") (fun () -> deal table2));
     "add_to_hole_test_1" >:: (fun _->
-        assert (table1 <> (add_to_hole (table1))));
+        assert (table1 <> (add_to_board (table1))));
   ]
 
 
