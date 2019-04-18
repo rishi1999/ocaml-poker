@@ -4,7 +4,7 @@ open Player
 open Hand_evaluator
 open Deck
 open State
-
+open Command
 
 
 let make_new_deck =
@@ -56,52 +56,101 @@ let player_tests =
 
   ]
 
-let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}
-let james = {id = 0; cards = []; money = 32}
-let bob = {id = 1; cards = []; money = 32}
-let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}
-let table2 = deal table1
+let command_tests = [
+
+  "test parse empty" >:: (fun _ -> 
+      assert_raises (Empty) (fun () -> parse ""));
+  "test parse empty with spaces" >:: (fun _ -> 
+      assert_raises (Empty) (fun () -> parse "      "));
+  "test parse quit malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "quit l"));
+  "test parse go malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "go "));
+  "test parse different verb malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "pie clock tower "));
+  "test parse take malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "take"));
+  "test parse inventory with word malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "inventory chicken"));
+  "test parse drop malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "drop"));
+  "test parse lock malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "lock"));
+  "test parse unlock malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "unlock"));
+  "test parse score malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "score chicken"));
+  "test command to string" >:: (fun _ -> 
+      assert_equal "checked!" (command_to_string Check));
+  "test command to string" >:: (fun command -> 
+      assert_equal Quit (parse "quit"));
+  "test command to string" >:: (fun command -> 
+      assert_equal Check (parse "check"));
+  "test command to string" >:: (fun command -> 
+      assert_equal Stack (parse "stack"));
+  "test command to string" >:: (fun command -> 
+      assert_equal Fold (parse "fold"));
+  "test command to string" >:: (fun command -> 
+      assert_equal Call (parse "call"));
+  "test command to string" >:: (fun command -> 
+      assert_equal (Bet 10) (parse "bet 10"));
+  "test command to string" >:: (fun command -> 
+      assert_equal (Raise 10) (parse "raise 10"));
+
+]
+
+let table1: table = {pot = 0; blind = 1; participants = [james;bob]; board= []}
+let james:player = {id = 0; cards = []; money = 32}
+let bob:player = {id = 1; cards = []; money = 32}
+let table1: table = {pot = 0; blind = 1; participants = [james;bob]; board= []}
+let table2: table = deal table1
 
 
-let table2_players table2 =  match table2 with
-    { pot = d ; blind = b; participants = p ; _ } -> p
+let table2_players table2 = table2.participants
 let james_cards_2 table2_players = match table2_players with
-  | {id = s; cards = c; money = m}::t -> c
+  | {
+    id = s;
+    cards = c;
+    money = m
+  } :: t -> c
   | _ -> failwith "table2 not dealt"
 
-let table1_players=  match table1 with
-    { pot = d ; blind = b; participants = p ; _ } -> p
-let james_cards= match table1_players with
-  | {id = s; cards = c; money = m}::t -> c
+let table1_players = table1.participants
+let james_cards = match table1_players with
+  | {
+    id = s;
+    cards = c;
+    money = m
+  } :: t -> c
   | _ -> failwith "table2 not dealt"
 
-let empty: (Deck.suit * Deck.rank) list = []
-
+let empty : Deck.card list = []
 let jimmy = {id = 1; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
 let bobby = {id = 2; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
 let alice = {id = 3; cards = [(Spades, Three); (Hearts, Four)]; money = 42}
-
 let state_table_1 = {pot = 0; blind = 2; participants = [jimmy; bobby; alice];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
-let state_bet_1 = {
-  bet_player = 1;
-  bet_amount = 0;
-  bet_paid_amt = [(0,0)];
-}
+let state_bet_1 =
+  {
+    bet_player = 1;
+    bet_amount = 0;
+    bet_paid_amt = [(0,0)];
+  }
 
-let state1 = {
-  game_type = 0;
-  num_players = 2;
-  table = state_table_1;
-  player_turn = 0;
-  button = 0;
-  players_in = [1;2;3];
-  players_played = [];
-  bet = state_bet_1;
-  avail_action = ["fold"];
-  winner = (-1,0);
-}
+let state1 =
+  {
+    game_type = 0;
+    num_players = 2;
+    table = state_table_1;
+    player_turn = 0;
+    button = 0;
+    players_in = [1;2;3];
+    players_played = [];
+    bet = state_bet_1;
+    avail_action = ["fold"];
+    winner = (-1,0);
+  }
 let state2 = {state1 with players_in = [2]}
 let state3 = {state1 with players_in = [3]}
 let state4 = {state1 with players_in = [2; 3]}
@@ -127,7 +176,6 @@ let state_tests =
   [
     "hand_order_test1" >:: (fun _ ->
         assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
-
     "winner_test_1" >:: (fun _ ->
         assert_equal jimmy (fst (winner state1)));
     "winner_test_2" >:: (fun _ ->
@@ -154,7 +202,7 @@ let state_tests =
     "simulation_8" >:: (fun _ ->
         assert_equal 623 (State.find_participant state_8 2).money); 
     "simulation_9" >:: (fun _ ->
-        assert_equal 370 (State.find_participant state_8 1).money); 
+        assert_equal 370 (State.find_participant state_8 1).money);
 
     (* Also extensive testing done by play testing the engine *)
   ]
@@ -232,5 +280,6 @@ let suite =
     hand_evaluator_tests;
     state_tests;
     player_tests;
+    command_tests;
   ]
 let _ = run_test_tt_main suite

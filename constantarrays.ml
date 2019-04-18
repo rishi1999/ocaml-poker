@@ -3,6 +3,7 @@
    We translated and built upon his implementation. *
    Original Source: https://github.com/HenryRLee/PokerHandEvaluator *)
 
+(*BISECT-IGNORE-BEGIN*)
 let dynamicProgram = [|
   [|
     [|0;	0;	0;	0;	0;	0;	0;	0|];
@@ -600,3 +601,4 @@ let suits_map = [|
   0;	0;	0;	0;	0;	0;	0;	0;
   0;	0;	0;	0;	0;	0;	0;	0;
 |]
+(*BISECT-IGNORE-END*)

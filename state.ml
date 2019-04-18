@@ -299,29 +299,29 @@ let go_next_round st =
     let button_updated = if st.button + 1 > st.num_players then 1 else st.button + 1 in
     let players_in_updated = hand_order st.num_players button_updated in
     if List.length st.players_in = 1 then
-    let interim_state = {
-      st with
-      table = Table.deal (cleared);
-      bet = init_bet players_in_updated;
-      player_turn = List.nth players_in_updated 0;
-      button = button_updated;
-      players_in = players_in_updated;
-      players_played = [];
-      winner = (winner_player, 0);
-    } in
-    interim_state |> pay_blinds |> get_avail_action
+      let interim_state = {
+        st with
+        table = Table.deal (cleared);
+        bet = init_bet players_in_updated;
+        player_turn = List.nth players_in_updated 0;
+        button = button_updated;
+        players_in = players_in_updated;
+        players_played = [];
+        winner = (winner_player, 0);
+      } in
+      interim_state |> pay_blinds |> get_avail_action
     else 
-    let interim_state = {
-      st with
-      table = Table.deal (cleared);
-      bet = init_bet players_in_updated;
-      player_turn = List.nth players_in_updated 0;
-      button = button_updated;
-      players_in = players_in_updated;
-      players_played = [];
-      winner = (winner_player, (snd (winner st)));
-    } in
-    interim_state |> pay_blinds |> get_avail_action
+      let interim_state = {
+        st with
+        table = Table.deal (cleared);
+        bet = init_bet players_in_updated;
+        player_turn = List.nth players_in_updated 0;
+        button = button_updated;
+        players_in = players_in_updated;
+        players_played = [];
+        winner = (winner_player, (snd (winner st)));
+      } in
+      interim_state |> pay_blinds |> get_avail_action
   else
     let card_added = Table.add_to_board st.table in
     {
@@ -416,20 +416,29 @@ let stack st =
 
 let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
-    if amt >= st.table.blind &&
-       amt <= (find_stack st.player_turn st.table.participants) then
-      if comm_str = "bet" then
-        Legal (get_avail_action (money_to_pot st amt))
-      else
-        let rec get_paid_amt = function
-          | [] -> 0
-          | (player,amt)::t -> if st.player_turn = player then amt
-            else get_paid_amt t in
-        let curr_paid_amt = get_paid_amt st.bet.bet_paid_amt in
-        let temp_state =  (money_to_pot st amt) in
-        let updated_bet = {temp_state.bet with bet_amount = curr_paid_amt + amt;} in
-        Legal (get_avail_action {temp_state with bet = updated_bet})
-    else Illegal "You are out of money!"
+    if amt < st.table.blind then 
+      Illegal "You have to bet at least the blind!"
+    else if amt > (find_stack st.player_turn st.table.participants) then 
+      Illegal "You're not very liquid at the moment...."
+    else if comm_str = "bet" then 
+      Legal (get_avail_action (money_to_pot st amt))
+    else
+      let rec get_paid_amt = function
+        | [] -> 0
+        | (player,amt)::t -> if st.player_turn = player then amt
+          else get_paid_amt t in
+      let curr_paid_amt = get_paid_amt st.bet.bet_paid_amt in
+      let temp_state =  (money_to_pot st amt) in
+      let updated_bet =
+        {
+          temp_state.bet with
+          bet_amount = curr_paid_amt + amt;
+        } in
+      Legal (get_avail_action
+               {
+                 temp_state with
+                 bet = updated_bet;
+               })
   else Illegal "You can't do that right now!"
 
 let bet' amt st = bet_or_raise amt st "bet"
