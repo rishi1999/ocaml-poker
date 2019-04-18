@@ -11,7 +11,7 @@ let print_hline () =
   for i = 1 to 100 do
     print_char '-'
   done;
-  print_newline ();
+  print_newline (); 
   print_newline ()
 
 let print_intro () =
@@ -118,8 +118,8 @@ let play_game st =
       ANSITerminal.(print_string [yellow] string);
       print_newline ();
       print_newline ();
-      exit 0
-      (*keep_playing (State.continue_game st)*)
+      (* exit 0 *)
+      keep_playing (State.continue_game st)
     else
       print_hline ();
     print_current_state st;

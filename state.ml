@@ -59,6 +59,7 @@ let money_to_pot st amount =
   let table =
     {
       st.table with
+      pot = st.table.pot + amount;
       participants = participants';
     } in
 
@@ -392,7 +393,17 @@ let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
     if amt >= st.table.blind &&
        amt <= (find_stack st.player_turn st.table.participants) then
-      Legal (money_to_pot st amt)
+      if comm_str = "bet" then
+        Legal (money_to_pot st amt)
+      else
+        let rec get_paid_amt = function
+        | [] -> 0
+        | (player,amt)::t -> if st.player_turn = player then amt
+        else get_paid_amt t in
+        let curr_paid_amt = get_paid_amt st.bet.bet_paid_amt in
+        let temp_state =  (money_to_pot st amt) in
+        let updated_bet = {temp_state.bet with bet_amount = curr_paid_amt + amt;} in
+        Legal {temp_state with bet = updated_bet}
     else Illegal "You are out of money!"
   else Illegal "You can't do that right now!"
 
