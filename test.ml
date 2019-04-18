@@ -82,7 +82,7 @@ let state1:State.t = {
   players_played = [];
   bet = state_bet_1;
   avail_action = ["fold"];
-  winner = -1;
+  winner = (-1,0);
 }
 let state2 = {state1 with players_in = [2]}
 let state3 = {state1 with players_in = [3]}
@@ -96,13 +96,13 @@ let state_tests =
         assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
 
     "winner_test_1" >:: (fun _ ->
-        assert_equal jimmy (winner state1));
+        assert_equal jimmy (fst (winner state1)));
     "winner_test_2" >:: (fun _ ->
-        assert_equal bobby (winner state2));
+        assert_equal bobby (fst (winner state2)));
     "winner_test_3" >:: (fun _ ->
-        assert_equal alice (winner state3));
+        assert_equal alice (fst (winner state3)));
     "winner_test_4" >:: (fun _ ->
-        assert_equal alice (winner state3));
+        assert_equal alice (fst (winner state3)));
     (*  "get_players_in_test" >:: (fun _->
           assert_equal [bobby;alice] (get_players_in state4)); *)
 
