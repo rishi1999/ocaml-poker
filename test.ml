@@ -7,14 +7,25 @@ open State
 
 
 
-(**Deck Tests*)
-let make_new_deck =
-  Deck.deck_init
 
+
+
+let empty_table = {
+  pot=0;
+  blind=1;
+  participants = [{id = 1; cards = []; money = 20}];
+  board = [];
+}
+
+
+(**Deck Tests*)
 let deck_tests = 
   [
-    "pick first card" >:: (fun _ -> 
-        assert_equal [] []);
+    "pick first card" >:: (fun _ -> deck_init ();
+                            assert_equal (pick_cards 1) [(Clubs, Two)]);
+    "pick second card" >:: (fun _ -> deck_init();
+                             assert_equal (pick_cards 2) [(Clubs, Two); (Clubs, Three)]);
+
     "convert 9C" >:: (fun _ -> 
         assert_equal 28 (int_converter (Clubs, Nine)));
     "pick_card_test" >:: (fun _ -> 
@@ -112,6 +123,8 @@ let state_tests =
 
 let table_tests =
   [
+    "participants test" >:: (fun _ ->
+        assert_equal [{id = 1; cards = []; money = 20}] (participants empty_table));
     "deal_test_1" >:: (fun _->
         assert ((deal table1) <> table1));
     "deal_test_2" >:: (fun _->
