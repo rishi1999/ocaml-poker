@@ -26,7 +26,8 @@ let deck_tests =
     "pick first card" >:: (fun _ -> deck_init ();
                             assert_equal (pick_cards 1) [(Clubs, Two)]);
     "pick second card" >:: (fun _ -> deck_init();
-                             assert_equal (pick_cards 2) [(Clubs, Two); (Clubs, Three)]);
+                             assert_equal (pick_cards 2) [(Clubs, Two); 
+                                                          (Clubs, Three)]);
 
     "convert 9C" >:: (fun _ -> 
         assert_equal 28 (int_converter (Clubs, Nine)));
@@ -210,13 +211,15 @@ let state_tests =
 let table_tests =
   [
     "participants test" >:: (fun _ ->
-        assert_equal [{id = 1; cards = []; money = 20}] (participants empty_table));
+        assert_equal [{id = 1; cards = []; money = 20}] (participants 
+                                                           empty_table));
     "deal_test_1" >:: (fun _->
         assert ((deal table1) <> table1));
     "deal_test_2" >:: (fun _->
         assert_equal james_cards empty);
     "deal_failure_test_1" >:: (fun _->
-        assert_raises (Failure "player has non 0 cards") (fun () -> deal table2));
+        assert_raises (Failure "player has non 0 cards") 
+          (fun () -> deal table2));
     "add_to_hole_test_1" >:: (fun _->
         assert (table1 <> (add_to_board (table1))));
   ]
