@@ -2,6 +2,7 @@
    and improved their algorithm. 
    Original Source: https://github.com/HenryRLee/PokerHandEvaluator *)
 
+(*BISECT-IGNORE-BEGIN*)
 let noflush_hashes = [|
   11;	23;	11;	167;	23;	11;	167;	179;
   23;	12;	168;	191;	180;	24;	35;	35;
@@ -6155,3 +6156,5 @@ let noflush_hashes = [|
   165;	155;	156;	157;	158;	159;	160;	161;
   162;	163;	164;	165;	166;
 |]
+
+(*BISECT-IGNORE-END*)

@@ -23,8 +23,9 @@ type t = {
 }
 exception Tie
 
-(** [get_next_player] st returns the number of the player that has
-    to act next. *)
+(** [get_next_player] st returns the id of the player that has
+    to act next.
+    Requires: st.players_in is not an empty list *)
 let get_next_player st =
   let rec helper = function
     | x -> let guess = if x + 1 > st.num_players then 1 else x + 1 in
@@ -38,6 +39,10 @@ let find_participant st target =
     | h :: t -> if (Player.id h) = target then h else helper target t in
   helper target (Table.participants (st.table))
 
+(** [money_to_pot] st amount returns the state after the player has put
+    amount of money into the pot, either through betting or raising.
+    Requires: st is a valid state of the game
+              the player has at least amount in his stack *)
 let money_to_pot st amount =
   let player = find_participant st st.player_turn in
   let player' =
@@ -87,10 +92,16 @@ let money_to_pot st amount =
     players_played = st.player_turn :: st.players_played;
   }
 
+(** [pay_blinds] st returns the state after the first two players,
+    the small blind and the big blind, have paid their blinds.
+    Requires: st is a valid state where it has just started a new hand *)
 let pay_blinds st =
   let small_blind = money_to_pot st (st.table.blind / 2) in
   money_to_pot small_blind st.table.blind
 
+(** [init_players] num_players money returns the list of type Player.player,
+    with length of num_players and everyone's money is equal to the
+    input money. *)
 let init_players num_players money =
   let rec init_players' acc money = function
     | 0 -> acc
@@ -103,6 +114,9 @@ let init_players num_players money =
       init_players' (curr_player :: acc) money (id - 1) in
   init_players' [] money num_players
 
+(** [init_table] num_players money blind returns the list of type Player.player,
+    with length of num_players and everyone's money is equal to the
+    input money. *)
 let init_table num_players money blind =
   Table.deal {
     pot = 0;
@@ -111,18 +125,23 @@ let init_table num_players money blind =
     board = [];
   }
 
+(** [init_bet_paid_amt] players_in returns a list of elements in the form
+    (player_id, 0) for the second value of the tuple to denote the total amount
+    of that the player has put in the pot in this round. *)
 let init_bet_paid_amt players_in =
   let rec helper lst = function
     | [] -> lst
     | h::t -> helper ((h,0)::lst) t in
   helper [] players_in
 
+(** [init_players_in] num_players returns a list containing all players' id *)
 let init_players_in num_players =
   let rec init_players_in' acc = function
     | 0 -> acc
     | t -> init_players_in' (t :: acc) (t - 1) in
   init_players_in' [] num_players
 
+(** [init_bet] players_in initializes a type bet*)
 let init_bet players_in =
   {
     bet_player = 0;
@@ -258,6 +277,8 @@ let winner st =
 
   (List.nth part num_winner, best_rank)
 
+(** [go_next_round] st ends the current round or the current hand and
+    returns the state with the next round. *)
 let go_next_round st =
   if is_hand_complete st then
     let winner_player = if List.length st.players_in = 1 then 
@@ -321,6 +342,8 @@ let continue_game st = {st with winner = (-1,0)}
 
 let winning_player st = st.winner
 
+(** [calculate_pay_amt] st returns the amount that the current player has
+    to put into the pot to call either a bet or a raise *)
 let calculate_pay_amt st =
   let cur_bet_size = st.bet.bet_amount in
   let rec get_bet_amt target = function
@@ -426,159 +449,6 @@ let bet_or_raise amt st comm_str =
 
 let bet' amt st = bet_or_raise amt st "bet"
 let raise' amt st = bet_or_raise amt st "raise"
-
-(* SAVE / LOAD NEEDS IMPLEMENTATION *)
-
-
-(* game_type: int;
-   num_players: int;
-   table: Table.table;
-   player_turn: int;
-   button: int;
-   players_in: int list;
-   players_played: int list;
-   bet: bet;
-   avail_action: string list;
-   winner : int; *)
-
-(* type table = {
-   pot: int;
-   blind: int;
-   participants: Player.player list;
-   board: (Deck.suit * Deck.rank) list;
-   } *)
-
-(* type player =
-   {
-    id: int;
-    cards: (Deck.suit * Deck.rank) list;
-    money: int;
-   } *)
-
-(* type bet = {
-   bet_player: int;
-   bet_amount: int;
-   bet_paid_amt: (int*int) list;
-   } *)
-(*
-let save st =
-Yojson.to_file "saved_game.json" (
-  `Assoc
-  [
-  ("game_type", `Int st.game_type);
-  ("num_players", `Int st.num_players);
-  ("table",
-    `List
-      [`Assoc
-         [("pot", `Int st.table.pot);
-          ("blind", `Int st.table.blind);
-          ("participants",
-          `List
-            [ `List
-              [`Assoc [
-              ("id", `Int 1);
-              ("card1", `Int 4);
-              ("card2", `Int 19);
-              ("money", `Int 300);
-              ];
-              `Assoc [
-              ("id", `Int 2);
-              ("card1", `Int 5);
-              ("card2", `Int 28);
-              ("money", `Int 300);
-                ]
-              ]]);
-            ]]);
-          ("board",
-          `List
-             [
-              `Int 20; `Int 3; `Int 50;
-            ]);
-  ("player_turn", `Int st.player_turn);
-  ("button", `Int st.button);
-  ("players_in", `List [`Int 1; `Int 2]);
-  ("players_played", `List[`Int 1; `Int 2]);
-  ("bet", `List
-    [
-      `Assoc [
-        ("bet_player", `Int st.bet.bet_player);
-        ("bet_amount", `Int st.bet.bet_amount);
-        ("bet_paid_amt", `List[
-          `Assoc [
-            ("id", `Int 1);
-            ("paid", `Int 0)
-          ];
-          `Assoc [
-            ("id", `Int 2);
-            ("paid", `Int 3)
-          ]
-        ]);
-      ];
-    ]);
-  ("avail_action", `List[]);
-  ("winner", `List[`Int (-1)]);
-
-  ]
-);
-exit 0;
-Legal st *)
-
-(* let load json =
-
-   let rec intlist outlst =
-   function
-   | [] -> outlst
-   | h::t -> intlist (to_int h::outlst) t in
-
-   (* let keys_of_json json = {
-    key_id = json |> member "id" |> to_string;
-    description = json |> member "description" |> to_string;
-    target_room_id = json |> member "target room" |> to_string;
-    start_room_description =
-      json |> member "start room description" |> to_string;
-   } in *)
-
-   let bet_paid_of_json json =
-    let id = json |> member "id" |> to_int in
-    let money = json |> member "paid" |> to_int in
-    (id, money)
-   in
-
-   let bet_of_json json = {
-    bet_player = json |> member "bet_player" |> to_int;
-    bet_amount = json |> member "bet_amount" |> to_int;
-    bet_paid_amt = json |> member "bet_paid_amt" |> to_list
-    |> List.map bet_paid_of_json;
-   }
-   in
-
-   let table_of_json json = {
-    pot = json |> member "pot" |> to_int;
-    blind = json |> member "blind" |> to_int;
-    participants = json |> member "participants"
-    |> to_list |> List.map participants_of_json;
-    board = json |> member "board" |> to_list
-   } in
-
-   let t_of_json json = {
-    game_type = json |> member "game_type" |> to_int;
-    num_players = json |> member "num_players" |> to_int;
-    table = json |> member "table" |> table_of_json;
-    player_turn = json |> member "player_turn" |> to_int;
-    button = json |> member "button" |> to_int;
-    players_in = json |> member "players_in" |> to_list |> intlist [];
-    players_played = json |> member "players_played" |> to_list |> intlist [];
-    bet = json |> member "bet" |> bet_of_json;
-    avail_action = [];
-    winner = json |> member "winner" |> to_int;
-   } in
-
-   let parse json =
-    try t_of_json json
-    with Type_error (s, _) -> failwith ("Parscing error: " ^ s) in
-
-   parse json
-   init_state 0 0 0 0 *)
 
 let command_to_function = Command.(function
     | Check -> check
