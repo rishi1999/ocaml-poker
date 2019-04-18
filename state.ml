@@ -31,8 +31,6 @@ let get_next_player st =
       if List.mem guess st.players_in then guess else helper (guess) in
   helper st.player_turn
 
-(** [find_participant] st target returns a type Player.player of a player that
-    has an id of target. *)
 let find_participant st target =
   let rec helper target = function
     | [] -> failwith "No match"
@@ -140,6 +138,34 @@ let hand_order num_players button =
   let first = list_builder (button + 1) num_players [] in
   first @ second
 
+let get_avail_action st =
+  (* preflop *)
+  (* if List.length st.table.board = 0 then
+     let big_blind_player = List.nth st.players_in 1 in
+     if st.player_turn = big_blind_player && st.bet.bet_amount = st.table.blind then
+      {
+        st with
+        avail_action = ["check"; "bet"; "fold"];
+      }
+     else
+      {
+        st with
+        avail_action = ["call"; "raise"; "fold"];
+      }
+      (* flop *)
+     else *)
+  if st.bet.bet_amount = 0 then
+    {
+      st with
+      avail_action = ["check"; "bet"; "fold"]
+    }
+  else
+    {
+      st with
+      avail_action = ["call"; "raise"; "fold"]
+    }
+
+
 let init_state game_type num_players money blind =
   {
     game_type;
@@ -152,7 +178,7 @@ let init_state game_type num_players money blind =
     bet = init_bet (init_players_in num_players);
     avail_action = ["bet"; "check"; "fold"];
     winner = (-1,0);
-  } |> pay_blinds
+  } |> pay_blinds |> get_avail_action
 
 let game_type st = st.game_type
 let num_players st = st.num_players
@@ -262,7 +288,7 @@ let go_next_round st =
         players_played = [];
         winner = (winner_player, 0);
       } in
-      pay_blinds interim_state
+      interim_state |> pay_blinds |> get_avail_action
     else 
       let interim_state = {
         st with
@@ -274,7 +300,7 @@ let go_next_round st =
         players_played = [];
         winner = (winner_player, (snd (winner st)));
       } in
-      pay_blinds interim_state
+      interim_state |> pay_blinds |> get_avail_action
   else
     let card_added = Table.add_to_board st.table in
     {
@@ -288,33 +314,6 @@ let go_next_round st =
 let continue_game st = {st with winner = (-1,0)}
 
 let winning_player st = st.winner
-
-let get_avail_action st =
-  (* preflop *)
-  (* if List.length st.table.board = 0 then
-     let big_blind_player = List.nth st.players_in 1 in
-     if st.player_turn = big_blind_player && st.bet.bet_amount = st.table.blind then
-      {
-        st with
-        avail_action = ["check"; "bet"; "fold"];
-      }
-     else
-      {
-        st with
-        avail_action = ["call"; "raise"; "fold"];
-      }
-      (* flop *)
-     else *)
-  if st.bet.bet_amount = 0 then
-    {
-      st with
-      avail_action = ["check"; "bet"; "fold"]
-    }
-  else
-    {
-      st with
-      avail_action = ["call"; "raise"; "fold"]
-    }
 
 let calculate_pay_amt st =
   let cur_bet_size = st.bet.bet_amount in
@@ -341,10 +340,10 @@ let check st =
       bet = st.bet;
     } in
     if is_round_complete checked || is_hand_complete checked then
-      Legal (go_next_round checked)
+      Legal (get_avail_action (go_next_round checked))
     else
       Legal
-        checked
+        (get_avail_action checked)
   else Illegal "You can't do that right now!"
 
 let call st =
@@ -353,9 +352,9 @@ let call st =
        (find_stack st.player_turn st.table.participants) then
       let t = money_to_pot st (calculate_pay_amt st) in
       if is_round_complete t || is_hand_complete t then
-        Legal (go_next_round t)
+        Legal (get_avail_action (go_next_round t))
       else
-        Legal t
+        Legal (get_avail_action t)
     else Illegal "You are out of money!"
   else Illegal "You can't do that right now!"
 
@@ -376,9 +375,9 @@ let fold st =
       } in
 
     if is_round_complete t || is_hand_complete t then
-      Legal (go_next_round t)
+      Legal (get_avail_action (go_next_round t))
     else
-      Legal t
+      Legal (get_avail_action t)
   else Illegal "You can't do that right now!"
 
 let stack st =
@@ -399,7 +398,7 @@ let bet_or_raise amt st comm_str =
     else if amt > (find_stack st.player_turn st.table.participants) then 
       Illegal "You're not very liquid at the moment...."
     else if comm_str = "bet" then 
-      Legal (money_to_pot st amt)
+      Legal (get_avail_action (money_to_pot st amt))
     else
       let rec get_paid_amt = function
         | [] -> 0
@@ -407,16 +406,16 @@ let bet_or_raise amt st comm_str =
           else get_paid_amt t in
       let curr_paid_amt = get_paid_amt st.bet.bet_paid_amt in
       let temp_state =  (money_to_pot st amt) in
-      let updated_bet = 
+      let updated_bet =
         {
-          temp_state.bet with 
+          temp_state.bet with
           bet_amount = curr_paid_amt + amt;
         } in
-      Legal 
-        {
-          temp_state with 
-          bet = updated_bet;
-        }
+      Legal (get_avail_action
+               {
+                 temp_state with
+                 bet = updated_bet;
+               })
   else Illegal "You can't do that right now!"
 
 let bet' amt st = bet_or_raise amt st "bet"
@@ -443,7 +442,7 @@ let raise' amt st = bet_or_raise amt st "raise"
    board: (Deck.suit * Deck.rank) list;
    } *)
 
-(* type player = 
+(* type player =
    {
     id: int;
     cards: (Deck.suit * Deck.rank) list;
@@ -455,7 +454,7 @@ let raise' amt st = bet_or_raise amt st "raise"
    bet_amount: int;
    bet_paid_amt: (int*int) list;
    } *)
-(* 
+(*
 let save st =
 Yojson.to_file "saved_game.json" (
   `Assoc
