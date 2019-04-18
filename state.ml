@@ -114,9 +114,9 @@ let init_players num_players money =
       init_players' (curr_player :: acc) money (id - 1) in
   init_players' [] money num_players
 
-(** [init_table] num_players money blind returns the list of type Player.player,
-    with length of num_players and everyone's money is equal to the
-    input money. *)
+(** [init_table] num_players money blind returns the list of type 
+    Player.player, with length of num_players and everyone's money is equal 
+    to the input money. *)
 let init_table num_players money blind =
   Table.deal {
     pot = 0;
@@ -158,22 +158,6 @@ let hand_order num_players button =
   first @ second
 
 let get_avail_action st =
-  (* preflop *)
-  (* if List.length st.table.board = 0 then
-     let big_blind_player = List.nth st.players_in 1 in
-     if st.player_turn = big_blind_player && 
-     st.bet.bet_amount = st.table.blind then
-      {
-        st with
-        avail_action = ["check"; "bet"; "fold"];
-      }
-     else
-      {
-        st with
-        avail_action = ["call"; "raise"; "fold"];
-      }
-      (* flop *)
-     else *)
   if st.bet.bet_amount = 0 then
     {
       st with
@@ -459,6 +443,5 @@ let command_to_function = Command.(function
     | Raise amt -> raise' amt
     | Fold -> fold
     | Stack -> stack
-    (* | Save -> save *)
     | _ -> failwith "UNSUPPORTED COMMAND"
   )

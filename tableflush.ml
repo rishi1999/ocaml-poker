@@ -1,5 +1,6 @@
 (* The hashes here were taken from the following source as we adapted
-   and improved their algorithm. *
+   and improved their algorithm. Their usage is explained in detail
+   in the project report.
    Original Source: https://github.com/HenryRLee/PokerHandEvaluator *)
 
 (*BISECT-IGNORE-BEGIN*)
