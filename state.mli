@@ -30,7 +30,7 @@ type t = {
   players_played: int list;
   bet: bet;
   avail_action: string list;
-  winner: int;
+  winner: (int*int);
 }
 (** [game_type st] is the type of the game being played in [st].
     Requires: valid state [st]. *)
@@ -64,7 +64,7 @@ val continue_game : t -> t
 
 (** [winning_player st] is the player that has won the hand in state [st].
     Requires: valid state [st]. *)
-val winning_player : t -> int
+val winning_player : t -> (int*int)
 
 (** [bet st] is the amount currently being bet
     in the game being played in [st].
@@ -119,7 +119,7 @@ val command_to_function : Command.command -> (t -> move_result)
     Requries there are 5 hole cards
     throws "cannot determine winner" exception if called on
     list of empty players or hole cards less than 5*)
-val winner : t -> Player.player
+val winner : t -> (Player.player*int)
 
 (** [get_avail_action st] is the list of valid commands
     the player can currently execute.
