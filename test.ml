@@ -4,7 +4,7 @@ open Player
 open Hand_evaluator
 open Deck
 open State
-
+open Command
 
 
 let make_new_deck =
@@ -56,10 +56,54 @@ let player_tests =
 
   ]
 
-let james = {id = 0; cards = []; money = 32}
-let bob = {id = 1; cards = []; money = 32}
-let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}
-let table2 = deal table1
+let command_tests = [
+
+  "test parse empty" >:: (fun _ -> 
+      assert_raises (Empty) (fun () -> parse ""));
+  "test parse empty with spaces" >:: (fun _ -> 
+      assert_raises (Empty) (fun () -> parse "      "));
+  "test parse quit malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "quit l"));
+  "test parse go malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "go "));
+  "test parse different verb malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "pie clock tower "));
+  "test parse take malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "take"));
+  "test parse inventory with word malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "inventory chicken"));
+  "test parse drop malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "drop"));
+  "test parse lock malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "lock"));
+  "test parse unlock malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "unlock"));
+  "test parse score malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "score chicken"));
+  "test command to string" >:: (fun _ -> 
+      assert_equal "checked!" (command_to_string Check));
+  "test command to string" >:: (fun command -> 
+      assert_equal Quit (parse "quit"));
+  "test command to string" >:: (fun command -> 
+      assert_equal Check (parse "check"));
+  "test command to string" >:: (fun command -> 
+      assert_equal Stack (parse "stack"));
+  "test command to string" >:: (fun command -> 
+      assert_equal Fold (parse "fold"));
+  "test command to string" >:: (fun command -> 
+      assert_equal Call (parse "call"));
+  "test command to string" >:: (fun command -> 
+      assert_equal (Bet 10) (parse "bet 10"));
+  "test command to string" >:: (fun command -> 
+      assert_equal (Raise 10) (parse "raise 10"));
+
+]
+
+let table1: table = {pot = 0; blind = 1; participants = [james;bob]; board= []}
+let james:player = {id = 0; cards = []; money = 32}
+let bob:player = {id = 1; cards = []; money = 32}
+let table1: table = {pot = 0; blind = 1; participants = [james;bob]; board= []}
+let table2: table = deal table1
 
 
 let table2_players table2 = table2.participants
@@ -236,5 +280,6 @@ let suite =
     hand_evaluator_tests;
     state_tests;
     player_tests;
+    command_tests;
   ]
 let _ = run_test_tt_main suite

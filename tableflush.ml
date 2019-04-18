@@ -1,6 +1,8 @@
 (* The hashes here were taken from the following source as we adapted
    and improved their algorithm. *
    Original Source: https://github.com/HenryRLee/PokerHandEvaluator *)
+
+(*BISECT-IGNORE-BEGIN*)
 let flush_hashes = [|
   0;	0;	0;	0;	0;	0;	0;	0;
   0;	0;	0;	0;	0;	0;	0;	0;
@@ -1027,4 +1029,4 @@ let flush_hashes = [|
   0;	0;	0;	0;	0;	0;	0;	0;
   0;	0;	0;	0;	0;	0;	0;	0;
 |]
-
+(*BISECT-IGNORE-END*)

@@ -1,5 +1,8 @@
+
+(* The type of a bet amount. *)
 type bet_amount = int
 
+(* The type of a command *)
 type command =
   | Check
   | Fold
@@ -16,7 +19,5 @@ exception Malformed
 val command_to_string : command -> string
 
 val parse : string -> command
-
-val remove_emp_str: string list -> string list -> string list
 
 val empty_list: string list -> bool
