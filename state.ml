@@ -2,7 +2,6 @@ open Deck
 open Table
 open Player
 open Hand_evaluator
-open Yojson.Basic.Util
 
 type bet = {
   bet_player: int;
@@ -131,12 +130,6 @@ let init_bet players_in =
     bet_paid_amt = init_bet_paid_amt players_in;
   }
 
-(** [hand_order num_players button] is an integer list
-    containing integers from (button + 1) to num_players and then from 1
-    to button.
-    Requires: button >= 1 and num_players >=1
-    Requires: button <= num_players
-    Example:  [hand_order 5 3] is [4; 5; 1; 2; 3] *)
 let hand_order num_players button =
   let rec list_builder start term outlist =
     if start > term then outlist
@@ -211,12 +204,9 @@ let has_everyone_played st =
       else false in
   check_subset st.players_played st.players_in
 
-(* let print_that_list lst = List.iter (fun x -> print_int x) lst *)
-
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
 let is_round_complete st =
-  (*print_that_list st.players_in; print_newline (); print_that_list st.players_played;*)
   are_all_bets_equal st &&
   has_everyone_played st
 
@@ -269,7 +259,6 @@ let winner st =
 
 let go_next_round st =
   if is_hand_complete st then
-    (* everyone folded *)
     let winner_player = if List.length st.players_in = 1 then List.hd st.players_in else 
         try (fst (winner st)).id with Tie -> -2
     in
@@ -543,7 +532,7 @@ Legal st *)
    let bet_of_json json = {
     bet_player = json |> member "bet_player" |> to_int;
     bet_amount = json |> member "bet_amount" |> to_int;
-    bet_paid_amt = json |> member "bet_paid_amt" |> to_list 
+    bet_paid_amt = json |> member "bet_paid_amt" |> to_list
     |> List.map bet_paid_of_json;
    }
    in
@@ -551,7 +540,7 @@ Legal st *)
    let table_of_json json = {
     pot = json |> member "pot" |> to_int;
     blind = json |> member "blind" |> to_int;
-    participants = json |> member "participants" 
+    participants = json |> member "participants"
     |> to_list |> List.map participants_of_json;
     board = json |> member "board" |> to_list
    } in
@@ -569,7 +558,7 @@ Legal st *)
     winner = json |> member "winner" |> to_int;
    } in
 
-   let parse json = 
+   let parse json =
     try t_of_json json
     with Type_error (s, _) -> failwith ("Parscing error: " ^ s) in
 

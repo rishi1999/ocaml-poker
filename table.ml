@@ -5,7 +5,7 @@ type table = {
   pot: int;
   blind: int;
   participants: Player.player list;
-  board: (Deck.suit * Deck.rank) list;
+  board: Deck.card list;
 }
 let pot tb = tb.pot
 let blind tb = tb.blind

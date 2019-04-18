@@ -5,7 +5,8 @@ open Hand_evaluator
 open Deck
 open State
 
-(**Deck Tests*)
+
+
 let make_new_deck =
   Deck.deck_init
 
@@ -13,16 +14,19 @@ let deck_tests =
   [
     "pick first card" >:: (fun _ -> 
         assert_equal [] []);
-    "convert 9C" >:: (fun _ -> 
+    "convert 9C" >:: (fun _ ->
         assert_equal 28 (int_converter (Clubs, Nine)));
-    "pick_card_test" >:: (fun _ -> 
+    "pick_card_test" >:: (fun _ ->
+        assert_equal 4 (List.length (pick_cards 4)));
+    "int_converter Test 1" >:: (fun _ ->
         assert_equal 4 (List.length (pick_cards 4)));
   ]
-let james : player = {id = 0; cards = []; money = 32}
-let bob : player = {id = 1; cards = []; money = 32}
-let julian : player = {id = 2; cards = [(Diamonds, Five)]; money = 32}
 
-let player_tests = 
+let james = {id = 0; cards = []; money = 32}
+let bob = {id = 1; cards = []; money = 23}
+let julian = {id = 2; cards = [(Diamonds, Five)]; money = 32}
+
+let player_tests =
   [
     "ID Test1" >:: (fun _->
         assert_equal 0  (id james));
@@ -38,20 +42,20 @@ let player_tests =
 
   ]
 
-let table1: table = {pot = 0; blind = 1; participants = [james;bob]; board= []}
-let james:player = {id = 0; cards = []; money = 32}
-let bob:player = {id = 1; cards = []; money = 32}
-let table1: table = {pot = 0; blind = 1; participants = [james;bob]; board= []}
-let table2: table = deal table1
+let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}
+let james = {id = 0; cards = []; money = 32}
+let bob = {id = 1; cards = []; money = 32}
+let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}
+let table2 = deal table1
 
 
-let table2_players table2 =  match table2 with 
+let table2_players table2 =  match table2 with
     { pot = d ; blind = b; participants = p ; _ } -> p
-let james_cards_2 table2_players = match table2_players with 
+let james_cards_2 table2_players = match table2_players with
   | {id = s; cards = c; money = m}::t -> c
   | _ -> failwith "table2 not dealt"
 
-let table1_players=  match table1 with 
+let table1_players=  match table1 with
     { pot = d ; blind = b; participants = p ; _ } -> p
 let james_cards= match table1_players with
   | {id = s; cards = c; money = m}::t -> c
@@ -72,7 +76,7 @@ let state_bet_1 = {
   bet_paid_amt = [(0,0)];
 }
 
-let state1:State.t = {
+let state1 = {
   game_type = 0;
   num_players = 2;
   table = state_table_1;
@@ -106,7 +110,6 @@ let state_8 = get_state (State.fold state_7)
 (* State Tests*)
 
 let state_tests =
-
   [
     "hand_order_test1" >:: (fun _ ->
         assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
@@ -162,9 +165,8 @@ let d = 7*4+1
 let e = 2*4+2
 let f = 10*4+0
 let g = 4*4+0
-
-let h = 0 * 4 + 0
-let i = 7 * 4 +2
+let h = 0*4+0
+let i = 7*4+2
 
 let list1 = [(Spades, Two);(Clubs, Two)]
 
@@ -173,14 +175,17 @@ let cards_1 = list1 @ [(Hearts, Ace);(Diamonds, Ace);
                        (Hearts, King); (Hearts, Three)];;
 
 
-let list2 = [(Hearts, Ace); (Diamonds, Ace); (Spades, King); (Hearts, King); 
+let list2 = [(Hearts, Ace); (Diamonds, Ace); (Spades, King); (Hearts, King);
              (Hearts, Three)]
 let cards_2 = list1 @ list2
 let cards_3 = [(Spades, Three); (Hearts, Four)] @ [(Hearts, Ace);
                                                    (Diamonds, Ace);
                                                    (Spades, King);
-                                                   (Hearts, King); 
+                                                   (Hearts, King);
                                                    (Hearts, Three)];;
+let single_card = [(Spades, Ace)]
+
+
 
 let hand_evaluator_tests =
   [
@@ -192,6 +197,7 @@ let hand_evaluator_tests =
 
     "rank_mapper_test" >:: (fun _->
         assert_equal "Royal Flush" (rank_mapper 1));
+
     "seven_list_eval_test1" >:: (fun _ ->
         assert_equal 2477 (seven_list_eval cards_1));
 

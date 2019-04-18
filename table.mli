@@ -5,7 +5,7 @@ type table = {
   pot: int;
   blind: int;
   participants: Player.player list;
-  board: (Deck.card) list;
+  board: Deck.card list;
 }
 
 (** [pot tab] returns the total current pot of the table tab
@@ -34,7 +34,7 @@ val next_round_players: table -> table
     Raises: "player has non 0 cards" exception if any player doesn't have 0 cards*)
 val deal: table -> table
 
-(** [add_to_hole tab] adds cards to the board depending on 
+(** [add_to_hole tab] adds cards to the board depending on
     how many are already there
     Requires: tab is a valid table*)
 val add_to_board:  table -> table
