@@ -1,13 +1,13 @@
 (* Deck initialization and card choosing *)
 
-(** The type of a card's rank. *)
+(** [rank] is the rank of a card*)
 type rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack
           |Queen | King | Ace
 
-(** The type of a card's suit. *)
+(** [Suit] is the type of a card's suit. *)
 type suit = Clubs | Diamonds | Hearts | Spades
 
-(** The type of a card in the Deck. *)
+(** [card] is a card with a suit and a rank*)
 type card = suit * rank
 
 (* [played_cards] is a mutable (suit * rank) list ref that is used to track
@@ -20,8 +20,8 @@ let played_cards = ref []
    first. *)
 let current_deck = ref []
 
-(* [deck_size] is an int ref that tracks the number of cards currently in
-   the deck. *)
+(** [deck_size] is an int ref that tracks the number of cards currently in
+    the deck. *)
 let deck_size = ref 0
 
 let deck = let ranks = [Two; Three; Four; Five; Six; Seven; Eight; Nine; Ten;
@@ -31,7 +31,7 @@ let deck = let ranks = [Two; Three; Four; Five; Six; Seven; Eight; Nine; Ten;
   List.concat (List.map (fun suit -> all_ranks suit) suits)
 
 
-(** [shuffle_deck] shuffles the cards currently in the deck. *)
+(** [shuffle_deck ()] shuffles the cards currently in the deck. *)
 let shuffle_deck () =
   Random.self_init();
   let shuffle_list compare list =
@@ -43,7 +43,7 @@ let shuffle_deck () =
   let shuffled = shuffle_list compare_second !current_deck in
   current_deck := shuffled
 
-(** [deck_init] initializes the deck with all 52 cards in the same order
+(** [deck_init ()] initializes the deck with all 52 cards in the same order
     each time. *)
 let deck_init () =
   current_deck := deck;
@@ -75,11 +75,11 @@ let pick_cards num =
     update_state cards;
     cards
 
-(* [int_converter card] returns an integer representation of the card
-   such that the card is in the range 0 to 52. The integer is calculcated by
-   taking the rank of the card and mapping it from 0 to 12 such that Two maps
+(* [int_converter card] returns an integer representation of [card]
+   such that [card] is in the range 0 to 52. The integer is calculcated by
+   taking the rank of [card] and mapping it from 0 to 12 such that Two maps
    to 0 and Ace to 12 and the suit of the card (0 for Clubs, 1 for Diamonds,
-   2 for Hearts and 3 for Spades). The card is then represented as
+   2 for Hearts and 3 for Spades). [card] is then represented as
    Rank * 4 + Suit.
    Example: int_converter (Clubs, Nine) = 28
    Requires: [card] is a valid (suit, rank) tuple  *)
