@@ -2,7 +2,10 @@ open Deck
 open Player
 
 (** [table] is a table:
-*)
+    [pot] : money in the pot from bets and blinds
+    [blind] : integer of player who is blind for that round
+    [participants] : list of players in the game
+    [board] : cards on the board*)
 type table = {
   pot: int;
   blind: int;
