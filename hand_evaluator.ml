@@ -11,7 +11,7 @@ open Deck
     Requires: All input parameters are integers between 1 and 52.*)
 let seven_eval c1 c2 c3 c4 c5 c6 c7 =
   let dp = Constantarrays.dynamicProgram in
-  let suits = Constantarrays.suits in
+  let suits = Constantarrays.suits_map in
   let base_5_hash q len k =
     let rec loop i len sum k =
       if i = len then sum

@@ -36,29 +36,32 @@ let player_tests =
 
   ]
 
-let table1: table = {dealer = 0; blind = 1; participants = [james;bob]; board= []}
+let table1: table = {pot = 0; blind = 1; participants = [james;bob]; board= []}
+let james:player = {id = 0; cards = []; money = 32}
+let bob:player = {id = 1; cards = []; money = 32}
+let table1: table = {pot = 0; blind = 1; participants = [james;bob]; board= []}
 let table2: table = deal table1
 
 
 let table2_players table2 =  match table2 with 
-    { dealer = d ; blind = b; participants = p ; _ } -> p
+    { pot = d ; blind = b; participants = p ; _ } -> p
 let james_cards_2 table2_players = match table2_players with 
   | {id = s; cards = c; money = m}::t -> c
   | _ -> failwith "table2 not dealt"
 
 let table1_players=  match table1 with 
-    { dealer = d ; blind = b; participants = p ; _ } -> p
+    { pot = d ; blind = b; participants = p ; _ } -> p
 let james_cards= match table1_players with
   | {id = s; cards = c; money = m}::t -> c
   | _ -> failwith "table2 not dealt"
 
 let empty: (Deck.suit * Deck.rank) list = []
 
-let jimmy:player = {id = 1; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
-let bobby:player = {id = 2; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
-let alice:player = {id = 3; cards = [(Spades, Three); (Hearts, Four)]; money = 42}
+let jimmy = {id = 1; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
+let bobby = {id = 2; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
+let alice = {id = 3; cards = [(Spades, Three); (Hearts, Four)]; money = 42}
 
-let state_table_1 = {dealer = 1; blind = 2; participants = [jimmy;bobby;alice];
+let state_table_1 = {pot = 0; blind = 2; participants = [jimmy; bobby; alice];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
 let state_bet_1 = {
@@ -81,7 +84,7 @@ let state1:State.t = {
 }
 let state2 = {state1 with players_in = [2]}
 let state3 = {state1 with players_in = [3]}
-let state4 = {state1 with players_in = [2;3]}
+let state4 = {state1 with players_in = [2; 3]}
 
 (* State Tests*)
 let state_tests =
@@ -112,8 +115,9 @@ let table_tests =
     "deal_failure_test_1" >:: (fun _->
         assert_raises (Failure "player has non 0 cards") (fun () -> deal table2));
     "add_to_hole_test_1" >:: (fun _->
-        assert (table1 <> (add_to_hole (table1))));
+        assert (table1 <> (add_to_board (table1))));
   ]
+
 
 let a = 7*4+0
 let b = 2*4+0
@@ -126,6 +130,22 @@ let g = 4*4+0
 let h = 0 * 4 + 0
 let i = 7 * 4 +2
 
+let list1 = [(Spades, Two);(Clubs, Two)]
+
+let cards_1 = list1 @ [(Hearts, Ace);(Diamonds, Ace);
+                       (Spades, King);
+                       (Hearts, King); (Hearts, Three)];;
+
+
+let list2 = [(Hearts, Ace); (Diamonds, Ace); (Spades, King); (Hearts, King); 
+             (Hearts, Three)]
+let cards_2 = list1 @ list2
+let cards_3 = [(Spades, Three); (Hearts, Four)] @ [(Hearts, Ace);
+                                                   (Diamonds, Ace);
+                                                   (Spades, King);
+                                                   (Hearts, King); 
+                                                   (Hearts, Three)];;
+
 let hand_evaluator_tests =
   [
     "4_full_house" >:: (fun _->
@@ -136,6 +156,14 @@ let hand_evaluator_tests =
 
     "rank_mapper_test" >:: (fun _->
         assert_equal "Royal Flush" (rank_mapper 1));
+    "seven_list_eval_test1" >:: (fun _ ->
+        assert_equal 2477 (seven_list_eval cards_1));
+
+    "seven_list_eval_test2" >:: (fun _ ->
+        assert_equal 2477 (seven_list_eval cards_2));
+
+    "seven_list_eval_test3" >:: (fun _ ->
+        assert_equal 2476 (seven_list_eval cards_3));
 
   ]
 

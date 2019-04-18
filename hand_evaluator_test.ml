@@ -1,5 +1,4 @@
 (* the flush hash table *)
-
 let dynamicProgram = [|
   [|
     [|0;	0;	0;	0;	0;	0;	0;	0|];
@@ -83,7 +82,7 @@ let dynamicProgram = [|
   |];
 |]
 
-let suits = [|
+let suits_map = [|
   0;	0;	0;	0;	0;	1;	1;	1;
   0;	0;	0;	0;	0;	1;	1;	0;
   0;	0;	0;	0;	0;	1;	0;	0;
@@ -7848,7 +7847,7 @@ let seven_eval c1 c2 c3 c4 c5 c6 c7 =
   let suit_bin = Array.make 4 0 in
   let quinary = Array.make 13 0 in
 
-  if (suits.(suit_hash)) <> 0 then
+  if (suits_map.(suit_hash)) <> 0 then
     let () = suit_bin.(c1 land 0x3) <- 
         suit_bin.(c1 land 0x3) lor bin_id.(c1) in
     let () = suit_bin.(c2 land 0x3) <- 
@@ -7863,7 +7862,7 @@ let seven_eval c1 c2 c3 c4 c5 c6 c7 =
         suit_bin.(c6 land 0x3) lor bin_id.(c6) in
     let () = suit_bin.(c7 land 0x3) <- 
         suit_bin.(c7 land 0x3) lor bin_id.(c7) in
-    let target_index = suits.(suit_hash) - 1 in
+    let target_index = suits_map.(suit_hash) - 1 in
     flush.(suit_bin.(target_index))
   else
     let () = quinary.(c1 lsr 2) <- (quinary.(c1 lsr 2)) + 1 in
