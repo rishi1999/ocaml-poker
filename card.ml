@@ -1,5 +1,9 @@
 open Deck
 
+(* The following 4 lists are actually string representations of cards
+   in the different suits. They are used for printing purposes and appear
+   like this in order to meet the 80 character limit restriction. *)
+(*BISECT-IGNORE-BEGIN*)
 let diamonds = [
   "┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";
   "┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";
@@ -116,7 +120,7 @@ let hearts = [
   "└─────────┘";"└─────────┘";"└─────────┘";"└─────────┘";"└─────────┘";
   "└─────────┘";"└─────────┘";"└─────────┘";
 ]
-
+(*BISECT-IGNORE-END*)
 let card_printer cardlist =
   let rec card_builder count start_index target_list outlist =
     if count = 9 then List.rev outlist
