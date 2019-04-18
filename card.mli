@@ -10,7 +10,7 @@
      │    ♦    │    
      │         │    
      │         │    
-     │        A│    
+     │        A│
      └─────────┘ *)
 
-val card_printer : (Deck.suit * Deck.rank) list -> unit
+val card_printer : Deck.card list -> unit
