@@ -158,7 +158,7 @@ let state_tests =
     "simulation_8" >:: (fun _ ->
         assert_equal 623 (State.find_participant state_8 2).money); 
     "simulation_9" >:: (fun _ ->
-        assert_equal 370 (State.find_participant state_8 1).money); 
+        assert_equal 370 (State.find_participant state_8 1).money);
 
     (* Also extensive testing done by play testing the engine *)
   ]
