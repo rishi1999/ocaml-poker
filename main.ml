@@ -3,17 +3,18 @@ open Hand_evaluator
 
 exception Wrong_Input
 
-let rec get_and_read_input expected_output =
+let play_game st =
+  let rec get_and_read_input expected_output =
   let input = int_of_string (read_line()) in
   if List.mem (input) expected_output then input
-  else raise Wrong_Input
+  else raise Wrong_Input in
 
 let print_hline () =
   for i = 1 to 100 do
     print_char '-'
   done;
   print_newline (); 
-  print_newline ()
+  print_newline () in
 
 let print_intro () =
   print_endline "Tips:";
@@ -27,17 +28,17 @@ let print_intro () =
   ANSITerminal.(print_string [yellow] "LET'S PLAY!");
   print_newline ();
   print_newline ();
-  print_newline ()
+  print_newline () in
 
 let print_list func = function
   | h :: t ->
     func h;
     List.iter (fun x -> print_string ", "; func x) t;
     print_newline ()
-  | _ -> print_endline "none"
+  | _ -> print_endline "none" in
 
-let print_string_list = print_list print_string
-let print_int_list = print_list print_int
+let print_string_list = print_list print_string in
+let print_int_list = print_list print_int in
 
 let print_players_in st =
   let lst = State.players_in st in
@@ -54,7 +55,7 @@ let print_players_in st =
          print_string [white] " "
       ) lst;
     print_newline ()
-  )
+  ) in
 
 let print_player_bets st =
   let lst = State.bet_paid_amt st in
@@ -69,14 +70,14 @@ let print_player_bets st =
         helper t) in
   let sorted = List.sort compare lst in
   helper sorted;
-  print_newline ()
+  print_newline () in
 
 let find_participant st target =
   let rec find_participant' target = function
     | [] -> failwith "PLAYER DOES NOT EXIST"
     | h :: t -> if (Player.id h) = target then h
       else find_participant' target t in
-  find_participant' target (Table.participants (State.table st))
+  find_participant' target (Table.participants (State.table st)) in
 
 let print_current_state st =
   ANSITerminal.(
@@ -103,15 +104,10 @@ let print_current_state st =
   print_newline ();
   print_player_bets st;
   print_string "Available actions: ";
-  print_string_list ("quit" :: "stack" :: (State.avail_action st))
-
-
-
-
-
-let play_game st =
+  print_string_list ("quit" :: "stack" :: (State.avail_action st)); in
+  
   print_intro ();
-
+  
   let rec keep_playing st =
     let winning_id = State.winning_player st in
     if (fst winning_id) >= 0 then
