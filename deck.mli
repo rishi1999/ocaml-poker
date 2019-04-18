@@ -1,12 +1,14 @@
-(**Type representing the rank of a card*)
+
+(** [rank] is the rank of a card*)
 type rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack
           |Queen | King | Ace
 
-(**Type representing the suit of a card*)
+(** [Suit] is the type of a card's suit. *)
 type suit = Clubs | Diamonds | Hearts | Spades
 
-(**Type representing a card*)
+(** [card] is a card with a suit and a rank*)
 type card = suit * rank
+
 
 val deck_size : int ref
 
