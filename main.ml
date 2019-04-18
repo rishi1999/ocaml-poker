@@ -181,14 +181,10 @@ let main () =
   ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
   print_newline ();
   print_newline ();
-  print_string "Do you want to load a game or play a new game? (new, load)";
-  match read_line() with
-  | "new" ->
   (
   print_endline "How many (human) players are there?";
   ANSITerminal.(print_string [blue] "> ");
 
-  (
     try
       read_int ()
     with
@@ -202,13 +198,6 @@ let main () =
   )
 
   |> init_game
-  )
-  | "load" -> (
-    match read_line() with
-    | file_name -> Save_load_engine.load file_name |> play_game
-    | _ -> Save_load_engine.load "temp" |> play_game
-  )
-  | _ -> Save_load_engine.load "temp" |> play_game
 
 
 (* Execute the game engine. *)
