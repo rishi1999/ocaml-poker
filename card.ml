@@ -1,7 +1,8 @@
 open Deck
 
 let diamonds = [
-  "┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";
+  "┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐"
+  ;"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";"┌─────────┐";
   "│2        │";"│3        │";"│4        │";"│5        │";"│6        │";"│7        │";"│8        │";"│9        │";"│10       │";"│J        │";"│Q        │";"│K        │";"│A        │";
   "│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";
   "│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";"│         │";
@@ -86,7 +87,7 @@ let card_printer cardlist =
     | (Spades, rank) -> (card_builder 0 (rank_to_int rank) (spades) [], Spades)
     | (Clubs, rank) -> (card_builder 0 (rank_to_int rank) (clubs) [], Clubs) in
   let str_list_list = List.map element cardlist in
-  let black_printer line = ANSITerminal.(print_string [black] (line)) in
+  let white_printer line = ANSITerminal.(print_string [white] (line)) in
   let red_printer line = ANSITerminal.(print_string [red] (line)) in
   let rec all_lines count card_list original_list = match card_list with
     | [] when count = 8 -> ()
@@ -97,10 +98,10 @@ let card_printer cardlist =
     | (h, Hearts) :: t -> red_printer (List.nth h count);
       print_string "    ";
       all_lines count t original_list
-    | (h, Clubs) :: t -> black_printer (List.nth h count);
+    | (h, Clubs) :: t -> white_printer (List.nth h count);
       print_string "    ";
       all_lines count t original_list
-    | (h, Spades) :: t -> black_printer (List.nth h count);
+    | (h, Spades) :: t -> white_printer (List.nth h count);
       print_string "    ";
       all_lines count t original_list in
   all_lines 0 str_list_list str_list_list
