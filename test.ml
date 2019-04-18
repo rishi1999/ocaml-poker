@@ -109,8 +109,7 @@ let state_tests =
     "winner_test_3" >:: (fun _ ->
         assert_equal alice (fst (winner state3)));
     "winner_test_4" >:: (fun _ ->
-        assert_equal alice (fst (winner state3));
-
+        assert_equal alice (fst (winner state3)));
   ]
 
 (* Table Tests*)
