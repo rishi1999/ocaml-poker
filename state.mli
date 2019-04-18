@@ -133,35 +133,48 @@ type move_result =
   | Illegal of string
 
 (** [check st] is the result of the player calling the check command.
-    Requires: valid state [st]. *)
+    Requires: valid state [st]. 
+    Example: [check st] is [st] with it being the next player's turn. *)
 val check : t -> move_result
 
 (** [call st] is the result of the player calling the call command.
-    Requires: valid state [st]. *)
+    Requires: valid state [st]. 
+    Example: [call st] is [st] with the player's bet raised 
+    to the current bet amount. *)
 val call : t -> move_result
 
 (** [fold st] is the result of the player calling the fold command.
-    Requires: valid state [st]. *)
+    Requires: valid state [st]. 
+    Example: [fold st] is [st] with the current player removed
+    from the hand. *)
 val fold : t -> move_result
 
 (** [stack st] is the result of the player calling the stack command.
-    Requires: valid state [st]. *)
+    Requires: valid state [st].
+    Example: [stack st] is [st] with three 500s printed to the console
+    if there are three players in the hand with $500 each. *)
 val stack : t -> move_result
 
 (** [command_to_function comm] is the function in State
     associated with the command [comm].
-    Requires: valid command [comm]. *)
+    Requires: valid command [comm].
+    Example: [command_to_function Check] is [State.check]. *)
 val command_to_function : Command.command -> (t -> move_result)
 
 (** [winner st] is the player that wins the round and the rank of
-    the winning hand, in the form (player, rank)
-    Requires: state has a nonempty list of players
-    Requries: there are 5 hole cards
-    throws "cannot determine winner" exception if called on
-    list of empty players or hole cards less than 5*)
+    the winning hand, in the form (player, rank).
+    Requires: state has a nonempty list of players.
+    Requires: there are 5 hole cards.
+    Throws "cannot determine winner" exception if called on
+    list of empty players or hole cards less than 5.
+    Example: [winner st] is [(1,28)] if player 1 wins with a hand
+    of value 28. *)
 val winner : t -> (Player.player*int)
 
 (** [get_avail_action st] is the list of valid commands
     the player can currently execute.
-    Requires: valid state [st]. *)
+    Requires: valid state [st].
+    Example: [get_avail_action st] is [[check; bet; fold]] if the actions
+    available to the player at that moment
+    are checking, betting, and folding. *)
 val get_avail_action : t -> t

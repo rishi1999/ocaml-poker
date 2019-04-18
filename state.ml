@@ -2,7 +2,6 @@ open Deck
 open Table
 open Player
 open Hand_evaluator
-open Yojson.Basic.Util
 
 type bet = {
   bet_player: int;

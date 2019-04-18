@@ -81,7 +81,7 @@ let seven_eval c1 c2 c3 c4 c5 c6 c7 =
     let () = suit_bin.(c7 land 0x3) <- 
         suit_bin.(c7 land 0x3) lor bin_id.(c7) in
     let target_index = suits.(suit_hash) - 1 in
-    flush.(suit_bin.(target_index))
+    flush_hashes.(suit_bin.(target_index))
   else
     let () = quinary.(c1 lsr 2) <- (quinary.(c1 lsr 2)) + 1 in
     let () = quinary.(c2 lsr 2) <- (quinary.(c2 lsr 2)) + 1 in

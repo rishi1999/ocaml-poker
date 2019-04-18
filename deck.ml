@@ -31,23 +31,21 @@ let deck = let ranks = [Two; Three; Four; Five; Six; Seven; Eight; Nine; Ten;
   let suits = [Clubs; Diamonds; Hearts; Spades] in
   List.concat (List.map (fun suit -> all_ranks suit) suits)
 
-(** [shuffle_list compare list] shuffles the elements that are currently 
-    present within deck *)
-let shuffle_list compare list =
-  Random.self_init();
-  let tagged_list = List.map (fun card -> (card, Random.bits())) deck in
-  let sorted_tags = List.sort compare tagged_list in
-  List.map fst sorted_tags
 
-(** [shuffle_deck] shuffles the cards currently in the deck *)
+(** [shuffle_deck] shuffles the cards currently in the deck. *)
 let shuffle_deck () =
   Random.self_init();
+  let shuffle_list compare list =
+    Random.self_init();
+    let tagged_list = List.map (fun card -> (card, Random.bits())) deck in
+    let sorted_tags = List.sort compare tagged_list in
+    List.map fst sorted_tags in
   let compare_second a b = Pervasives.compare (snd a) (snd b) in
   let shuffled = shuffle_list compare_second !current_deck in
   current_deck := shuffled
 
 (** [deck_init] initializes the deck with all 52 cards in the same order
-    each time.*)
+    each time. *)
 let deck_init () =
   current_deck := deck;
   played_cards := [];
@@ -56,7 +54,8 @@ let deck_init () =
 (** [update_state lst] is the deck with all cards played
     since the last update, [lst],
     removed from the deck and included in the cards-played list.
-    Example: update_state [(Club, Five)] removes (Club, Five) from the *)
+    Example: update_state [(Club, Five)] removes (Club, Five) from the 
+    [current_deck]*)
 let update_state card_list =
   played_cards := card_list @ !played_cards;
   current_deck := List.filter (fun x -> not (List.mem x card_list)) 
