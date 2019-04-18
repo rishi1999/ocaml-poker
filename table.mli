@@ -5,7 +5,7 @@ type table = {
   pot: int;
   blind: int;
   participants: Player.player list;
-  board: (Deck.card) list;
+  board: Deck.card list;
 }
 
 val pot : table -> int
@@ -14,7 +14,7 @@ val blind : table -> int
 
 val participants : table -> Player.player list
 
-val board : table -> (Deck.card) list
+val board : table -> Deck.card list
 
 val next_round_players: table -> table
 
