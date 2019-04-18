@@ -117,20 +117,6 @@ let hearts = [
   "└─────────┘";"└─────────┘";"└─────────┘";
 ]
 
-(** [card_printer cardlist] prints the ASCII representation of each card
-    in cardlist horizontally across the screen.
-    Requires: cardlist contains valid tuples of type Deck.suit * Deck.rank
-    Example: [card_printer [Diamonds, Ace]]
-    is 
-     ┌─────────┐    
-     │A        │    
-     │         │    
-     │         │    
-     │    ♦    │    
-     │         │    
-     │         │    
-     │        A│    
-     └─────────┘ *)
 let card_printer cardlist =
   let rec card_builder count start_index target_list outlist =
     if count = 9 then List.rev outlist
