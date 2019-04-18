@@ -38,6 +38,10 @@ val deal: table -> table
     Requires tab is a valid table*)
 val add_to_board:  table -> table
 
+(** [clear_players p] clears the cards of each player in player list p
+    Requires p is a valid player list*)
 val clear_players: player list -> player list -> player list
 
+(** [clear_round table x] is the table x with the cards cleared.
+    Requires x is a valid table*)
 val clear_round: table -> table
