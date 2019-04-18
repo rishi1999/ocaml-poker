@@ -1,7 +1,7 @@
 
 (** [rank] is the rank of a card*)
 type rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack
-          |Queen | King | Ace
+          | Queen | King | Ace
 
 (** [Suit] is the type of a card's suit. *)
 type suit = Clubs | Diamonds | Hearts | Spades

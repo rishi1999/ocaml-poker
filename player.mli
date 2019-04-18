@@ -5,7 +5,7 @@
 type player =
   {
     id: int;
-    cards: (Deck.suit * Deck.rank) list;
+    cards: Deck.card list;
     money: int;
   }
 (** [id player] returns the id of the player.
@@ -14,7 +14,7 @@ val id : player -> int
 
 (** [cards player] returns the cards that the player has.
     Requires: player is a valid player. *)
-val cards : player -> (Deck.suit * Deck.rank) list
+val cards : player -> Deck.card list
 
 (** [money player] returns how much the player has.
     Requires: player is a valid player. *)

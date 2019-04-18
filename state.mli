@@ -1,7 +1,8 @@
 (** [bet] is the bet situation of the current round:
     [bet_player] : the player that has bet / raised the last
     [bet_amount] : the current bet amount that the next player has to match
-    [bet_paid_amt] : the current bet situation in form (player, bet_amount) list
+    [bet_paid_amt] : the current bet situation 
+    in form (player, bet_amount) list
 *)
 type bet = {
   bet_player: int;
@@ -180,10 +181,10 @@ val get_avail_action : t -> t
     has an id of target. *)
 val find_participant : t -> int -> Player.player
 
-(** [bet_or_raise] amt st comm_str returns a state where the player has 
+(** [bet_or_raise] amt st comm_str returns a state where the player has
     bet or raised, according to the string comm_str and returns the next state
     Requires: st is a vaild state
               the player has at least amt in his stack
               comm_str is either "bet" or "raise"
-     *)
+*)
 val bet_or_raise : int -> t -> string -> move_result
