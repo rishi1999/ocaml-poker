@@ -4,10 +4,6 @@ open Hand_evaluator
 exception Wrong_Input
 
 let play_game st =
-  let rec get_and_read_input expected_output =
-  let input = int_of_string (read_line()) in
-  if List.mem (input) expected_output then input
-  else raise Wrong_Input in
 
 let print_hline () =
   for i = 1 to 100 do
@@ -38,7 +34,6 @@ let print_list func = function
   | _ -> print_endline "none" in
 
 let print_string_list = print_list print_string in
-let print_int_list = print_list print_int in
 
 let print_players_in st =
   let lst = State.players_in st in
@@ -105,7 +100,7 @@ let print_current_state st =
   print_player_bets st;
   print_string "Available actions: ";
   print_string_list ("quit" :: "stack" :: (State.avail_action st)); in
-  
+
   print_intro ();
   
   let rec keep_playing st =
