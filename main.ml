@@ -1,4 +1,5 @@
 open Card
+open Hand_evaluator
 
 exception Wrong_Input
 
@@ -113,8 +114,9 @@ let play_game st =
 
   let rec keep_playing st =
     let winning_id = State.winning_player st in
-    if winning_id >= 0 then
-      let string = "The winner is player " ^ string_of_int winning_id ^ "!" in
+    if (fst winning_id) >= 0 then
+      let string = "The winner is player " ^ string_of_int (fst winning_id) 
+      ^ " with " ^ Hand_evaluator.rank_mapper (snd winning_id) ^ "!" in
       ANSITerminal.(print_string [yellow] string);
       print_newline ();
       print_newline ();
