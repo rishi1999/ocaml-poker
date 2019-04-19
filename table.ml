@@ -135,6 +135,7 @@ let rec clear_round table = match table with
     ->
     {
       tab with
+      pot = 0;
       participants = clear_players participants [];
       board = [];
     }
