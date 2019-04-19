@@ -148,7 +148,7 @@ let card_printer cardlist =
     | (Spades, rank) -> (card_builder 0 (rank_to_int rank) (spades) [], Spades)
     | (Clubs, rank) -> (card_builder 0 (rank_to_int rank) (clubs) [], Clubs) in
   let str_list_list = List.map element cardlist in
-  let white_printer line = ANSITerminal.(print_string [white] (line)) in
+  let white_printer line = ANSITerminal.(print_string [black] (line)) in
   let red_printer line = ANSITerminal.(print_string [red] (line)) in
   let rec all_lines count card_list original_list = match card_list with
     | [] when count = 8 -> ()
