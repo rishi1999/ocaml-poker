@@ -121,12 +121,17 @@ let hearts = [
   "└─────────┘";"└─────────┘";"└─────────┘";
 ]
 (*BISECT-IGNORE-END*)
+
+(** [color] is the color of a card. *)
+type color = Red | Black
+
 let card_printer cardlist =
   let rec card_builder count start_index target_list outlist =
     if count = 9 then List.rev outlist
     else let element = List.nth target_list start_index in
       card_builder (count + 1) (start_index + 13) (target_list)
         (element :: outlist) in
+
   let rank_to_int = function
     | Two -> 0
     | Three -> 1
@@ -148,30 +153,31 @@ let card_printer cardlist =
     | Spades -> spades
     | Clubs -> clubs in
 
+  let suit_color = function
+    | Diamonds
+    | Hearts -> Red
+    | Spades
+    | Clubs -> Black in
+
   let element (suit, rank) =
     let func suit rank lst =
       (card_builder 0 (rank_to_int rank) (lst) [], suit) in
     func suit rank (suit_ascii suit) in
-  let str_list_list = List.map element cardlist in
+  let card_ascii = List.map element cardlist in
 
-  let card_printer col line =
+  let card_printer_impl col line =
     ANSITerminal.(print_string [col; Background White]) line in
-  let black_printer = card_printer ANSITerminal.black in
-  let red_printer = card_printer ANSITerminal.red in
+  let red_printer = card_printer_impl ANSITerminal.red in
+  let black_printer = card_printer_impl ANSITerminal.black in
+  let card_printer = function
+    | Red -> red_printer
+    | Black -> black_printer in
 
-  let rec all_lines count original_list = function
+  let rec print_all_lines count original_list = function
     | [] when count = 8 -> ()
-    | [] -> print_newline (); all_lines (count + 1) original_list original_list
-    | (h, Diamonds) :: t -> red_printer (List.nth h count);
+    | [] -> print_newline ();
+      print_all_lines (count + 1) original_list original_list
+    | (h, suit) :: t -> (suit_color suit |> card_printer) (List.nth h count);
       print_string "    ";
-      all_lines count original_list t
-    | (h, Hearts) :: t -> red_printer (List.nth h count);
-      print_string "    ";
-      all_lines count original_list t
-    | (h, Clubs) :: t -> black_printer (List.nth h count);
-      print_string "    ";
-      all_lines count original_list t
-    | (h, Spades) :: t -> black_printer (List.nth h count);
-      print_string "    ";
-      all_lines count original_list t in
-  all_lines 0 str_list_list str_list_list
+      print_all_lines count original_list t in
+  print_all_lines 0 card_ascii card_ascii
