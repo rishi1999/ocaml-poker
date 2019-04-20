@@ -127,7 +127,7 @@ let card_printer cardlist =
     else let element = List.nth target_list start_index in
       card_builder (count + 1) (start_index + 13) (target_list)
         (element :: outlist) in
-  let rank_to_int rank = match rank with
+  let rank_to_int = function
     | Two -> 0
     | Three -> 1
     | Four -> 2
@@ -141,34 +141,37 @@ let card_printer cardlist =
     | Queen -> 10
     | King -> 11
     | Ace -> 12 in
+
+  let suit_ascii = function
+    | Diamonds -> diamonds
+    | Hearts -> hearts
+    | Spades -> spades
+    | Clubs -> clubs in
+
   let element (suit, rank) =
     let func suit rank lst =
       (card_builder 0 (rank_to_int rank) (lst) [], suit) in
-    let card_list = function
-      | Diamonds -> diamonds
-      | Hearts -> hearts
-      | Spades -> spades
-      | Clubs -> clubs in
-    func suit rank (card_list suit) in
+    func suit rank (suit_ascii suit) in
   let str_list_list = List.map element cardlist in
 
-  let card_printer col line = ANSITerminal.(print_string [col; Background White] (line)) in
+  let card_printer col line =
+    ANSITerminal.(print_string [col; Background White]) line in
   let black_printer = card_printer ANSITerminal.black in
   let red_printer = card_printer ANSITerminal.red in
 
-  let rec all_lines count card_list original_list = match card_list with
+  let rec all_lines count original_list = function
     | [] when count = 8 -> ()
     | [] -> print_newline (); all_lines (count + 1) original_list original_list
     | (h, Diamonds) :: t -> red_printer (List.nth h count);
       print_string "    ";
-      all_lines count t original_list
+      all_lines count original_list t
     | (h, Hearts) :: t -> red_printer (List.nth h count);
       print_string "    ";
-      all_lines count t original_list
+      all_lines count original_list t
     | (h, Clubs) :: t -> black_printer (List.nth h count);
       print_string "    ";
-      all_lines count t original_list
+      all_lines count original_list t
     | (h, Spades) :: t -> black_printer (List.nth h count);
       print_string "    ";
-      all_lines count t original_list in
+      all_lines count original_list t in
   all_lines 0 str_list_list str_list_list
