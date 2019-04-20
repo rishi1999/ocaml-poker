@@ -41,9 +41,10 @@ let next_round_players (tab:table) = match tab with
 let deal (table : table) : table =
   Deck.deck_init ();
   Deck.shuffle_deck ();
-  let deal_helper (player:player) = match player with
+  let deal_helper = function
     | {
       id;
+      name;
       cards = c;
       money;
     } when List.length c <> 0 -> failwith "player has non 0 cards"

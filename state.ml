@@ -108,6 +108,7 @@ let init_players num_players money =
     | id -> let curr_player =
               {
                 id;
+                name = "Default";
                 cards = [];
                 money;
               } in
@@ -271,21 +272,21 @@ let go_next_round st =
     in
     let win_amount = st.table.pot in
     let player_won = find_participant st winner_player in
-    let player_paid = 
+    let player_paid =
       {player_won with money = player_won.money + win_amount} in
     let rec update_parcipant target player outlst = function
       | [] -> outlst
-      | h::t -> if h.id = target then 
+      | h::t -> if h.id = target then
           update_parcipant target player (player::outlst) t
         else update_parcipant target player (h::outlst) t in
-    let updated_participants = update_parcipant winner_player player_paid [] 
+    let updated_participants = update_parcipant winner_player player_paid []
         st.table.participants in
     let updated_table = {
       st.table with
       participants = updated_participants;
     } in
     let cleared = Table.clear_round updated_table in
-    let button_updated = if st.button + 1 > st.num_players then 1 
+    let button_updated = if st.button + 1 > st.num_players then 1
       else st.button + 1 in
     let players_in_updated = hand_order st.num_players button_updated in
     if List.length st.players_in = 1 then
@@ -300,7 +301,7 @@ let go_next_round st =
         winner = (winner_player, 0);
       } in
       interim_state |> pay_blinds |> get_avail_action
-    else 
+    else
       let interim_state = {
         st with
         table = Table.deal (cleared);
