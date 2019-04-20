@@ -12,7 +12,7 @@ let blind tb = tb.blind
 let participants tb = tb.participants
 let board tb = tb.board
 
-let next_round_players (tab:table) = match tab with
+let next_round_players = function
   |
     {
       pot;
@@ -35,10 +35,10 @@ let next_round_players (tab:table) = match tab with
     ->
     {
       tab with
-      blind = b+1;
+      blind = b + 1;
     }
 
-let deal (table : table) : table =
+let deal table =
   Deck.deck_init ();
   Deck.shuffle_deck ();
   let deal_helper = function
@@ -47,31 +47,20 @@ let deal (table : table) : table =
       name;
       cards = c;
       money;
-    } when List.length c <> 0 -> failwith "player has non 0 cards"
+    } when List.length c <> 0 ->
+      failwith "player has non 0 cards"
     | pl ->
       {
         pl with
         cards = Deck.pick_cards 2;
-      }
-  in
-  let rec deal_to_each players list=
-    match players with
+      } in
+  let rec deal_to_each list = function
     | [] -> list
-    | player :: t -> deal_to_each t ((deal_helper player) :: list)
-
-  in
-  match table with
-  |
-    {
-      blind;
-      participants;
-      board;
-    } as tab
-    ->
-    {
-      tab with
-      participants = deal_to_each participants [];
-    }
+    | h :: t -> deal_to_each (deal_helper h :: list) t in
+  {
+    table with
+    participants = deal_to_each [] table.participants;
+  }
 
 let add_to_board table =
   match table with
@@ -112,31 +101,22 @@ let add_to_board table =
       board = Deck.pick_cards 1 @ h;
     }
 
-
-let rec clear_players (p:player list) list = match p with
+let rec clear_players list = function
   | [] -> list
   | pl :: t
-    -> clear_players t
+    -> clear_players
          (
            {
              pl with
              cards = [];
            } :: list
-         )
+         ) t
 
 
-let rec clear_round table = match table with
-  |
-    {
-      pot;
-      blind;
-      participants;
-      board;
-    } as tab
-    ->
-    {
-      tab with
-      pot = 0;
-      participants = clear_players participants [];
-      board = [];
-    }
+let clear_round table =
+  {
+    table with
+    pot = 0;
+    participants = clear_players [] table.participants;
+    board = [];
+  }
