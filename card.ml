@@ -125,7 +125,7 @@ let card_printer cardlist =
   let rec card_builder count start_index target_list outlist =
     if count = 9 then List.rev outlist
     else let element = List.nth target_list start_index in
-      card_builder (count + 1) (start_index + 13) (target_list) 
+      card_builder (count + 1) (start_index + 13) (target_list)
         (element :: outlist) in
   let rank_to_int rank = match rank with
     | Two -> 0
@@ -141,15 +141,15 @@ let card_printer cardlist =
     | Queen -> 10
     | King -> 11
     | Ace -> 12 in
-  let element card = match card with
+  let element = function
     | (Diamonds, rank) -> (card_builder 0 (rank_to_int rank) (diamonds) [],
                            Diamonds)
     | (Hearts, rank) -> (card_builder 0 (rank_to_int rank) (hearts) [], Hearts)
     | (Spades, rank) -> (card_builder 0 (rank_to_int rank) (spades) [], Spades)
     | (Clubs, rank) -> (card_builder 0 (rank_to_int rank) (clubs) [], Clubs) in
   let str_list_list = List.map element cardlist in
-  let white_printer line = ANSITerminal.(print_string [black] (line)) in
-  let red_printer line = ANSITerminal.(print_string [red] (line)) in
+  let white_printer line = ANSITerminal.(print_string [black; Background White] (line)) in
+  let red_printer line = ANSITerminal.(print_string [red; Background White] (line)) in
   let rec all_lines count card_list original_list = match card_list with
     | [] when count = 8 -> ()
     | [] -> print_newline (); all_lines (count + 1) original_list original_list
