@@ -141,15 +141,21 @@ let card_printer cardlist =
     | Queen -> 10
     | King -> 11
     | Ace -> 12 in
-  let element = function
-    | (Diamonds, rank) -> (card_builder 0 (rank_to_int rank) (diamonds) [],
-                           Diamonds)
-    | (Hearts, rank) -> (card_builder 0 (rank_to_int rank) (hearts) [], Hearts)
-    | (Spades, rank) -> (card_builder 0 (rank_to_int rank) (spades) [], Spades)
-    | (Clubs, rank) -> (card_builder 0 (rank_to_int rank) (clubs) [], Clubs) in
+  let element (suit, rank) =
+    let func suit rank lst =
+      (card_builder 0 (rank_to_int rank) (lst) [], suit) in
+    let card_list = function
+      | Diamonds -> diamonds
+      | Hearts -> hearts
+      | Spades -> spades
+      | Clubs -> clubs in
+    func suit rank (card_list suit) in
   let str_list_list = List.map element cardlist in
-  let white_printer line = ANSITerminal.(print_string [black; Background White] (line)) in
-  let red_printer line = ANSITerminal.(print_string [red; Background White] (line)) in
+
+  let card_printer col line = ANSITerminal.(print_string [col; Background White] (line)) in
+  let black_printer = card_printer ANSITerminal.black in
+  let red_printer = card_printer ANSITerminal.red in
+
   let rec all_lines count card_list original_list = match card_list with
     | [] when count = 8 -> ()
     | [] -> print_newline (); all_lines (count + 1) original_list original_list
@@ -159,10 +165,10 @@ let card_printer cardlist =
     | (h, Hearts) :: t -> red_printer (List.nth h count);
       print_string "    ";
       all_lines count t original_list
-    | (h, Clubs) :: t -> white_printer (List.nth h count);
+    | (h, Clubs) :: t -> black_printer (List.nth h count);
       print_string "    ";
       all_lines count t original_list
-    | (h, Spades) :: t -> white_printer (List.nth h count);
+    | (h, Spades) :: t -> black_printer (List.nth h count);
       print_string "    ";
       all_lines count t original_list in
   all_lines 0 str_list_list str_list_list
