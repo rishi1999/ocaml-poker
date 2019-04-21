@@ -2,6 +2,7 @@ open Deck
 open Table
 open Player
 open Hand_evaluator
+open Yojson.Basic.Util
 
 type bet = {
   bet_player: int;
@@ -521,9 +522,17 @@ let save st =
     ("paid", `Int paid);
     ] in
     get_bet_amt (x::outlst) t in
+(* 
+  let rec get_winner outlst = function
+  | [] -> outlst
+  | (player, rank) :: t -> 
+    let x = `Assoc [("id", `Int player); 
+    ("rank", `Int rank);] in
+    get_winner (x::outlst) t in *)
 
   let participants_json = get_participants [] st.table.participants in
   let bet_amt = get_bet_amt [] st.bet.bet_paid_amt in
+  (* let winners = get_winner [] st.winner in *)
 
   Yojson.to_file "saved_game.json" (
     `Assoc
@@ -546,8 +555,8 @@ let save st =
               );
     ("player_turn", `Int st.player_turn);
     ("button", `Int st.button);
-    ("players_in", `List [`Int 1; `Int 2]);
-    ("players_played", `List[`Int 1; `Int 2]);
+    ("players_in", `List (List.map (fun x -> `Int x) st.players_in));
+    ("players_played", `List (List.map (fun x -> `Int x) st.players_played));
     ("bet", `List
       [ 
         `Assoc [
@@ -558,26 +567,48 @@ let save st =
         ];
       ]);
     ("avail_action", `List (List.map (fun x -> `String x) st.avail_action));
-    ("winner", `List[`Int (-1)]);
+    ("winner", `Assoc [("player", `Int (fst st.winner)); 
+                       ("rank", `Int (snd st.winner))]);
     ]
   );
-  exit 0;
   Legal st
 
-(* let load json = 
+let load json = 
 
-   let rec intlist outlst =
-   function
-   | [] -> outlst
-   | h::t -> intlist (to_int h::outlst) t in 
+  let card_inverter card_int = 
+    let offset = match card_int mod 4 with
+      | 0 -> Clubs
+      | 1 -> Diamonds
+      | 2 -> Hearts
+      | 3 -> Spades
+      | _ -> failwith "Wrong Card" 
+      in
+    let rank = match card_int / 4 with
+      | 0 -> Two
+      | 1 -> Three
+      | 2 -> Four
+      | 3 -> Five
+      | 4 -> Six
+      | 5 -> Seven
+      | 6 -> Eight
+      | 7 -> Nine
+      | 8 -> Ten
+      | 9 -> Jack
+      | 10 -> Queen
+      | 11 -> King
+      | 12 -> Ace 
+      | _ -> failwith "Wrong Card" in
 
-   (* let keys_of_json json = {
-    key_id = json |> member "id" |> to_string;
-    description = json |> member "description" |> to_string;
-    target_room_id = json |> member "target room" |> to_string;
-    start_room_description =
-      json |> member "start room description" |> to_string;
-   } in *)
+    (offset, rank) in
+
+
+   let participants_of_json json = {
+    id = json |> member "id" |> to_int;
+    cards = [(json |> member "card1" |> to_int |> card_inverter);
+    (json |> member "card2" |> to_int |> card_inverter);];
+    name = "Default";
+    money = json |> member "money" |> to_int;
+   } in
 
    let bet_paid_of_json json =
     let id = json |> member "id" |> to_int in
@@ -598,7 +629,8 @@ let save st =
     blind = json |> member "blind" |> to_int;
     participants = json |> member "participants"
     |> to_list |> List.map participants_of_json;
-    board = json |> member "board" |> to_list
+    board = json |> member "board" |> to_list |> List.map to_int 
+    |> List.map card_inverter;
    } in
 
    let t_of_json json = {
@@ -607,11 +639,13 @@ let save st =
     table = json |> member "table" |> table_of_json;
     player_turn = json |> member "player_turn" |> to_int;
     button = json |> member "button" |> to_int;
-    players_in = json |> member "players_in" |> to_list |> intlist [];
-    players_played = json |> member "players_played" |> to_list |> intlist [];
+    players_in = json |> member "players_in" |> to_list 
+    |> List.map (fun x -> to_int x);
+    players_played = json |> member "players_played" |> to_list
+    |> List.map (fun x -> to_int x);
     bet = json |> member "bet" |> bet_of_json;
     avail_action = [];
-    winner = json |> member "winner" |> to_int;
+    winner = (json |> member "winner" |> to_int, 0);
    } in
 
    let parse json =
@@ -619,7 +653,6 @@ let save st =
     with Type_error (s, _) -> failwith ("Parscing error: " ^ s) in
 
    parse json
-   init_state 0 0 0 0 *)
 
 let command_to_function = Command.(function
     | Check -> check
@@ -627,5 +660,6 @@ let command_to_function = Command.(function
     | Call -> call
     | Raise amt -> raise' amt
     | Fold -> fold
+    | Save -> save
     | _ -> failwith "ERROR: unsupported command"
   )
