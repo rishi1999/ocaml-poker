@@ -48,10 +48,10 @@ let print_players_in st =
            (
              if x = (State.player_turn st) then [green]
              else if x = (State.button st) then [red]
-             else [white]
+             else [default]
            )
            (string_of_int x);
-         print_string [white] " "
+         print_string [default] " "
       ) lst;
     print_newline ()
   )

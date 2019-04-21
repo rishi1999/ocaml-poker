@@ -405,11 +405,12 @@ let fold st =
 let stack st =
   let players = List.sort compare st.players_in in
   let print_stack player =
-    print_string "Player ";
-    print_int player;
-    print_string " has $";
-    print_int (find_stack player st.table.participants);
-    print_endline ". "; in
+    ANSITerminal.(
+      print_string [default] "Player ";
+      print_int player;
+      print_string [default] " has $";
+      print_int (find_stack player st.table.participants);
+      print_endline ". "); in
 
   List.iter print_stack (List.sort compare players);
   Legal st
