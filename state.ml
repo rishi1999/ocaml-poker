@@ -405,12 +405,15 @@ let fold st =
 let stack st =
   let players = List.sort compare st.players_in in
   let print_stack player =
-    ANSITerminal.(
-      print_string [default] "Player ";
-      print_int player;
-      print_string [default] " has $";
-      print_int (find_stack player st.table.participants);
-      print_endline ". "); in
+    let color = ANSITerminal.(if player = player_turn st then
+                                green else default) in
+    ANSITerminal.print_string [color]
+      ((Player.name (find_participant st player)) ^
+       " has $" ^
+       (string_of_int
+          (find_stack player st.table.participants)) ^
+       ".");
+    print_newline () in
 
   List.iter print_stack (List.sort compare players);
   Legal st
