@@ -627,7 +627,7 @@ let load json =
     blind = json |> member "blind" |> to_int;
     participants = json |> member "participants"
                    |> to_list |> List.map participants_of_json;
-    board = json |> member "board" |> to_list |> List.map to_int 
+    board = json |> member "board" |> to_list |> List.map to_int
             |> List.map card_inverter;
   } in
 
@@ -648,7 +648,7 @@ let load json =
 
   let parse json =
     try t_of_json json
-    with Type_error (s, _) -> failwith ("Parscing error: " ^ s) in
+    with Type_error (s, _) -> failwith ("Parsing error: " ^ s) in
 
   parse json
 
