@@ -85,8 +85,8 @@ let money_to_pot st amount =
       bet_player = st.player_turn;
       bet_amount = if st.bet.bet_amount > amount then st.bet.bet_amount
         else amount;
-      bet_paid_amt = update_bet_paid
-          [] st.player_turn amount st.bet.bet_paid_amt;
+      bet_paid_amt = List.rev( update_bet_paid
+          [] st.player_turn amount st.bet.bet_paid_amt;)
     } in
 
   {
@@ -168,27 +168,30 @@ let hand_order num_players button =
   first @ second
 
 let get_avail_action st =
-  if st.bet.bet_amount = 0 then
-    {
-      st with
-      avail_action = ["check"; "bet"; "fold"]
-    }
-  else if List.length st.table.board = 0 &&
-          st.bet.bet_amount = st.table.blind &&
-          st.player_turn = match st.bet.bet_paid_amt with
-          | [] -> failwith "ERROR: no bets exist"
-          | h :: [] -> failwith "ERROR: only one bet exists"
-          | h :: (p,a) :: t -> p
-  then
-    {
-      st with
-      avail_action = ["check"; "bet"; "fold"]
-    }
-  else
-    {
-      st with
-      avail_action = ["call"; "raise"; "fold"]
-    }
+  if List.length st.table.board = 0 then
+    if (st.player_turn = fst (List.nth (st.bet.bet_paid_amt) 1)) &&
+          (st.bet.bet_amount = st.table.blind)
+    then
+      {
+        st with
+        avail_action = ["check"; "bet"; "fold"]
+      }
+    else
+      {
+        st with
+        avail_action = ["call"; "raise"; "fold"]
+      }
+  else 
+    if st.bet.bet_amount = 0 then
+      {
+        st with
+        avail_action = ["check"; "bet"; "fold"]
+      }
+    else
+      {
+        st with
+        avail_action = ["call"; "raise"; "fold"]
+      }
 
 
 let init_state game_type num_players money blind =
@@ -233,10 +236,11 @@ let has_everyone_played st =
     ready to move on to the next round. *)
 let is_round_complete st =
   if List.length st.table.board = 0 then
+    if st.player_turn = fst (List.nth st.bet.bet_paid_amt 1) then
+      not (st.bet.bet_amount = st.table.blind)
+    else 
     (are_all_bets_equal st &&
-     has_everyone_played st) &&
-    not (st.player_turn = fst (List.nth st.bet.bet_paid_amt 1) ||
-         st.bet.bet_amount = st.table.blind)
+     has_everyone_played st)
   else
     are_all_bets_equal st &&
     has_everyone_played st
@@ -652,12 +656,19 @@ let load json =
 
   parse json
 
+let show st =
+  print_endline "Your hand is: ";
+  Card.card_printer (Player.cards (find_participant st
+                                     (st.player_turn)));
+  Legal st
+
 let command_to_function = Command.(function
     | Check -> check
     | Bet amt -> bet' amt
     | Call -> call
     | Raise amt -> raise' amt
     | Fold -> fold
+    | Show -> show
     | Save -> save
     | _ -> failwith "ERROR: unsupported command"
   )

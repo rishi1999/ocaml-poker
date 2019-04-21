@@ -11,6 +11,7 @@ type command =
   | Raise of bet_amount
   | Stack
   | Save
+  | Show
   | Quit
 
 exception Empty

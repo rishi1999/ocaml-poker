@@ -86,11 +86,6 @@ let print_current_state st =
   print_newline ();
   print_players_in st;
   print_newline ();
-  print_endline "Your hand is: ";
-  Card.card_printer (Player.cards (State.find_participant st
-                                     (State.player_turn st)));
-  print_newline ();
-  print_newline ();
   print_player_bets st;
   print_newline ();
   print_string "Available actions: ";
