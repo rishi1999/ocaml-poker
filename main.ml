@@ -73,13 +73,6 @@ let print_player_bets st =
   helper sorted;
   print_newline ()
 
-let find_participant st target =
-  let rec find_participant' target = function
-    | [] -> failwith "ERROR: player does not exist"
-    | h :: t -> if (Player.id h) = target then h
-      else find_participant' target t in
-  find_participant' target (Table.participants (State.table st))
-
 let print_current_state st =
   ANSITerminal.(
     print_string [yellow] (Player.name (State.find_participant st (State.player_turn st)));
@@ -94,7 +87,7 @@ let print_current_state st =
   print_players_in st;
   print_newline ();
   print_endline "Your hand is: ";
-  Card.card_printer (Player.cards (find_participant st
+  Card.card_printer (Player.cards (State.find_participant st
                                      (State.player_turn st)));
   print_newline ();
   print_newline ();

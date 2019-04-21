@@ -38,11 +38,11 @@ let get_next_player st =
   helper st.player_turn
 
 let find_participant st target =
-  let rec helper target = function
-    | [] -> failwith "ERROR: player not found"
-    | [h] -> h
-    | h :: t -> if (Player.id h) = target then h else helper target t in
-  helper target (Table.participants (st.table))
+  let rec find_participant' target = function
+    | [] -> failwith "ERROR: player does not exist"
+    | h :: t -> if (Player.id h) = target then h
+      else find_participant' target t in
+  find_participant' target (Table.participants st.table)
 
 (** [money_to_pot] st amount returns the state after the player has put
     amount of money into the pot, either through betting or raising.
