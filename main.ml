@@ -103,7 +103,7 @@ let print_current_state st =
   print_player_bets st;
   print_newline ();
   print_string "Available actions: ";
-  print_string_list ("quit" :: "stack" :: (State.avail_action st))
+  print_string_list ("quit" :: (State.avail_action st))
 
 
 
