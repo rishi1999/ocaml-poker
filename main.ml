@@ -172,21 +172,19 @@ let main () =
   ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
   print_newline ();
 
-  State.prompt "How many (human) players are there?";
+  let rec select_num_players () =
+    State.prompt "How many (human) players are there?";
+    let input = read_line () in
+    if input = "quit" then exit 0
+    else
+      try int_of_string input with
+      | Failure _ ->
+        print_newline ();
+        prerr_endline "Invalid integer.";
+        select_num_players ()
+  in
 
-  try
-    read_int ()
-  with
-  | Failure _ ->
-    print_newline ();
-    print_endline "Please do not make a mockery of the institution \
-                   of poker by inputting such values.";
-    print_newline ();
-    print_endline "Shutting down....";
-    exit 0;
-
-
-    |> init_game
+  init_game (select_num_players ())
 
 
 (* Execute the game engine. *)
