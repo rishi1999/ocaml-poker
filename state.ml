@@ -141,7 +141,7 @@ let init_bet_paid_amt players_in =
   let rec helper lst = function
     | [] -> lst
     | h::t -> helper ((h,0)::lst) t in
-  helper [] players_in
+  List.rev (helper [] players_in)
 
 (** [init_players_in] num_players returns a list containing all players' id *)
 let init_players_in num_players =
@@ -229,8 +229,14 @@ let has_everyone_played st =
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
 let is_round_complete st =
-  are_all_bets_equal st &&
-  has_everyone_played st
+  if List.length st.table.board = 0 then
+    (are_all_bets_equal st &&
+    has_everyone_played st) &&
+    not (st.player_turn = fst (List.nth st.bet.bet_paid_amt 1) ||
+    st.bet.bet_amount = st.table.blind)
+  else
+    are_all_bets_equal st &&
+    has_everyone_played st
 
 
 (** [is_hand_complete st] is true if hand is complete. *)
