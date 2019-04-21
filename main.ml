@@ -12,7 +12,7 @@ let print_hline () =
   for i = 1 to 100 do
     print_char '-'
   done;
-  print_newline (); 
+  print_newline ();
   print_newline ()
 
 let print_intro () =
@@ -60,13 +60,15 @@ let print_player_bets st =
   let lst = State.bet_paid_amt st in
   let rec helper = function
     | [] -> ()
-    | (a,b) :: t -> if b != 0 then(
-        print_string "Player ";
-        print_int a;
-        print_string " has currently paid: $";
-        print_int b;
-        print_newline ();
-        helper t) in
+    | (a,b) :: t -> if b != 0 then
+        (
+          let p = State.find_participant st a in
+          print_string p.name;
+          print_string " has currently paid: $";
+          print_int b;
+          print_newline ();
+          helper t
+        ) in
   let sorted = List.sort compare lst in
   helper sorted;
   print_newline ()
@@ -80,8 +82,7 @@ let find_participant st target =
 
 let print_current_state st =
   ANSITerminal.(
-    print_string [yellow] "Player ";
-    print_string [yellow] (string_of_int (State.player_turn st));
+    print_string [yellow] (Player.name (State.find_participant st (State.player_turn st)));
     print_string [yellow] "'s turn"
   );
   print_newline ();
@@ -115,8 +116,8 @@ let play_game st =
   let rec keep_playing st =
     let winning_id = State.winning_player st in
     if (fst winning_id) >= 0 then
-      let string = "The winner is player " ^ string_of_int (fst winning_id) 
-      ^ " with " ^ Hand_evaluator.rank_mapper (snd winning_id) ^ "!" in
+      let string = "The winner is player " ^ string_of_int (fst winning_id)
+                   ^ " with " ^ Hand_evaluator.rank_mapper (snd winning_id) ^ "!" in
       ANSITerminal.(print_string [yellow] string);
       print_newline ();
       print_newline ();
@@ -160,13 +161,9 @@ let play_game st =
   keep_playing st
 
 let init_game num_players =
-  print_newline ();
-  print_endline "Starting stack amount?";
-  ANSITerminal.(print_string [blue] "> ");
+  State.prompt "Starting stack amount?";
   let money = read_int () in
-  print_newline ();
-  print_endline "Blind amount?";
-  ANSITerminal.(print_string [blue] "> ");
+  State.prompt "Blind amount?";
   let blind = read_int () in
   let st = match num_players with
     | 1 -> State.init_state 1 2 money blind
@@ -182,24 +179,22 @@ let main () =
   print_newline ();
   ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
   print_newline ();
-  print_newline ();
-  (
-    print_endline "How many (human) players are there?";
-    ANSITerminal.(print_string [blue] "> ");
 
-    try
-      read_int ()
-    with
-    | Failure _ ->
-      print_newline ();
-      print_endline "Please do not make a mockery of the institution \
-                     of poker by inputting such values.";
-      print_newline ();
-      print_endline "Shutting down....";
-      exit 0
-  )
+  State.prompt "How many (human) players are there?";
 
-  |> init_game
+  try
+    read_int ()
+  with
+  | Failure _ ->
+    print_newline ();
+    print_endline "Please do not make a mockery of the institution \
+                   of poker by inputting such values.";
+    print_newline ();
+    print_endline "Shutting down....";
+    exit 0;
+
+
+    |> init_game
 
 
 (* Execute the game engine. *)

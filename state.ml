@@ -23,6 +23,11 @@ type t = {
 }
 exception Tie
 
+let prompt str =
+  print_newline ();
+  print_endline str;
+  ANSITerminal.(print_string [blue] "> ")
+
 (** [get_next_player] st returns the id of the player that has
     to act next.
     Requires: st.players_in is not an empty list *)
@@ -99,24 +104,27 @@ let pay_blinds st =
   let small_blind = money_to_pot st (st.table.blind / 2) in
   money_to_pot small_blind st.table.blind
 
-(** [init_players] num_players money returns the list of type Player.player,
+(** [init_players] num_players money returns the sorted list of players,
     with length of num_players and everyone's money is equal to the
     input money. *)
 let init_players num_players money =
   let rec init_players' acc money = function
-    | 0 -> acc
-    | id -> let curr_player =
-              {
-                id;
-                name = "Default";
-                cards = [];
-                money;
-              } in
-      init_players' (curr_player :: acc) money (id - 1) in
-  init_players' [] money num_players
+    | id when id > num_players -> acc
+    | id ->
+      prompt ("Enter player " ^ (string_of_int) id ^ "'s name.");
+      let name = read_line () in
+      let curr_player =
+        {
+          id;
+          name;
+          cards = [];
+          money;
+        } in
+      init_players' (curr_player :: acc) money (id + 1) in
+  (init_players' [] money 1)
 
-(** [init_table] num_players money blind returns the list of type 
-    Player.player, with length of num_players and everyone's money is equal 
+(** [init_table] num_players money blind returns the list of type
+    Player.player, with length of num_players and everyone's money is equal
     to the input money. *)
 let init_table num_players money blind =
   Table.deal {
@@ -225,7 +233,7 @@ let is_hand_complete st =
 
 let rec get_players_in part players_in ls = match players_in with
   | a :: t when List.mem a.id part -> get_players_in part t (a :: ls)
-  | a :: t -> get_players_in part t ls 
+  | a :: t -> get_players_in part t ls
   | [] -> List.rev ls
 
 let winner st =
@@ -257,7 +265,7 @@ let winner st =
 
   let part = get_players_in p_in all_part [] in
   let rlist = ranks part board [] in
-  let best_rank = (best_player rlist 7463) in 
+  let best_rank = (best_player rlist 7463) in
   let num_winner = get_player_int best_rank rlist 0 in
 
   (List.nth part num_winner, best_rank)
@@ -266,8 +274,8 @@ let winner st =
     returns the state with the next round. *)
 let go_next_round st =
   if is_hand_complete st then
-    let winner_player = if List.length st.players_in = 1 then 
-        List.hd st.players_in else 
+    let winner_player = if List.length st.players_in = 1 then
+        List.hd st.players_in else
         try (fst (winner st)).id with Tie -> -2
     in
     let win_amount = st.table.pot in

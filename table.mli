@@ -97,7 +97,7 @@ val clear_players: player list -> player list -> player list
     Requires [x] is a valid table
     Example: [clear_round {pot = 0; blind = 1;
     participants = [{id= 1; cards= []; money = 20}];
-    board = [(Spades, Ace)]}] = 
+    board = [(Spades, Ace)]}] =
     {pot = 0; blind = 1;
     participants = [{id= 1; cards= []; money = 20}];
     board = []} *)

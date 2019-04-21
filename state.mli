@@ -36,6 +36,16 @@ type t = {
   avail_action: string list;
   winner: (int*int);
 }
+
+(** [prompt str] prompts the user for input, using the string [str].
+    Requires: [str] is a valid string.
+    Example: [prompt "Please enter some text."] prints to the screen: 
+
+    Please enter some text.
+    >
+*)
+val prompt : string -> unit
+
 (** [game_type st] is the type of the game being played in [st].
     Requires: valid state [st].
     Example: [game_type st] is 0 if [st] is a multiplayer game. *)
@@ -140,12 +150,12 @@ val check : t -> move_result
 
 (** [call st] is the result of the player calling the call command.
     Requires: valid state [st]. 
-    Example: [call st] is [st] with the player's bet raised 
+    Example: [call st] is [st] with the player's bet raised
     to the current bet amount. *)
 val call : t -> move_result
 
 (** [fold st] is the result of the player calling the fold command.
-    Requires: valid state [st]. 
+    Requires: valid state [st].
     Example: [fold st] is [st] with the current player removed
     from the hand. *)
 val fold : t -> move_result
