@@ -75,7 +75,7 @@ let print_player_bets st =
 
 let find_participant st target =
   let rec find_participant' target = function
-    | [] -> failwith "PLAYER DOES NOT EXIST"
+    | [] -> failwith "ERROR: player does not exist"
     | h :: t -> if (Player.id h) = target then h
       else find_participant' target t in
   find_participant' target (Table.participants (State.table st))

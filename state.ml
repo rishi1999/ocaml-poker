@@ -39,7 +39,7 @@ let get_next_player st =
 
 let find_participant st target =
   let rec helper target = function
-    | [] -> failwith "No match"
+    | [] -> failwith "ERROR: player not found"
     | [h] -> h
     | h :: t -> if (Player.id h) = target then h else helper target t in
   helper target (Table.participants (st.table))
@@ -270,7 +270,7 @@ let winner st =
   let rec get_player_int target ls acc = match ls with
     | a :: b when a = target -> acc
     | a :: b -> get_player_int target b (acc + 1)
-    | [] -> failwith "not in list" in
+    | [] -> failwith "ERROR: no best player" in
 
   let part = get_players_in p_in all_part [] in
   let rlist = ranks part board [] in
@@ -465,6 +465,5 @@ let command_to_function = Command.(function
     | Call -> call
     | Raise amt -> raise' amt
     | Fold -> fold
-    (*| Stack -> stack*)
-    | _ -> failwith "UNSUPPORTED COMMAND"
+    | _ -> failwith "ERROR: unsupported command"
   )
