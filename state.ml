@@ -38,11 +38,11 @@ let get_next_player st =
   helper st.player_turn
 
 let find_participant st target =
-  let rec helper target = function
-    | [] -> failwith "No match"
-    | [h] -> h
-    | h :: t -> if (Player.id h) = target then h else helper target t in
-  helper target (Table.participants (st.table))
+  let rec find_participant' target = function
+    | [] -> failwith "ERROR: player does not exist"
+    | h :: t -> if (Player.id h) = target then h
+      else find_participant' target t in
+  find_participant' target (Table.participants st.table)
 
 (** [money_to_pot] st amount returns the state after the player has put
     amount of money into the pot, either through betting or raising.
@@ -141,7 +141,7 @@ let init_bet_paid_amt players_in =
   let rec helper lst = function
     | [] -> lst
     | h::t -> helper ((h,0)::lst) t in
-  helper [] players_in
+  List.rev (helper [] players_in)
 
 (** [init_players_in] num_players returns a list containing all players' id *)
 let init_players_in num_players =
@@ -168,6 +168,17 @@ let hand_order num_players button =
 
 let get_avail_action st =
   if st.bet.bet_amount = 0 then
+    {
+      st with
+      avail_action = ["check"; "bet"; "fold"]
+    }
+  else if List.length st.table.board = 0 &&
+          st.bet.bet_amount = st.table.blind &&
+          st.player_turn = match st.bet.bet_paid_amt with
+          | [] -> failwith "ERROR: no bets exist"
+          | h :: [] -> failwith "ERROR: only one bet exists"
+          | h :: (p,a) :: t -> p
+  then
     {
       st with
       avail_action = ["check"; "bet"; "fold"]
@@ -220,8 +231,14 @@ let has_everyone_played st =
 (** [is_round_complete st] is true if the game is
     ready to move on to the next round. *)
 let is_round_complete st =
-  are_all_bets_equal st &&
-  has_everyone_played st
+  if List.length st.table.board = 0 then
+    (are_all_bets_equal st &&
+     has_everyone_played st) &&
+    not (st.player_turn = fst (List.nth st.bet.bet_paid_amt 1) ||
+         st.bet.bet_amount = st.table.blind)
+  else
+    are_all_bets_equal st &&
+    has_everyone_played st
 
 
 (** [is_hand_complete st] is true if hand is complete. *)
@@ -261,7 +278,7 @@ let winner st =
   let rec get_player_int target ls acc = match ls with
     | a :: b when a = target -> acc
     | a :: b -> get_player_int target b (acc + 1)
-    | [] -> failwith "not in list" in
+    | [] -> failwith "ERROR: no best player" in
 
   let part = get_players_in p_in all_part [] in
   let rlist = ranks part board [] in
@@ -456,6 +473,5 @@ let command_to_function = Command.(function
     | Call -> call
     | Raise amt -> raise' amt
     | Fold -> fold
-    (*| Stack -> stack*)
-    | _ -> failwith "UNSUPPORTED COMMAND"
+    | _ -> failwith "ERROR: unsupported command"
   )

@@ -50,8 +50,8 @@ let print_players_in st =
              else if x = (State.button st) then [red]
              else [default]
            )
-           (string_of_int x);
-         print_string [default] " "
+           (State.find_participant st x).name;
+         print_string [default] "  "
       ) lst;
     print_newline ()
   )
@@ -64,21 +64,14 @@ let print_player_bets st =
         (
           let p = State.find_participant st a in
           print_string p.name;
-          print_string " has currently paid: $";
+          print_string " added $";
           print_int b;
-          print_newline ();
+          print_endline " to the pot.";
           helper t
         ) in
   let sorted = List.sort compare lst in
   helper sorted;
   print_newline ()
-
-let find_participant st target =
-  let rec find_participant' target = function
-    | [] -> failwith "PLAYER DOES NOT EXIST"
-    | h :: t -> if (Player.id h) = target then h
-      else find_participant' target t in
-  find_participant' target (Table.participants (State.table st))
 
 let print_current_state st =
   ANSITerminal.(
@@ -94,7 +87,7 @@ let print_current_state st =
   print_players_in st;
   print_newline ();
   print_endline "Your hand is: ";
-  Card.card_printer (Player.cards (find_participant st
+  Card.card_printer (Player.cards (State.find_participant st
                                      (State.player_turn st)));
   print_newline ();
   print_newline ();
@@ -103,7 +96,7 @@ let print_current_state st =
   print_player_bets st;
   print_newline ();
   print_string "Available actions: ";
-  print_string_list ("quit" :: "stack" :: (State.avail_action st))
+  print_string_list ("quit" :: (State.avail_action st))
 
 
 
