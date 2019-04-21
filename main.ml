@@ -97,12 +97,11 @@ let print_current_state st =
   Card.card_printer (Player.cards (find_participant st
                                      (State.player_turn st)));
   print_newline ();
-  print_string "You have: $";
-  print_int (Player.money
-               (find_participant st (State.player_turn st)));
   print_newline ();
+  ignore(State.stack st);
   print_newline ();
   print_player_bets st;
+  print_newline ();
   print_string "Available actions: ";
   print_string_list ("quit" :: "stack" :: (State.avail_action st))
 

@@ -410,6 +410,7 @@ let stack st =
     print_string " has $";
     print_int (find_stack player st.table.participants);
     print_endline ". "; in
+
   List.iter print_stack (List.sort compare players);
   Legal st
 
@@ -451,6 +452,6 @@ let command_to_function = Command.(function
     | Call -> call
     | Raise amt -> raise' amt
     | Fold -> fold
-    | Stack -> stack
+    (*| Stack -> stack*)
     | _ -> failwith "UNSUPPORTED COMMAND"
   )
