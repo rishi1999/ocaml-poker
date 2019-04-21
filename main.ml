@@ -152,6 +152,9 @@ let play_game st =
   in
   keep_playing st
 
+(** [init_game num_players] initializes a game with [num_players] players.
+    Requires: integer amount of players [num_players].
+    Example: [init_game 3] initializes a game with 3 players. *)
 let init_game num_players =
   State.prompt "Starting stack amount?";
   let money = read_int () in
@@ -159,7 +162,8 @@ let init_game num_players =
   let blind = read_int () in
   let st = match num_players with
     | 1 -> State.init_state 1 2 money blind
-    | _ -> State.init_state 0 num_players money blind in
+    | x when x > 0 -> State.init_state 0 x money blind
+    | _ -> failwith "ERROR: negative number of players" in
   print_newline ();
   print_newline ();
   play_game st
@@ -173,15 +177,18 @@ let main () =
   print_newline ();
 
   let rec select_num_players () =
+    let retry () =
+      print_newline ();
+      prerr_endline "Invalid integer.";
+      select_num_players () in
     State.prompt "How many (human) players are there?";
     let input = read_line () in
     if input = "quit" then exit 0
     else
-      try int_of_string input with
-      | Failure _ ->
-        print_newline ();
-        prerr_endline "Invalid integer.";
-        select_num_players ()
+      let num = try int_of_string input with
+        | Failure _ ->
+          retry () in
+      if num > 0 then num else retry ()
   in
 
   init_game (select_num_players ())
