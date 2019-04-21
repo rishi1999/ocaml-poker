@@ -141,7 +141,7 @@ let init_bet_paid_amt players_in =
   let rec helper lst = function
     | [] -> lst
     | h::t -> helper ((h,0)::lst) t in
-  helper [] players_in
+  List.rev (helper [] players_in)
 
 (** [init_players_in] num_players returns a list containing all players' id *)
 let init_players_in num_players =
