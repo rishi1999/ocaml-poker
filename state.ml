@@ -172,6 +172,12 @@ let get_avail_action st =
       st with
       avail_action = ["check"; "bet"; "fold"]
     }
+  else if st.bet.bet_amount = st.table.blind &&
+          st.player_turn = (fst (List.nth st.bet.bet_paid_amt 1)) then
+    {
+      st with
+      avail_action = ["check"; "bet"; "fold"]
+    }
   else
     {
       st with
