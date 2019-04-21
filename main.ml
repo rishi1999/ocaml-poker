@@ -84,7 +84,6 @@ let print_current_state st =
   print_endline "Cards on the board: ";
   (Card.card_printer (Table.board (State.table st)));
   print_newline ();
-  print_string "Players in: ";
   print_players_in st;
   print_newline ();
   print_endline "Your hand is: ";
