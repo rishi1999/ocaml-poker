@@ -176,7 +176,8 @@ let get_avail_action st =
           st.bet.bet_amount = st.table.blind &&
           st.player_turn = match st.bet.bet_paid_amt with
           | [] -> failwith "ERROR: no bets exist"
-          | (p,a) :: t -> p
+          | h :: [] -> failwith "ERROR: only one bet exists"
+          | h :: (p,a) :: t -> p
   then
     {
       st with
@@ -232,9 +233,9 @@ let has_everyone_played st =
 let is_round_complete st =
   if List.length st.table.board = 0 then
     (are_all_bets_equal st &&
-    has_everyone_played st) &&
+     has_everyone_played st) &&
     not (st.player_turn = fst (List.nth st.bet.bet_paid_amt 1) ||
-    st.bet.bet_amount = st.table.blind)
+         st.bet.bet_amount = st.table.blind)
   else
     are_all_bets_equal st &&
     has_everyone_played st

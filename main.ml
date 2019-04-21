@@ -64,9 +64,9 @@ let print_player_bets st =
         (
           let p = State.find_participant st a in
           print_string p.name;
-          print_string " has currently paid: $";
+          print_string " added $";
           print_int b;
-          print_newline ();
+          print_endline " to the pot.";
           helper t
         ) in
   let sorted = List.sort compare lst in
