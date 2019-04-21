@@ -187,13 +187,17 @@ val winner : t -> (Player.player*int)
     Requires: valid state [st]. *)
 val get_avail_action : t -> t
 
-(** [find_participant st] target returns a type Player.player of a player that
+(** [calculate_pay_amt] st returns the amount that the current player has
+    to put into the pot to call either a bet or a raise *)
+val calculate_pay_amt : t -> int
+
+(** [find_participant] st target returns a type Player.player of a player that
     has an id of target. *)
 val find_participant : t -> int -> Player.player
 
 (** [find_stack id st] is the amount of money that the player 
     with id [id] has in state [st]. 
-    Requires: valid state [st], valid player id [id]. 
+    Requires: valid state [st], valid player id [id].
     Example: [find_stack 2 st] is the amount of money that the big blind has
     in the given state [st]. *)
 val find_stack : int -> Player.player list -> int
