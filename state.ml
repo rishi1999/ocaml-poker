@@ -419,7 +419,7 @@ let fold st =
       Legal (get_avail_action t)
   else Illegal "You can't do that right now!"
 
-let stack st =
+(*let stack st =
   let players = List.sort compare st.players_in in
   let print_stack player =
     let color = ANSITerminal.(if player = player_turn st then
@@ -433,7 +433,7 @@ let stack st =
     print_newline () in
 
   List.iter print_stack (List.sort compare players);
-  Legal st
+  Legal st*)
 
 let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
@@ -503,63 +503,63 @@ let raise' amt st = bet_or_raise amt st "raise"
 
 let save st = 
   let rec get_participants outlst = function
-  | [] -> outlst
-  | h::t -> let x = `Assoc [("id", `Int h.id); 
-    ("card1", `Int (Deck.int_converter (List.hd h.cards)));
-    ("card2", `Int (Deck.int_converter (List.hd (List.tl h.cards))));
-    ("money", `Int h.money);
-    ] in
-    get_participants (x::outlst) t in
+    | [] -> outlst
+    | h::t -> let x = `Assoc [("id", `Int h.id); 
+                              ("card1", `Int (Deck.int_converter (List.hd h.cards)));
+                              ("card2", `Int (Deck.int_converter (List.hd (List.tl h.cards))));
+                              ("money", `Int h.money);
+                             ] in
+      get_participants (x::outlst) t in
 
   let rec get_cards_int outlst = function
     | [] -> outlst
     | h::t -> get_cards_int (`Int (Deck.int_converter h)::outlst) t in
 
   let rec get_bet_amt outlst = function
-  | [] -> outlst
-  | (player,paid)::t -> let x = `Assoc [("id", `Int player); 
-    ("paid", `Int paid);
-    ] in
-    get_bet_amt (x::outlst) t in
+    | [] -> outlst
+    | (player,paid)::t -> let x = `Assoc [("id", `Int player); 
+                                          ("paid", `Int paid);
+                                         ] in
+      get_bet_amt (x::outlst) t in
 
   let participants_json = get_participants [] st.table.participants in
   let bet_amt = get_bet_amt [] st.bet.bet_paid_amt in
 
   Yojson.to_file "saved_game.json" (
     `Assoc
-    [
-    ("game_type", `Int st.game_type);
-    ("num_players", `Int st.num_players);
-    ("table",
-      `List
-        [`Assoc
-          [("pot", `Int st.table.pot);
-            ("blind", `Int st.table.blind);
-            ("participants", 
-            `List 
-                participants_json);
-          ]
-        ]);
-            ("board", 
-            `List 
-                (get_cards_int [] st.table.board);
-              );
-    ("player_turn", `Int st.player_turn);
-    ("button", `Int st.button);
-    ("players_in", `List [`Int 1; `Int 2]);
-    ("players_played", `List[`Int 1; `Int 2]);
-    ("bet", `List
-      [ 
-        `Assoc [
-          ("bet_player", `Int st.bet.bet_player);
-          ("bet_amount", `Int st.bet.bet_amount);
-          ("bet_paid_amt", `List bet_amt
-          );
-        ];
-      ]);
-    ("avail_action", `List (List.map (fun x -> `String x) st.avail_action));
-    ("winner", `List[`Int (-1)]);
-    ]
+      [
+        ("game_type", `Int st.game_type);
+        ("num_players", `Int st.num_players);
+        ("table",
+         `List
+           [`Assoc
+              [("pot", `Int st.table.pot);
+               ("blind", `Int st.table.blind);
+               ("participants", 
+                `List 
+                  participants_json);
+              ]
+           ]);
+        ("board", 
+         `List 
+           (get_cards_int [] st.table.board);
+        );
+        ("player_turn", `Int st.player_turn);
+        ("button", `Int st.button);
+        ("players_in", `List [`Int 1; `Int 2]);
+        ("players_played", `List[`Int 1; `Int 2]);
+        ("bet", `List
+           [ 
+             `Assoc [
+               ("bet_player", `Int st.bet.bet_player);
+               ("bet_amount", `Int st.bet.bet_amount);
+               ("bet_paid_amt", `List bet_amt
+               );
+             ];
+           ]);
+        ("avail_action", `List (List.map (fun x -> `String x) st.avail_action));
+        ("winner", `List[`Int (-1)]);
+      ]
   );
   exit 0;
   Legal st
@@ -569,7 +569,7 @@ let save st =
    let rec intlist outlst =
    function
    | [] -> outlst
-   | h::t -> intlist (to_int h::outlst) t in 
+   | h::t -> intlist (to_int h::outlst) t in
 
    (* let keys_of_json json = {
     key_id = json |> member "id" |> to_string;

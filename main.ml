@@ -50,8 +50,9 @@ let print_players_in st =
              else if x = (State.button st) then [red]
              else [default]
            )
-           (State.find_participant st x).name;
-         print_string [default] "  "
+           ((State.find_participant st x).name ^ " ($" ^
+            (string_of_int (State.find_stack x st.table.participants)) ^
+            ")    ");
       ) lst;
     print_newline ()
   )
@@ -90,8 +91,6 @@ let print_current_state st =
   Card.card_printer (Player.cards (State.find_participant st
                                      (State.player_turn st)));
   print_newline ();
-  print_newline ();
-  ignore(State.stack st);
   print_newline ();
   print_player_bets st;
   print_newline ();
@@ -179,7 +178,7 @@ let main () =
   let rec select_num_players () =
     let retry () =
       print_newline ();
-      prerr_endline "Invalid integer.";
+      prerr_endline "Invalid amount.";
       select_num_players () in
     State.prompt "How many (human) players are there?";
     let input = read_line () in
