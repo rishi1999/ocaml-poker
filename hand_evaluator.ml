@@ -109,6 +109,7 @@ let seven_list_eval hand =
   let g = Deck.int_converter (List.nth hand 6) in
   seven_eval a b c d e f g
 
+
 (** [rank_mapper rank_val] returns the general name of the rank of a hand that 
     has been mapped to [rank_val] using the evaluator function for the hand.
     Example: [rank_mapper 1] is "Royal Flush" (as the hand has been mapped
