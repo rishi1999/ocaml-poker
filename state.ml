@@ -2,6 +2,7 @@ open Deck
 open Table
 open Player
 open Hand_evaluator
+open Yojson.Basic.Util
 
 type bet = {
   bet_player: int;
@@ -465,11 +466,198 @@ let bet_or_raise amt st comm_str =
 let bet' amt st = bet_or_raise amt st "bet"
 let raise' amt st = bet_or_raise amt st "raise"
 
+(* SAVE / LOAD NEEDS IMPLEMENTATION *)
+
+
+(* game_type: int;
+   num_players: int;
+   table: Table.table;
+   player_turn: int;
+   button: int;
+   players_in: int list;
+   players_played: int list;
+   bet: bet;
+   avail_action: string list;
+   winner : int; *)
+
+(* type table = {
+   pot: int;
+   blind: int;
+   participants: Player.player list;
+   board: (Deck.suit * Deck.rank) list;
+   } *)
+
+(* type player = 
+   {
+    id: int;
+    cards: (Deck.suit * Deck.rank) list;
+    money: int;
+   } *)
+
+(* type bet = {
+   bet_player: int;
+   bet_amount: int;
+   bet_paid_amt: (int*int) list;
+   } *)
+
+let save st = 
+  let rec get_participants outlst = function
+  | [] -> outlst
+  | h::t -> let x = `Assoc [("id", `Int h.id); 
+    ("card1", `Int (Deck.int_converter (List.hd h.cards)));
+    ("card2", `Int (Deck.int_converter (List.hd (List.tl h.cards))));
+    ("money", `Int h.money);
+    ] in
+    get_participants (x::outlst) t in
+
+  let rec get_cards_int outlst = function
+    | [] -> outlst
+    | h::t -> get_cards_int (`Int (Deck.int_converter h)::outlst) t in
+
+  let rec get_bet_amt outlst = function
+  | [] -> outlst
+  | (player,paid)::t -> let x = `Assoc [("id", `Int player); 
+    ("paid", `Int paid);
+    ] in
+    get_bet_amt (x::outlst) t in
+(* 
+  let rec get_winner outlst = function
+  | [] -> outlst
+  | (player, rank) :: t -> 
+    let x = `Assoc [("id", `Int player); 
+    ("rank", `Int rank);] in
+    get_winner (x::outlst) t in *)
+
+  let participants_json = get_participants [] st.table.participants in
+  let bet_amt = get_bet_amt [] st.bet.bet_paid_amt in
+  (* let winners = get_winner [] st.winner in *)
+
+  Yojson.to_file "saved_game.json" (
+    `Assoc
+    [
+    ("game_type", `Int st.game_type);
+    ("num_players", `Int st.num_players);
+    ("table",
+      `List
+        [`Assoc
+          [("pot", `Int st.table.pot);
+            ("blind", `Int st.table.blind);
+            ("participants", 
+            `List 
+                participants_json);
+          ]
+        ]);
+            ("board", 
+            `List 
+                (get_cards_int [] st.table.board);
+              );
+    ("player_turn", `Int st.player_turn);
+    ("button", `Int st.button);
+    ("players_in", `List (List.map (fun x -> `Int x) st.players_in));
+    ("players_played", `List (List.map (fun x -> `Int x) st.players_played));
+    ("bet", `List
+      [ 
+        `Assoc [
+          ("bet_player", `Int st.bet.bet_player);
+          ("bet_amount", `Int st.bet.bet_amount);
+          ("bet_paid_amt", `List bet_amt
+          );
+        ];
+      ]);
+    ("avail_action", `List (List.map (fun x -> `String x) st.avail_action));
+    ("winner", `Assoc [("player", `Int (fst st.winner)); 
+                       ("rank", `Int (snd st.winner))]);
+    ]
+  );
+  Legal st
+
+let load json = 
+
+  let card_inverter card_int = 
+    let offset = match card_int mod 4 with
+      | 0 -> Clubs
+      | 1 -> Diamonds
+      | 2 -> Hearts
+      | 3 -> Spades
+      | _ -> failwith "Wrong Card" 
+      in
+    let rank = match card_int / 4 with
+      | 0 -> Two
+      | 1 -> Three
+      | 2 -> Four
+      | 3 -> Five
+      | 4 -> Six
+      | 5 -> Seven
+      | 6 -> Eight
+      | 7 -> Nine
+      | 8 -> Ten
+      | 9 -> Jack
+      | 10 -> Queen
+      | 11 -> King
+      | 12 -> Ace 
+      | _ -> failwith "Wrong Card" in
+
+    (offset, rank) in
+
+
+   let participants_of_json json = {
+    id = json |> member "id" |> to_int;
+    cards = [(json |> member "card1" |> to_int |> card_inverter);
+    (json |> member "card2" |> to_int |> card_inverter);];
+    name = "Default";
+    money = json |> member "money" |> to_int;
+   } in
+
+   let bet_paid_of_json json =
+    let id = json |> member "id" |> to_int in
+    let money = json |> member "paid" |> to_int in
+    (id, money)
+   in
+
+   let bet_of_json json = {
+    bet_player = json |> member "bet_player" |> to_int;
+    bet_amount = json |> member "bet_amount" |> to_int;
+    bet_paid_amt = json |> member "bet_paid_amt" |> to_list
+    |> List.map bet_paid_of_json;
+   }
+   in
+
+   let table_of_json json = {
+    pot = json |> member "pot" |> to_int;
+    blind = json |> member "blind" |> to_int;
+    participants = json |> member "participants"
+    |> to_list |> List.map participants_of_json;
+    board = json |> member "board" |> to_list |> List.map to_int 
+    |> List.map card_inverter;
+   } in
+
+   let t_of_json json = {
+    game_type = json |> member "game_type" |> to_int;
+    num_players = json |> member "num_players" |> to_int;
+    table = json |> member "table" |> table_of_json;
+    player_turn = json |> member "player_turn" |> to_int;
+    button = json |> member "button" |> to_int;
+    players_in = json |> member "players_in" |> to_list 
+    |> List.map (fun x -> to_int x);
+    players_played = json |> member "players_played" |> to_list
+    |> List.map (fun x -> to_int x);
+    bet = json |> member "bet" |> bet_of_json;
+    avail_action = [];
+    winner = (json |> member "winner" |> to_int, 0);
+   } in
+
+   let parse json =
+    try t_of_json json
+    with Type_error (s, _) -> failwith ("Parscing error: " ^ s) in
+
+   parse json
+
 let command_to_function = Command.(function
     | Check -> check
     | Bet amt -> bet' amt
     | Call -> call
     | Raise amt -> raise' amt
     | Fold -> fold
+    | Save -> save
     | _ -> failwith "ERROR: unsupported command"
   )
