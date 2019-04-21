@@ -352,8 +352,6 @@ let continue_game st = {st with winner = (-1,0)}
 
 let winning_player st = st.winner
 
-(** [calculate_pay_amt] st returns the amount that the current player has
-    to put into the pot to call either a bet or a raise *)
 let calculate_pay_amt st =
   let cur_bet_size = st.bet.bet_amount in
   let rec get_bet_amt target = function

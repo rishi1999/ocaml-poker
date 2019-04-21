@@ -187,6 +187,10 @@ val winner : t -> (Player.player*int)
     Requires: valid state [st]. *)
 val get_avail_action : t -> t
 
+(** [calculate_pay_amt] st returns the amount that the current player has
+    to put into the pot to call either a bet or a raise *)
+val calculate_pay_amt : t -> int
+
 (** [find_participant] st target returns a type Player.player of a player that
     has an id of target. *)
 val find_participant : t -> int -> Player.player
