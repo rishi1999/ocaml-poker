@@ -50,8 +50,8 @@ let print_players_in st =
              else if x = (State.button st) then [red]
              else [default]
            )
-           (string_of_int x);
-         print_string [default] " "
+           (State.find_participant st x).name;
+         print_string [default] "  "
       ) lst;
     print_newline ()
   )
@@ -103,7 +103,7 @@ let print_current_state st =
   print_player_bets st;
   print_newline ();
   print_string "Available actions: ";
-  print_string_list ("quit" :: "stack" :: (State.avail_action st))
+  print_string_list ("quit" :: (State.avail_action st))
 
 
 
