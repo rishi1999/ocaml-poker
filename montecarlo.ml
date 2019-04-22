@@ -1,4 +1,3 @@
-
 open Deck
 open Hand_evaluator
 open State
@@ -9,15 +8,6 @@ let community_card_fill base_cards used =
   let number = 5 - List.length (base_cards) in
   let required_cards = pick_new number used in
   base_cards @ required_cards
-
-type bot =
-  {
-    id: int;
-    name: string;
-    cards: Deck.card list;
-    money: int;
-    wins : int
-  }
 
 (* PyPoker Engine stuff *)
 let montecarlo_simulation num_players hole board =
