@@ -1,5 +1,6 @@
 open Card
 open Hand_evaluator
+open Montecarlo
 
 exception Wrong_Input
 
@@ -86,11 +87,6 @@ let print_current_state st =
   print_newline ();
   print_players_in st;
   print_newline ();
-  print_endline "Your hand is: ";
-  Card.card_printer (Player.cards (State.find_participant st
-                                     (State.player_turn st)));
-  print_newline ();
-  print_newline ();
   print_player_bets st;
   print_newline ();
   print_string "Available actions: ";
@@ -111,13 +107,71 @@ let play_game st =
       ANSITerminal.(print_string [yellow] string);
       print_newline ();
       print_newline ();
-      (* exit 0 *)
       keep_playing (State.continue_game st)
     else
       print_hline ();
     print_current_state st;
     print_newline ();
     ANSITerminal.(print_string [blue] "> ");
+
+    (* Easy Bot *)
+    if (State.game_type st) = 1 && State.player_turn st = 2 then
+      if List.mem "check" (State.avail_action st) then
+        match State.check st with
+        | Legal t ->
+          print_newline ();
+          print_endline (Command.command_to_string Check);
+          print_newline ();
+          keep_playing (State.get_avail_action t)
+        | Illegal str->
+          print_newline ();
+          print_endline str;
+          print_newline ();
+          keep_playing (State.get_avail_action st)
+      else if List.mem "call" (State.avail_action st) then
+        match (State.call st) with
+        | Legal t ->
+          print_newline ();
+          print_endline (Command.command_to_string Call);
+          print_newline ();
+          keep_playing (State.get_avail_action t)
+        | Illegal str->
+          print_newline ();
+          print_endline str;
+          print_newline ();
+          keep_playing (State.get_avail_action st)
+      else failwith "AI next move not defined"
+    
+    (* Medium Bot *)
+    else if (State.game_type st) = 2 && State.player_turn st = 2 then
+      let next_action = Montecarlo.declare_action (State.find_participant st 2)
+      (Player.cards (State.find_participant st 2)) st 50000 in
+      let action = fst next_action in
+      print_endline action;
+      let amt = snd next_action in
+      print_int amt;
+      print_newline();
+      if action = "raise" then 
+        match Command.parse (action ^ " " ^ string_of_int amt) with
+        | comm ->
+        (match State.command_to_function comm st with
+        | Legal t ->
+          print_newline ();
+          print_endline (Command.command_to_string comm);
+          print_newline ();
+          keep_playing (State.get_avail_action t);
+        | Illegal s -> failwith s)
+      else
+        match Command.parse action with
+        | comm ->
+        (match State.command_to_function comm st with
+        | Legal t ->
+          print_newline ();
+          print_endline (Command.command_to_string comm);
+          print_newline ();
+          keep_playing (State.get_avail_action t);
+        | Illegal s -> failwith s)
+    else
 
     match read_line () with
     | curr_cmd ->
@@ -159,7 +213,13 @@ let init_game num_players =
   State.prompt "Blind amount?";
   let blind = read_int () in
   let st = match num_players with
-    | 1 -> State.init_state 1 2 money blind
+    | 1 -> State.prompt "Difficulty of AI? (easy, medium, hard)";
+      (match read_line() with 
+      | "easy" -> State.init_state 1 2 money blind
+      | "medium" -> State.init_state 2 2 money blind
+      | "hard" -> State.init_state 3 2 money blind
+      | _ -> failwith "ERROR: not a valid difficulty"
+      )
     | x when x > 0 -> State.init_state 0 x money blind
     | _ -> failwith "ERROR: negative number of players" in
   print_newline ();
