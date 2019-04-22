@@ -174,23 +174,23 @@ let get_avail_action st =
     then
       {
         st with
-        avail_action = ["check"; "bet"; "fold"]
+        avail_action = ["check"; "bet"; "fold"; "show"]
       }
     else
       {
         st with
-        avail_action = ["call"; "raise"; "fold"]
+        avail_action = ["call"; "raise"; "fold"; "show"]
       }
   else 
     if st.bet.bet_amount = 0 then
       {
         st with
-        avail_action = ["check"; "bet"; "fold"]
+        avail_action = ["check"; "bet"; "fold"; "show"]
       }
     else
       {
         st with
-        avail_action = ["call"; "raise"; "fold"]
+        avail_action = ["call"; "raise"; "fold"; "show"]
       }
 
 
