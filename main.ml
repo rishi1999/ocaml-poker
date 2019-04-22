@@ -141,11 +141,11 @@ let play_game st =
           print_newline ();
           keep_playing (State.get_avail_action st)
       else failwith "AI next move not defined"
-    
+
     (* Medium Bot *)
     else if (State.game_type st) = 2 && State.player_turn st = 2 then
       let next_action = Montecarlo.declare_action (State.find_participant st 2)
-      (Player.cards (State.find_participant st 2)) st 50000 in
+          (Player.cards (State.find_participant st 2)) st 50000 in
       let action = fst next_action in
       print_endline action;
       let amt = snd next_action in
@@ -154,53 +154,53 @@ let play_game st =
       if action = "raise" then 
         match Command.parse (action ^ " " ^ string_of_int amt) with
         | comm ->
-        (match State.command_to_function comm st with
-        | Legal t ->
-          print_newline ();
-          print_endline (Command.command_to_string comm);
-          print_newline ();
-          keep_playing (State.get_avail_action t);
-        | Illegal s -> failwith s)
+          (match State.command_to_function comm st with
+           | Legal t ->
+             print_newline ();
+             print_endline (Command.command_to_string comm);
+             print_newline ();
+             keep_playing (State.get_avail_action t);
+           | Illegal s -> failwith s)
       else
         match Command.parse action with
         | comm ->
-        (match State.command_to_function comm st with
-        | Legal t ->
-          print_newline ();
-          print_endline (Command.command_to_string comm);
-          print_newline ();
-          keep_playing (State.get_avail_action t);
-        | Illegal s -> failwith s)
+          (match State.command_to_function comm st with
+           | Legal t ->
+             print_newline ();
+             print_endline (Command.command_to_string comm);
+             print_newline ();
+             keep_playing (State.get_avail_action t);
+           | Illegal s -> failwith s)
     else
 
-    match read_line () with
-    | curr_cmd ->
-      match Command.parse curr_cmd with
-      | exception Command.Malformed ->
-        print_newline ();
-        print_endline "Not a valid command.";
-        keep_playing st
+      match read_line () with
+      | curr_cmd ->
+        match Command.parse curr_cmd with
+        | exception Command.Malformed ->
+          print_newline ();
+          print_endline "Not a valid command.";
+          keep_playing st
 
-      | exception Command.Empty ->
-        print_newline ();
-        print_endline "Please enter a command.";
-        keep_playing st
+        | exception Command.Empty ->
+          print_newline ();
+          print_endline "Please enter a command.";
+          keep_playing st
 
-      | Quit -> exit 0
+        | Quit -> exit 0
 
-      | comm ->
-        let func = State.command_to_function comm in
-        match func st with
-        | Legal t ->
-          print_newline ();
-          print_endline (Command.command_to_string comm);
-          print_newline ();
-          keep_playing (State.get_avail_action t)
-        | Illegal str->
-          print_newline ();
-          print_endline str;
-          print_newline ();
-          keep_playing (State.get_avail_action st)
+        | comm ->
+          let func = State.command_to_function comm in
+          match func st with
+          | Legal t ->
+            print_newline ();
+            print_endline (Command.command_to_string comm);
+            print_newline ();
+            keep_playing (State.get_avail_action t)
+          | Illegal str->
+            print_newline ();
+            print_endline str;
+            print_newline ();
+            keep_playing (State.get_avail_action st)
   in
   keep_playing st
 
@@ -214,11 +214,11 @@ let init_game num_players =
   let blind = read_int () in
   let st = match num_players with
     | 1 -> State.prompt "Difficulty of AI? (easy, medium, hard)";
-      (match read_line() with 
-      | "easy" -> State.init_state 1 2 money blind
-      | "medium" -> State.init_state 2 2 money blind
-      | "hard" -> State.init_state 3 2 money blind
-      | _ -> failwith "ERROR: not a valid difficulty"
+      (match read_line() with
+       | "easy" -> State.init_state 1 2 money blind
+       | "medium" -> State.init_state 2 2 money blind
+       | "hard" -> State.init_state 3 2 money blind
+       | _ -> failwith "ERROR: not a valid difficulty"
       )
     | x when x > 0 -> State.init_state 0 x money blind
     | _ -> failwith "ERROR: negative number of players" in
@@ -246,7 +246,7 @@ let main () =
       let num = try int_of_string input with
         | Failure _ ->
           retry () in
-      if num > 0 then num else retry ()
+      if num > 0 && num <= 10 then num else retry ()
   in
 
   init_game (select_num_players ())
