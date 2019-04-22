@@ -237,7 +237,7 @@ let has_everyone_played st =
 let is_round_complete st =
   if List.length st.table.board = 0 then
     if st.player_turn = fst (List.nth st.bet.bet_paid_amt 1) then
-      not (st.bet.bet_amount = st.table.blind)
+      not (st.bet.bet_amount = st.table.blind ) && are_all_bets_equal st
     else 
     (are_all_bets_equal st &&
      has_everyone_played st)
@@ -292,6 +292,19 @@ let winner st =
 
   (List.nth part num_winner, best_rank)
 
+(** [filter_busted_players] st [] filters out those player that do not
+have any money from players_in of t. *)
+let filter_busted_players st =
+  let rec helper outlst = function
+    | [] -> outlst
+    | h::t ->
+    let player_money = (find_participant st h).money in
+    if player_money > 0 then helper (h::outlst) t
+    else
+    helper (outlst) t in
+  {st with
+  players_in = List.rev (helper [] st.players_in)}
+
 (** [go_next_round] st ends the current round or the current hand and
     returns the state with the next round. *)
 let go_next_round st =
@@ -319,6 +332,7 @@ let go_next_round st =
     let button_updated = if st.button + 1 > st.num_players then 1
       else st.button + 1 in
     let players_in_updated = hand_order st.num_players button_updated in
+
     if List.length st.players_in = 1 then
       let interim_state = {
         st with
@@ -330,7 +344,7 @@ let go_next_round st =
         players_played = [];
         winner = (winner_player, 0);
       } in
-      interim_state |> pay_blinds |> get_avail_action
+      interim_state |> filter_busted_players |> pay_blinds |> get_avail_action
     else
       let interim_state = {
         st with
@@ -342,7 +356,7 @@ let go_next_round st =
         players_played = [];
         winner = (winner_player, (snd (winner st)));
       } in
-      interim_state |> pay_blinds |> get_avail_action
+      interim_state |> filter_busted_players |> pay_blinds |> get_avail_action
   else
     let card_added = Table.add_to_board st.table in
     {
