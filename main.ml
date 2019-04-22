@@ -106,13 +106,40 @@ let play_game st =
       ANSITerminal.(print_string [yellow] string);
       print_newline ();
       print_newline ();
-      (* exit 0 *)
       keep_playing (State.continue_game st)
     else
       print_hline ();
     print_current_state st;
     print_newline ();
     ANSITerminal.(print_string [blue] "> ");
+
+    if (State.game_type st) = 1 && State.player_turn st = 2 then
+      if List.mem "check" (State.avail_action st) then
+        match State.check st with
+        | Legal t ->
+          print_newline ();
+          print_endline (Command.command_to_string Check);
+          print_newline ();
+          keep_playing (State.get_avail_action t)
+        | Illegal str->
+          print_newline ();
+          print_endline str;
+          print_newline ();
+          keep_playing (State.get_avail_action st)
+      else if List.mem "call" (State.avail_action st) then
+        match (State.call st) with
+        | Legal t ->
+          print_newline ();
+          print_endline (Command.command_to_string Call);
+          print_newline ();
+          keep_playing (State.get_avail_action t)
+        | Illegal str->
+          print_newline ();
+          print_endline str;
+          print_newline ();
+          keep_playing (State.get_avail_action st)
+      else failwith "AI next move not defined"
+    else
 
     match read_line () with
     | curr_cmd ->
