@@ -86,7 +86,7 @@ let money_to_pot st amount =
       bet_amount = if st.bet.bet_amount > amount then st.bet.bet_amount
         else amount;
       bet_paid_amt = List.rev( update_bet_paid
-          [] st.player_turn amount st.bet.bet_paid_amt;)
+                                 [] st.player_turn amount st.bet.bet_paid_amt;)
     } in
 
   {
@@ -98,9 +98,9 @@ let money_to_pot st amount =
     players_played = st.player_turn :: st.players_played;
   }
 
-(** [pay_blinds] st returns the state after the first two players,
+(** [pay_blinds st] is the state after the first two players,
     the small blind and the big blind, have paid their blinds.
-    Requires: st is a valid state where it has just started a new hand *)
+    Requires: [st] is a valid state where it has just started a new hand. *)
 let pay_blinds st =
   let small_blind = money_to_pot st (st.table.blind / 2) in
   money_to_pot small_blind st.table.blind
@@ -170,7 +170,7 @@ let hand_order num_players button =
 let get_avail_action st =
   if List.length st.table.board = 0 then
     if (st.player_turn = fst (List.nth (st.bet.bet_paid_amt) 1)) &&
-          (st.bet.bet_amount = st.table.blind)
+       (st.bet.bet_amount = st.table.blind)
     then
       {
         st with
@@ -182,16 +182,16 @@ let get_avail_action st =
         avail_action = ["call"; "raise"; "fold"; "show"]
       }
   else 
-    if st.bet.bet_amount = 0 then
-      {
-        st with
-        avail_action = ["check"; "bet"; "fold"; "show"]
-      }
-    else
-      {
-        st with
-        avail_action = ["call"; "raise"; "fold"; "show"]
-      }
+  if st.bet.bet_amount = 0 then
+    {
+      st with
+      avail_action = ["check"; "bet"; "fold"; "show"]
+    }
+  else
+    {
+      st with
+      avail_action = ["call"; "raise"; "fold"; "show"]
+    }
 
 
 let init_state game_type num_players money blind =
@@ -239,8 +239,8 @@ let is_round_complete st =
     if st.player_turn = fst (List.nth st.bet.bet_paid_amt 1) then
       not (st.bet.bet_amount = st.table.blind ) && are_all_bets_equal st
     else 
-    (are_all_bets_equal st &&
-     has_everyone_played st)
+      (are_all_bets_equal st &&
+       has_everyone_played st)
   else
     are_all_bets_equal st &&
     has_everyone_played st
@@ -293,17 +293,17 @@ let winner st =
   (List.nth part num_winner, best_rank)
 
 (** [filter_busted_players] st [] filters out those player that do not
-have any money from players_in of t. *)
+    have any money from players_in of t. *)
 let filter_busted_players st =
   let rec helper outlst = function
     | [] -> outlst
     | h::t ->
-    let player_money = (find_participant st h).money in
-    if player_money > 0 then helper (h::outlst) t
-    else
-    helper (outlst) t in
+      let player_money = (find_participant st h).money in
+      if player_money > 0 then helper (h::outlst) t
+      else
+        helper (outlst) t in
   {st with
-  players_in = List.rev (helper [] st.players_in)}
+   players_in = List.rev (helper [] st.players_in)}
 
 (** [go_next_round] st ends the current round or the current hand and
     returns the state with the next round. *)
@@ -597,7 +597,7 @@ let load json =
       | 1 -> Diamonds
       | 2 -> Hearts
       | 3 -> Spades
-      | _ -> failwith "Wrong Card" 
+      | _ -> failwith "Wrong Card"
     in
     let rank = match card_int / 4 with
       | 0 -> Two
@@ -612,7 +612,7 @@ let load json =
       | 9 -> Jack
       | 10 -> Queen
       | 11 -> King
-      | 12 -> Ace 
+      | 12 -> Ace
       | _ -> failwith "Wrong Card" in
 
     (offset, rank) in
