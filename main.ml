@@ -221,11 +221,13 @@ let init_game num_players =
       ~condition:(fun x -> x >= 2 && x <= money / 10) () in
   let st = match num_players with
     | 1 -> State.prompt "Difficulty of AI? (easy, medium, hard)";
-      (match read_line() with
-       | "easy" -> State.init_state 1 2 money blind
-       | "medium" -> State.init_state 2 2 money blind
-       | "hard" -> State.init_state 3 2 money blind
-       | _ -> failwith "ERROR: not a valid difficulty"
+      (
+        let game_type = match read_line () with
+          | "easy" -> 1
+          | "medium" -> 2
+          | "hard" -> 3
+          | _ -> failwith "ERROR: not a valid difficulty" in
+        State.init_state game_type 2 money blind
       )
     | x when x > 0 -> State.init_state 0 x money blind
     | _ -> failwith "ERROR: negative number of players" in
