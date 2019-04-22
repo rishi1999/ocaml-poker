@@ -2,12 +2,20 @@ open Card
 open Hand_evaluator
 open Montecarlo
 
-exception Wrong_Input
+let rec read_integer prompt_str ?(condition=(fun x -> true)) () =
+  let retry () =
+    print_newline ();
+    print_string "Invalid amount.";
+    read_integer prompt_str ~condition () in
+  State.prompt prompt_str;
 
-let rec get_and_read_input expected_output =
-  let input = int_of_string (read_line()) in
-  if List.mem (input) expected_output then input
-  else raise Wrong_Input
+  let input = read_line () in
+  if input = "quit" then exit 0
+  else
+    let num = try int_of_string input with
+      | Failure _ ->
+        retry () in
+    if condition num then num else retry ()
 
 let print_hline () =
   for i = 1 to 100 do
@@ -111,8 +119,7 @@ let play_game st =
     else
       print_hline ();
     print_current_state st;
-    print_newline ();
-    ANSITerminal.(print_string [blue] "> ");
+    State.prompt "";
 
     (* Easy Bot *)
     if (State.game_type st) = 1 && State.player_turn st = 2 then
@@ -151,7 +158,7 @@ let play_game st =
       let amt = snd next_action in
       print_int amt;
       print_newline();
-      if action = "raise" then 
+      if action = "raise" then
         match Command.parse (action ^ " " ^ string_of_int amt) with
         | comm ->
           (match State.command_to_function comm st with
@@ -234,22 +241,10 @@ let main () =
   ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
   print_newline ();
 
-  let rec select_num_players () =
-    let retry () =
-      print_newline ();
-      prerr_endline "Invalid amount.";
-      select_num_players () in
-    State.prompt "How many (human) players are there?";
-    let input = read_line () in
-    if input = "quit" then exit 0
-    else
-      let num = try int_of_string input with
-        | Failure _ ->
-          retry () in
-      if num > 0 && num <= 10 then num else retry ()
-  in
+  read_integer "How many (human) players are there?"
+    ~condition:(fun x -> x > 0 && x <= 10) ()
 
-  init_game (select_num_players ())
+  |> init_game
 
 
 (* Execute the game engine. *)
