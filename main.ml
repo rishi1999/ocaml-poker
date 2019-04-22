@@ -215,10 +215,10 @@ let play_game st =
     Requires: integer amount of players [num_players].
     Example: [init_game 3] initializes a game with 3 players. *)
 let init_game num_players =
-  State.prompt "Starting stack amount?";
-  let money = read_int () in
-  State.prompt "Blind amount?";
-  let blind = read_int () in
+  let money = read_integer "Starting stack amount?"
+      ~condition:(fun x -> x >= 10 && x <= 5000) () in
+  let blind = read_integer "Blind amount?"
+      ~condition:(fun x -> x >= 2 && x <= money / 10) () in
   let st = match num_players with
     | 1 -> State.prompt "Difficulty of AI? (easy, medium, hard)";
       (match read_line() with
