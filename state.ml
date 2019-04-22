@@ -174,7 +174,7 @@ let get_avail_action st =
     then
       {
         st with
-        avail_action = ["check"; "bet"; "fold"; "show"]
+        avail_action = ["check"; "raise"; "fold"; "show"]
       }
     else
       {

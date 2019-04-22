@@ -43,7 +43,10 @@ let declare_action bot hole_cards state iterations =
   let win_rate = estimate_win_rate iterations (state.num_players) hole_cards (state.table.board) in
   let can_call = List.mem "call" valid_actions in
   let call_amount = if can_call then calculate_pay_amt state else 0 in
-  if win_rate >= 0.85 then ("raise", bot.money)
-  else if win_rate > 0.75 then ("raise", 2 * state.bet.bet_amount)
-  else if win_rate > 0.5 then ("call" , call_amount)
-  else if can_call && call_amount = 0 then ("check", 0) else ("fold",0)
+  if bot.money = 0 then 
+    ("check", 0)
+  else
+    if win_rate >= 0.85 then ("raise", bot.money)
+    else if win_rate > 0.75 then ("raise", 2 * state.bet.bet_amount)
+    else if win_rate > 0.5 then ("call" , call_amount)
+    else if can_call && call_amount = 0 then ("check", 0) else ("fold",0)
