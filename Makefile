@@ -1,5 +1,6 @@
 MODULES= authors deck player table command main hashone \
-	tableflush hand_evaluator constantarrays state card
+	tableflush hand_evaluator constantarrays state card \
+	montecarlo hand_analysis
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
