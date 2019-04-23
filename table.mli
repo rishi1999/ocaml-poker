@@ -43,6 +43,10 @@ val participants : table -> Player.player list
     board = [(Spade, Ace)]}] = [(Spade, Ace)] *)
 val board : table -> (Deck.card) list
 
+(** [nth_participant tb n] gets the number [n] player in the table [tb]
+    Requires : [tb] is a valid table*)
+val nth_participant : table -> int -> Player.player
+
 (** [next_round_players tab] returns the table [tab] with blind
      updated for the next round
     Requires [tab] is a valid table

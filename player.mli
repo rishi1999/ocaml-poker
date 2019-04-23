@@ -8,6 +8,9 @@ type player =
     name: string;
     cards: Deck.card list;
     money: int;
+    avatar_id: int;
+    wins: int;
+    losses: int;
   }
 
 (** [id player] returns the id of the player.
@@ -32,3 +35,9 @@ val cards : player -> Deck.card list
     Requires: [player] is a valid player.
     Example: [money {... money = 5; ...}] is [5]. *)
 val money : player -> int
+
+val avatar_id : player -> int
+
+val wins : player -> int
+
+val losses : player -> int

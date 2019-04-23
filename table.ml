@@ -11,7 +11,7 @@ let pot tb = tb.pot
 let blind tb = tb.blind
 let participants tb = tb.participants
 let board tb = tb.board
-
+let nth_participant tb n = List.nth (participants tb) n
 let next_round_players = function
   |
     {
