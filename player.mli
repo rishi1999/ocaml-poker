@@ -11,6 +11,8 @@ type player =
     avatar_id: int;
     wins: int;
     losses: int;
+    consecutive_wins : int;
+    orig_id : int
   }
 
 (** [id player] returns the id of the player.
@@ -41,3 +43,5 @@ val avatar_id : player -> int
 val wins : player -> int
 
 val losses : player -> int
+
+val consec_wins : player -> int

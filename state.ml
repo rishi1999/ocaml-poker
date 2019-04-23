@@ -153,7 +153,7 @@ let init_players num_players money =
         let avatar_int_id = get_int_id () in
         if avatar_int_id <= 10 && avatar_int_id >= 1 then avatar_int_id
         else get_int_id () in
-      let valid_id = get_valid_id () in
+      let valid_id = get_valid_id () - 1 in
       let name = input in
       let curr_player =
         {
@@ -163,7 +163,9 @@ let init_players num_players money =
           money;
           wins = 0;
           losses = 0;
-          avatar_id = valid_id - 1;
+          avatar_id = valid_id;
+          consecutive_wins = 0;
+          orig_id = valid_id;
         } in
       init_players' (curr_player :: acc) money (id + 1) in
   (init_players' [] money 1)
@@ -690,9 +692,11 @@ let load json =
              (json |> member "card2" |> to_int |> card_inverter);];
     name = "Default";
     money = json |> member "money" |> to_int;
-    wins = -1;
-    losses = -1;
+    wins = 0;
+    losses = 0;
     avatar_id = -1;
+    consecutive_wins = 0;
+    orig_id = -1;
   } in
 
   let bet_paid_of_json json =
@@ -752,6 +756,6 @@ let command_to_function = Command.(function
     | Raise amt -> raise' amt
     | Fold -> fold
     | Show -> show
- | Save -> save
+    | Save -> save
     | _ -> failwith "ERROR: unsupported command"
   )
