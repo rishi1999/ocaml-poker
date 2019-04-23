@@ -10,12 +10,11 @@ let rec read_integer prompt_str ?(condition=((fun x -> true), "Number does not s
   State.prompt prompt_str;
 
   let input = read_line () in
-  if input = "quit" then exit 0
-  else
-    let num = try int_of_string input with
-      | Failure _ ->
-        retry "Please enter an integer value." () in
-    if fst condition num then num else retry (snd condition) ()
+  if input = "quit" then exit 0;
+  let num = try int_of_string input with
+    | Failure _ ->
+      retry "Please enter an integer value." () in
+  if fst condition num then num else retry (snd condition) ()
 
 let print_hline () =
   for i = 1 to 100 do

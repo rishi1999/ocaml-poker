@@ -136,7 +136,9 @@ let init_players num_players money =
     | id when id > num_players -> acc
     | id ->
       prompt ("Enter player " ^ (string_of_int) id ^ "'s name.");
-      let name = read_line () in
+      let input = read_line () in
+      if input = "quit" then exit 0;
+      let name = input in
       let curr_player =
         {
           id;
