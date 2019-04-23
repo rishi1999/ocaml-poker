@@ -723,19 +723,12 @@ let load json =
 
   parse json
 
-let show st =
-  print_endline "Your hand is: ";
-  Card.card_printer (Player.cards (find_participant st
-                                     (st.player_turn)));
-  Legal st
-
 let command_to_function = Command.(function
     | Check -> check
     | Bet amt -> bet' amt
     | Call -> call
     | Raise amt -> raise' amt
     | Fold -> fold
-    | Show -> show
     | Save -> save
     | _ -> failwith "ERROR: unsupported command"
   )

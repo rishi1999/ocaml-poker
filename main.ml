@@ -222,6 +222,14 @@ let play_game st =
 
         | Quit -> exit 0
 
+        | Show ->
+          clear_screen ();
+          print_endline "Your hand is: ";
+          Card.card_printer (Player.cards (State.find_participant st
+                                             (st.player_turn)));
+          let _ = read_line () in
+          keep_playing st
+
         | comm ->
           let func = State.command_to_function comm in
           match func st with
