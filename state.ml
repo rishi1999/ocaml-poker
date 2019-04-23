@@ -3,6 +3,7 @@ open Table
 open Player
 open Hand_evaluator
 open Yojson.Basic.Util
+open Avatar
 
 type bet = {
   bet_player: int;
@@ -137,7 +138,22 @@ let init_players num_players money =
     | id ->
       prompt ("Enter player " ^ (string_of_int) id ^ "'s name.");
       let input = read_line () in
-      if input = "quit" then exit 0;
+      ANSITerminal.(print_string [ANSITerminal.black; Background White] array_choice);
+      prompt ("Choose player " ^ (string_of_int) id ^ "'s avatar.");
+      let rec get_int_id () = 
+        try
+          let input = read_line () in
+          if input = "quit" then exit 0 else
+            int_of_string input
+        with
+        | Failure _ -> print_endline "Please enter a valid integer from 1 - 10";
+          prompt ("Choose player " ^ (string_of_int) id ^ "'s avatar.");
+          get_int_id (); in
+      let rec get_valid_id () =
+        let avatar_int_id = get_int_id () in
+        if avatar_int_id <= 10 && avatar_int_id >= 1 then avatar_int_id
+        else get_int_id () in
+      let valid_id = get_valid_id () in
       let name = input in
       let curr_player =
         {
@@ -145,9 +161,9 @@ let init_players num_players money =
           name;
           cards = [];
           money;
-          wins = -1;
-          losses = -1;
-          avatar_id = -1;
+          wins = 0;
+          losses = 0;
+          avatar_id = valid_id - 1;
         } in
       init_players' (curr_player :: acc) money (id + 1) in
   (init_players' [] money 1)

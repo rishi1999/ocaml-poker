@@ -1,6 +1,7 @@
 open Card
 open Hand_evaluator
 open Montecarlo
+open Avatar
 
 
 let clear_screen () =
@@ -113,8 +114,18 @@ let print_player_bets st =
 let print_current_state st =
   print_table st;
   ANSITerminal.(
-    print_string [yellow] (Player.name (State.find_participant st (State.player_turn st)));
-    print_string [yellow] "'s turn"
+    let player = State.find_participant st (State.player_turn st) in
+    print_string [yellow] (Player.name player);
+    print_string [yellow] "'s turn";
+    print_newline ();
+    print_string [black; Background White] 
+      (avatar_array.(Player.avatar_id player));
+    print_string [yellow] "Wins: ";
+    print_string [yellow] (string_of_int player.wins);
+    print_newline ();
+    print_string [yellow] "Losses: ";
+    print_string [yellow] (string_of_int player.losses);
+    print_newline ();
   );
   print_newline ();
   print_newline ();
