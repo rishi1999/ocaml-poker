@@ -145,6 +145,9 @@ let init_players num_players money =
           name;
           cards = [];
           money;
+          wins = -1;
+          losses = -1;
+          avatar_id = -1;
         } in
       init_players' (curr_player :: acc) money (id + 1) in
   (init_players' [] money 1)
@@ -365,14 +368,18 @@ let go_next_round st =
   if is_hand_complete st then
 
     let _ = "ignore" in
+    print_newline ();
     print_endline "If this is the only debug message printed,
-                   there is a bug in the next line of code
-                   (in State.go_next_round).";
+there is a bug in the next line of code
+(in State.go_next_round).";
+    print_newline ();
 
     let winner_pl = fst (winner st) in
 
+    print_newline ();
     print_endline "If this message was printed,
-    you have fixed the bug -- congrats!";
+you have conquered the bug -- congrats!";
+    print_newline ();
 
     let hand_quality = snd (winner st) in
 
@@ -667,6 +674,9 @@ let load json =
              (json |> member "card2" |> to_int |> card_inverter);];
     name = "Default";
     money = json |> member "money" |> to_int;
+    wins = -1;
+    losses = -1;
+    avatar_id = -1;
   } in
 
   let bet_paid_of_json json =
