@@ -191,8 +191,20 @@ let hand_order num_players button =
 
 let get_avail_action st =
   if List.length st.table.board = 0 then
-    if (st.player_turn = fst (List.nth (st.bet.bet_paid_amt) 1)) &&
-       (st.bet.bet_amount = st.table.blind)
+    if (st.player_turn = fst
+          (
+            try List.nth st.bet.bet_paid_amt 1 with
+            | Failure _ ->
+              print_newline ();
+              print_endline
+                "Not enough players remaining with sufficient funds.";
+              print_newline ();
+              ANSITerminal.(print_string [yellow] "Game Over!");
+              print_newline ();
+              print_newline ();
+              exit 0
+          )
+       ) && (st.bet.bet_amount = st.table.blind)
     then
       {
         st with
@@ -330,59 +342,42 @@ let winner st =
     returns the state with the next round. *)
 let go_next_round st =
   if is_hand_complete st then
-    let winner_player = if List.length st.players_in = 1 then
-        List.hd st.players_in else
-        try (fst (winner st)).id with Tie -> -2
-    in
-    let win_amount = st.table.pot in
-    let player_won = find_participant st winner_player in
-    let player_paid =
-      {player_won with money = player_won.money + win_amount} in
-    let rec update_parcipant target player outlst = function
-      | [] -> outlst
-      | h::t -> if h.id = target then
-          update_parcipant target player (player::outlst) t
-        else update_parcipant target player (h::outlst) t in
-    let updated_participants = update_parcipant winner_player player_paid []
-        st.table.participants in
-    let updated_table = {
-      st.table with
-      participants = updated_participants;
+    let winner_pl_id = try (fst (winner st)).id with Tie -> -2 in
+    let winner_pl' = find_participant st winner_pl_id in
+    let winner_pl = {
+      winner_pl' with
+      money = winner_pl'.money + st.table.pot
     } in
-    let cleared = Table.clear_round updated_table in
-    let button_updated = if st.button + 1 > st.num_players then 1
+    let rec update_player target new_player acc = function
+      | [] -> acc
+      | h :: t -> if h.id = target then
+          update_player target new_player (new_player :: acc) t
+        else update_player target new_player (h :: acc) t in
+    let participants =
+      update_player winner_pl_id winner_pl [] st.table.participants in
+    let table = {
+      st.table with
+      participants;
+    } |> Table.clear_round in
+    let button = if st.button + 1 > st.num_players then 1
       else st.button + 1 in
-    let players_in_updated = hand_order st.num_players button_updated in
+    let players_in = hand_order st.num_players button in
 
-    if List.length st.players_in = 1 then
-      let interim_state = {
-        st with
-        table = Table.deal (cleared);
-        bet = init_bet players_in_updated;
-        player_turn = List.nth players_in_updated 0;
-        button = button_updated;
-        players_in = players_in_updated;
-        players_played = [];
-        winner = (winner_player, 0);
-      } in
-      interim_state |> filter_busted_players |> pay_blinds |> get_avail_action
-    else
-      let interim_state = {
-        st with
-        table = Table.deal (cleared);
-        bet = init_bet players_in_updated;
-        player_turn = List.nth players_in_updated 0;
-        button = button_updated;
-        players_in = players_in_updated;
-        players_played = [];
-        winner = (winner_player, (snd (winner st)));
-      } in
-      interim_state |> filter_busted_players |> pay_blinds |> get_avail_action
+    let interim_state = {
+      st with
+      table = Table.deal (table);
+      bet = init_bet players_in;
+      player_turn = List.nth players_in 0;
+      button = button;
+      players_in = players_in;
+      players_played = [];
+      winner = (winner_pl_id, (snd (winner st)));
+    } in
+    interim_state |> filter_busted_players |> pay_blinds |> get_avail_action
   else
-    let card_added = Table.add_to_board st.table in
     {
       st with
-      table = card_added;
+      table = Table.add_to_board st.table;
       bet = init_bet st.players_in;
       player_turn = List.nth st.players_in 0;
       players_played = [];
