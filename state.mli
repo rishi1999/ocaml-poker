@@ -122,6 +122,11 @@ val avail_action : t -> string list
     if the game has three players. *)
 val init_state : int -> int -> int -> int -> t
 
+(** [init_bet lst] is the initial bet for an initial list [lst] of players
+    REquires: [lst] must be a list of integers ranging from 1 to n
+    number of players*)
+val init_bet : int list -> bet
+
 (** [hand_order num_players button] is an integer list
     containing integers from (button + 1) to num_players and then from 1
     to button.
@@ -209,3 +214,7 @@ val find_stack : int -> Player.player list -> int
               comm_str is either "bet" or "raise"
 *)
 val bet_or_raise : int -> t -> string -> move_result
+
+(** [pay_blinds st] is the state [st] with players having payed blinds
+    Requires: st is a valid state*)
+val pay_blinds : t -> t

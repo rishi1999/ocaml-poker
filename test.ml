@@ -14,8 +14,9 @@ let make_new_deck =
 
 let empty_table = {
   pot=0;
-  blind=1;
-  participants = [{id = 1; name = "Wilson"; cards = []; money = 20}];
+  blind=5;
+  participants = [{id = 1; name = "Wilson"; cards = []; money = 500};
+                  {id = 2; name = "Lucy"; cards = []; money = 500}];
   board = [];
 }
 
@@ -24,7 +25,7 @@ let empty_table = {
 let deck_tests = 
   [
     "pick first card" >:: (fun _ -> deck_init ();
-                            assert_equal (pick_cards 1) 
+                            print_endline "deck";assert_equal (pick_cards 1) 
                               [(Clubs, Two)]);
     "pick second card" >:: (fun _ -> deck_init();
                              assert_equal (pick_cards 2) [(Clubs, Two); 
@@ -45,7 +46,7 @@ let julian = {id = 2; name = "Julian"; cards = [(Diamonds, Five)]; money = 32}
 let player_tests =
   [
     "ID Test1" >:: (fun _->
-        assert_equal 0  (id james));
+        print_endline "player"; assert_equal 0  (id james));
 
     "ID Test2" >:: (fun _->
         assert_equal 1  (id bob));
@@ -61,7 +62,7 @@ let player_tests =
 let command_tests = [
 
   "test parse empty" >:: (fun _ -> 
-      assert_raises (Empty) (fun () -> parse ""));
+      print_endline "command"; assert_raises (Empty) (fun () -> parse ""));
   "test parse empty with spaces" >:: (fun _ -> 
       assert_raises (Empty) (fun () -> parse "      "));
   "test parse quit malformed" >:: (fun _ -> 
@@ -167,8 +168,15 @@ let get_state move_result =
   match move_result with
   | Legal t -> t
   | Illegal failed -> failwith failed
-
-let state_1 = State.init_state 1 2 500 5
+let init_players = [{id = 1; name = "Wilson"; cards = []; money = 500};
+                    {id = 2; name = "Lucy"; cards = []; money = 500}]
+let state_1 = get_avail_action (pay_blinds {game_type = 0;num_players = 2; table = empty_table;
+                                            player_turn = 1; button = 1; players_in = [1;2];
+                                            players_played = [];
+                                            bet = init_bet [1;2];
+                                            avail_action = ["bet"; "check"; "fold"];
+                                            winner = (-1,0);
+                                           })
 let state_2 = get_state (State.call state_1)
 let state_3 = get_state (State.bet_or_raise 50 state_2 "bet")
 let state_4 = get_state (State.bet_or_raise 120 state_3 "raise")
@@ -218,8 +226,10 @@ let state_tests =
 let table_tests =
   [
     "participants test" >:: (fun _ ->
-        assert_equal [{id = 1; name = "Wilson"; cards = []; money = 20}] (participants
-                                                                            empty_table));
+        assert_equal [{id = 1; name = "Wilson"; cards = []; money = 500};
+                      {id = 2; name = "Lucy"; cards = []; money = 500}] 
+          (participants
+             empty_table));
     "deal_test_1" >:: (fun _->
         assert ((deal table1) <> table1));
     "deal_test_2" >:: (fun _->
