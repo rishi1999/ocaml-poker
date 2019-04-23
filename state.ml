@@ -98,12 +98,34 @@ let money_to_pot st amount =
     players_played = st.player_turn :: st.players_played;
   }
 
+let rec find_stack player = function
+  | [] -> 0
+  | h::t -> if h.id = player then h.money else find_stack player t
+
 (** [pay_blinds st] is the state after the first two players,
     the small blind and the big blind, have paid their blinds.
     Requires: [st] is a valid state where it has just started a new hand. *)
 let pay_blinds st =
-  let small_blind = money_to_pot st (st.table.blind / 2) in
-  money_to_pot small_blind st.table.blind
+  let rec pick_blind st amt =
+    if st.table.blind <= find_stack st.player_turn st.table.participants then
+      money_to_pot st amt
+    else
+      let remove target lst = List.filter (fun x -> not (x = target)) lst in
+      let pl = st.player_turn in
+      pick_blind
+        {
+          st with
+          players_in = remove pl st.players_in;
+          player_turn = get_next_player st;
+          bet =
+            {
+              st.bet with
+              bet_paid_amt = (List.remove_assoc pl st.bet.bet_paid_amt);
+            };
+        }
+        amt in
+  let st = pick_blind st (st.table.blind / 2) in
+  pick_blind st st.table.blind
 
 (** [init_players] num_players money returns the sorted list of players,
     with length of num_players and everyone's money is equal to the
@@ -181,7 +203,7 @@ let get_avail_action st =
         st with
         avail_action = ["call"; "raise"; "fold"; "show"]
       }
-  else 
+  else
   if st.bet.bet_amount = 0 then
     {
       st with
@@ -193,6 +215,18 @@ let get_avail_action st =
       avail_action = ["call"; "raise"; "fold"; "show"]
     }
 
+(** [filter_busted_players] st [] filters out those player that do not
+    have any money from players_in of t. *)
+let filter_busted_players st =
+  let rec helper outlst = function
+    | [] -> outlst
+    | h::t ->
+      let player_money = (find_participant st h).money in
+      if player_money > 0 then helper (h::outlst) t
+      else
+        helper (outlst) t in
+  {st with
+   players_in = List.rev (helper [] st.players_in)}
 
 let init_state game_type num_players money blind =
   {
@@ -206,7 +240,7 @@ let init_state game_type num_players money blind =
     bet = init_bet (init_players_in num_players);
     avail_action = ["bet"; "check"; "fold"];
     winner = (-1,0);
-  } |> pay_blinds |> get_avail_action
+  } |> filter_busted_players |> pay_blinds |> get_avail_action
 
 let game_type st = st.game_type
 let num_players st = st.num_players
@@ -238,7 +272,7 @@ let is_round_complete st =
   if List.length st.table.board = 0 then
     if st.player_turn = fst (List.nth st.bet.bet_paid_amt 1) then
       not (st.bet.bet_amount = st.table.blind ) && are_all_bets_equal st
-    else 
+    else
       (are_all_bets_equal st &&
        has_everyone_played st)
   else
@@ -291,19 +325,6 @@ let winner st =
   let num_winner = get_player_int best_rank rlist 0 in
 
   (List.nth part num_winner, best_rank)
-
-(** [filter_busted_players] st [] filters out those player that do not
-    have any money from players_in of t. *)
-let filter_busted_players st =
-  let rec helper outlst = function
-    | [] -> outlst
-    | h::t ->
-      let player_money = (find_participant st h).money in
-      if player_money > 0 then helper (h::outlst) t
-      else
-        helper (outlst) t in
-  {st with
-   players_in = List.rev (helper [] st.players_in)}
 
 (** [go_next_round] st ends the current round or the current hand and
     returns the state with the next round. *)
@@ -379,10 +400,6 @@ let calculate_pay_amt st =
 
   Pervasives.abs(cur_bet_size - get_bet_amt st.player_turn st.bet.bet_paid_amt)
 
-let rec find_stack player = function
-  | [] -> 0
-  | h::t -> if h.id = player then h.money else find_stack player t
-
 type move_result =
   | Legal of t
   | Illegal of string
@@ -411,7 +428,7 @@ let call st =
         Legal (get_avail_action (go_next_round t))
       else
         Legal (get_avail_action t)
-    else Illegal "You are out of money!"
+    else Illegal "You don't have enough money to do that!"
   else Illegal "You can't do that right now!"
 
 let fold st =
@@ -436,22 +453,6 @@ let fold st =
       Legal (get_avail_action t)
   else Illegal "You can't do that right now!"
 
-(*let stack st =
-  let players = List.sort compare st.players_in in
-  let print_stack player =
-    let color = ANSITerminal.(if player = player_turn st then
-                                green else default) in
-    ANSITerminal.print_string [color]
-      ((Player.name (find_participant st player)) ^
-       " has $" ^
-       (string_of_int
-          (find_stack player st.table.participants)) ^
-       ".");
-    print_newline () in
-
-  List.iter print_stack (List.sort compare players);
-  Legal st*)
-
 let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
     if amt < st.table.blind then
@@ -459,7 +460,7 @@ let bet_or_raise amt st comm_str =
     else if comm_str = "raise" && amt < 2*st.bet.bet_amount then
       Illegal "You have to raise at least twice the bet!"
     else if amt > (find_stack st.player_turn st.table.participants) then
-      Illegal "You're not very liquid at the moment...."
+      Illegal "You don't have enough money to do that!"
     else if comm_str = "bet" then
       Legal (get_avail_action (money_to_pot st amt))
     else
@@ -505,7 +506,7 @@ let raise' amt st = bet_or_raise amt st "raise"
    board: (Deck.suit * Deck.rank) list;
    } *)
 
-(* type player = 
+(* type player =
    {
     id: int;
     cards: (Deck.suit * Deck.rank) list;
@@ -518,10 +519,10 @@ let raise' amt st = bet_or_raise amt st "raise"
    bet_paid_amt: (int*int) list;
    } *)
 
-let save st = 
+let save st =
   let rec get_participants outlst = function
     | [] -> outlst
-    | h::t -> let x = `Assoc [("id", `Int h.id); 
+    | h::t -> let x = `Assoc [("id", `Int h.id);
                               ("card1", `Int (Deck.int_converter (List.hd h.cards)));
                               ("card2", `Int (Deck.int_converter (List.hd (List.tl h.cards))));
                               ("money", `Int h.money);
@@ -534,15 +535,15 @@ let save st =
 
   let rec get_bet_amt outlst = function
     | [] -> outlst
-    | (player,paid)::t -> let x = `Assoc [("id", `Int player); 
+    | (player,paid)::t -> let x = `Assoc [("id", `Int player);
                                           ("paid", `Int paid);
                                          ] in
       get_bet_amt (x::outlst) t in
-  (* 
+  (*
   let rec get_winner outlst = function
   | [] -> outlst
-  | (player, rank) :: t -> 
-    let x = `Assoc [("id", `Int player); 
+  | (player, rank) :: t ->
+    let x = `Assoc [("id", `Int player);
     ("rank", `Int rank);] in
     get_winner (x::outlst) t in *)
 
@@ -560,13 +561,13 @@ let save st =
            [`Assoc
               [("pot", `Int st.table.pot);
                ("blind", `Int st.table.blind);
-               ("participants", 
-                `List 
+               ("participants",
+                `List
                   participants_json);
               ]
            ]);
-        ("board", 
-         `List 
+        ("board",
+         `List
            (get_cards_int [] st.table.board);
         );
         ("player_turn", `Int st.player_turn);
@@ -574,7 +575,7 @@ let save st =
         ("players_in", `List (List.map (fun x -> `Int x) st.players_in));
         ("players_played", `List (List.map (fun x -> `Int x) st.players_played));
         ("bet", `List
-           [ 
+           [
              `Assoc [
                ("bet_player", `Int st.bet.bet_player);
                ("bet_amount", `Int st.bet.bet_amount);
@@ -583,15 +584,15 @@ let save st =
              ];
            ]);
         ("avail_action", `List (List.map (fun x -> `String x) st.avail_action));
-        ("winner", `Assoc [("player", `Int (fst st.winner)); 
+        ("winner", `Assoc [("player", `Int (fst st.winner));
                            ("rank", `Int (snd st.winner))]);
       ]
   );
   Legal st
 
-let load json = 
+let load json =
 
-  let card_inverter card_int = 
+  let card_inverter card_int =
     let offset = match card_int mod 4 with
       | 0 -> Clubs
       | 1 -> Diamonds
