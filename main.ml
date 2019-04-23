@@ -110,7 +110,7 @@ let play_game st =
   let rec keep_playing st =
     let winning_id = State.winning_player st in
     if (fst winning_id) >= 0 then
-      let string = "The winner is player " ^ string_of_int (fst winning_id)
+      let string = "The winner is " ^ (State.find_participant st (fst winning_id)).name
                    ^ " with " ^ Hand_evaluator.rank_mapper (snd winning_id) ^ "!" in
       ANSITerminal.(print_string [yellow] string);
       print_newline ();
