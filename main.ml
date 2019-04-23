@@ -3,6 +3,12 @@ open Hand_evaluator
 open Montecarlo
 open Avatar
 
+
+let clear_screen () =
+  match Sys.command "clear" with
+  | 0 -> ()
+  | _ -> exit 2
+
 let rec read_integer prompt_str ?(condition=((fun x -> true), "Number does not satisfy conditions.")) () =
   let retry error_str () =
     print_newline ();
@@ -84,10 +90,9 @@ let print_players_in st =
     print_newline ()
   )
 
-let print_table (st:State.t) = 
-  print_single_player st ;
-  print_endline "----------------------------------------------------------";
-  print_endline ""
+let print_table (st:State.t) =
+  (*print_single_player st ;*)
+  print_hline ()
 
 let print_player_bets st =
   let lst = State.bet_paid_amt st in
@@ -142,6 +147,8 @@ let play_game st =
   print_intro ();
 
   let rec keep_playing st =
+    clear_screen ();
+
     if (fst (State.winning_player st)) >= 0 then
       (
         print_hline ();
