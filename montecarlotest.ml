@@ -8050,26 +8050,42 @@ let seven_list_eval hand =
 
 (* [community_card_fill base_cards used] returns a random number of  *)
 let community_card_fill base_cards used = 
-  let number = 5 - List.length (base_cards) in
-  let required_cards = pick_new number used in
+  let number_needed = 5 - List.length (base_cards) in
+  let required_cards = pick_new number_needed used in
   base_cards @ required_cards
 
+(* PyPoker Engine stuff *)
 let montecarlo_simulation num_players hole board =
-  let used = hole @ board in
-  let community_card = community_card_fill board used in
-  let unused_card = pick_new ((num_players - 1) * 2) used in 
+  let community_card = community_card_fill board (hole @ board) in
+  let unused_card = pick_new ((num_players - 1) * 2) (hole @ community_card) in 
   let rec hand_builder current_hand count hand_list card_list = match card_list with
     |  [] -> List.rev hand_list
-    | h :: t  when count = 2 -> hand_builder [] 0 (current_hand :: hand_list) t
+    | h :: t  when count = 1 -> let new_hand = h :: current_hand in
+      hand_builder [] 0 (new_hand :: hand_list) t
     | h :: t -> hand_builder (h :: current_hand) (count + 1) hand_list t in
   let opponent_hands = hand_builder [] 0 [] unused_card in
   let rec opponent_rank_builder outlist hand_list = match hand_list with
     | [] -> List.rev outlist
     | h :: t -> let hand_score = seven_list_eval (h @ community_card) in
+     (*
+      print_string "opponent hand score";
+      print_int hand_score;
+      print_newline (); *)
       opponent_rank_builder (hand_score :: outlist) t in
   let opponent_rank = opponent_rank_builder [] opponent_hands in
-  let min_opponent_rank = List.fold_left (fun accu elem -> min accu elem) 7463 opponent_rank in
+  (*
+  print_int (List.length opponent_rank);
+  *)
+  let min_opponent_rank = List.fold_left (fun accu elem -> (* print_int elem; print_newline(); *) min accu elem) 7463 opponent_rank in
+  (*
+  print_string "min oppoent rank";
+  print_int min_opponent_rank;
+  print_newline (); *)
   let my_score = seven_list_eval (hole @  community_card) in
+  (*
+  print_string "my score";
+  print_int my_score;
+  print_newline (); *)
   if my_score < min_opponent_rank then 1.0 else 0.0
 
 (* estimate_win_rate *)
