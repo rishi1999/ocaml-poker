@@ -47,6 +47,27 @@ let pick_new number used =
     | h :: t -> list_builder (count - 1) (h :: outlist) t in
   List.rev (list_builder number [] shuffled_new)
 
+let const_int_deck =  [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 
+                       16; 17; 18; 19; 20; 21; 22; 23; 24; 25; 26; 27; 28; 
+                       29; 30; 31; 32; 33; 34; 35; 36; 37; 38; 39; 40; 41; 
+                       42; 43; 44; 45; 46; 47; 48;49; 50; 51]
+
+
+let pick_efficient number used = 
+  let new_deck = List.filter (fun x -> not (List.mem x used)) const_int_deck in
+  let shuffle_list compare list =
+    Random.self_init();
+    let tagged_list = List.map (fun card -> (card, Random.bits())) list in
+    let sorted_tags = List.sort compare tagged_list in
+    List.map fst sorted_tags in
+  let compare_second a b = Pervasives.compare (snd a) (snd b) in
+  let shuffled_new = shuffle_list compare_second new_deck in
+  let rec list_builder count outlist a = match a with
+    | [] -> outlist
+    | h :: t when count = 0 -> outlist
+    | h :: t -> list_builder (count - 1) (h :: outlist) t in
+  List.rev (list_builder number [] shuffled_new)
+
 
 (** [shuffle_deck ()] shuffles the cards currently in the deck. *)
 let shuffle_deck () =
