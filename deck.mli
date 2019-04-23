@@ -21,3 +21,7 @@ val update_state : card list -> unit
 val deck_init : unit -> unit
 
 val int_converter : card -> int
+
+val pick_new : int -> (suit * rank) list -> (suit * rank) list
+
+val pick_efficient : int -> int list -> int list

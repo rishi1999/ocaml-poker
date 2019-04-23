@@ -7,6 +7,8 @@ type command =
   | Bet of bet_amount
   | Raise of bet_amount
   | Stack
+  | Save
+  | Show
   | Quit
 
 exception Empty
@@ -17,6 +19,8 @@ exception Malformed
     Requires: command is a valid command
     Example: [command_to_string Check] is "checked!" *)
 let command_to_string = function
+  | Show -> ""
+  | Save -> "saved!"
   | Check -> "checked!"
   | Fold -> "folded!"
   | Call -> "called!"
@@ -56,7 +60,8 @@ let parse str =
   else
     let head = List.hd list_without_spaces in
     let tail = List.tl list_without_spaces in
-    let standalone_commands = ["fold"; "call";"quit";"stack";"check"] in
+    let standalone_commands = ["fold"; "call";"quit";"stack";
+    "show";"check"; "save"] in
     let phrase_commands = ["bet";"raise"] in
     if List.length tail > 1 then raise Malformed
     else
@@ -66,7 +71,8 @@ let parse str =
     else if head = "stack" then Stack
     else if head = "fold" then Fold
     else if head = "call" then Call
-    (* else if head = "save" then Save *)
+    else if head = "show" then Show
+    else if head = "save" then Save
     else if head = "bet" then Bet (tail |> List.hd |> int_of_string)
     else if head = "raise" then Raise (tail |> List.hd |> int_of_string)
     else if head = "quit" then Quit

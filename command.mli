@@ -10,8 +10,9 @@ type command =
   | Bet of bet_amount
   | Raise of bet_amount
   | Stack
+  | Save
+  | Show
   | Quit
-  (* | Save *)
 
 exception Empty
 exception Malformed

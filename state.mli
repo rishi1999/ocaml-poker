@@ -149,12 +149,12 @@ type move_result =
   | Illegal of string
 
 (** [check st] is the result of the player calling the check command.
-    Requires: valid state [st]. 
+    Requires: valid state [st].
     Example: [check st] is [st] with it being the next player's turn. *)
 val check : t -> move_result
 
 (** [call st] is the result of the player calling the call command.
-    Requires: valid state [st]. 
+    Requires: valid state [st].
     Example: [call st] is [st] with the player's bet raised
     to the current bet amount. *)
 val call : t -> move_result
@@ -165,11 +165,11 @@ val call : t -> move_result
     from the hand. *)
 val fold : t -> move_result
 
-(** [stack st] is the result of the player calling the stack command.
+(*(** [stack st] is the result of the player calling the stack command.
     Requires: valid state [st].
     Example: [stack st] is [st] with three 500s printed to the console
     if there are three players in the hand with $500 each. *)
-val stack : t -> move_result
+  val stack : t -> move_result*)
 
 (** [command_to_function comm] is the function in State
     associated with the command [comm].
@@ -192,9 +192,20 @@ val winner : t -> (Player.player*int)
     Requires: valid state [st]. *)
 val get_avail_action : t -> t
 
+(** [calculate_pay_amt] st returns the amount that the current player has
+    to put into the pot to call either a bet or a raise *)
+val calculate_pay_amt : t -> int
+
 (** [find_participant] st target returns a type Player.player of a player that
     has an id of target. *)
 val find_participant : t -> int -> Player.player
+
+(** [find_stack id st] is the amount of money that the player 
+    with id [id] has in state [st]. 
+    Requires: valid state [st], valid player id [id].
+    Example: [find_stack 2 st] is the amount of money that the big blind has
+    in the given state [st]. *)
+val find_stack : int -> Player.player list -> int
 
 (** [bet_or_raise] amt st comm_str returns a state where the player has
     bet or raised, according to the string comm_str and returns the next state
