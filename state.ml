@@ -299,7 +299,8 @@ let has_everyone_played st =
     ready to move on to the next round. *)
 let is_round_complete st =
   if List.length st.table.board = 0 then
-    if st.player_turn = fst (List.nth st.bet.bet_paid_amt 1) then
+    if List.length st.bet.bet_paid_amt > 1 &&
+       st.player_turn = fst (List.nth st.bet.bet_paid_amt 1) then
       not (st.bet.bet_amount = st.table.blind ) && are_all_bets_equal st
     else
       (are_all_bets_equal st &&
