@@ -31,6 +31,23 @@ let prompt str =
   print_endline str;
   ANSITerminal.(print_string [blue] "> ")
 
+let rec read_integer prompt_str
+    ?(condition=((fun x -> true),
+                 "Number does not satisfy conditions.")) () =
+  let retry error_str () =
+    print_newline ();
+    print_string error_str;
+    read_integer prompt_str ~condition () in
+  prompt prompt_str;
+
+  let input = read_line () in
+  if input = "quit" then exit 0;
+  let num = try int_of_string input with
+    | Failure _ ->
+      retry "Please enter an integer value." () in
+  if fst condition num then num else retry (snd condition) ()
+
+
 (** [get_next_player] st returns the id of the player that has
     to act next.
     Requires: st.players_in is not an empty list *)
