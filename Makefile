@@ -1,4 +1,4 @@
-MODULES= authors deck player table command main hashone \
+MODULES= authors avatar deck player table command main hashone \
 	tableflush hand_evaluator constantarrays state card montecarlo
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
