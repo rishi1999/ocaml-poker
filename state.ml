@@ -299,12 +299,15 @@ let has_everyone_played st =
     ready to move on to the next round. *)
 let is_round_complete st =
   if List.length st.table.board = 0 then
-    if List.length st.bet.bet_paid_amt > 1 &&
-       st.player_turn = fst (List.nth st.bet.bet_paid_amt 1) then
-      not (st.bet.bet_amount = st.table.blind ) && are_all_bets_equal st
+    if List.length st.bet.bet_paid_amt > 1 then if
+      st.player_turn = fst (List.nth st.bet.bet_paid_amt 1) then
+        not (st.bet.bet_amount = st.table.blind ) && are_all_bets_equal st
+
+      else (are_all_bets_equal st &&
+            has_everyone_played st)
     else
-      (are_all_bets_equal st &&
-       has_everyone_played st)
+      are_all_bets_equal st &&
+      has_everyone_played st
   else
     are_all_bets_equal st &&
     has_everyone_played st
@@ -360,7 +363,17 @@ let winner st =
     returns the state with the next round. *)
 let go_next_round st =
   if is_hand_complete st then
+
+    let _ = "ignore" in
+    print_endline "If this is the only debug message printed,
+                   there is a bug in the next line of code
+                   (in State.go_next_round).";
+
     let winner_pl = fst (winner st) in
+
+    print_endline "If this message was printed,
+    you have fixed the bug -- congrats!";
+
     let hand_quality = snd (winner st) in
 
     let winner_pl = {
