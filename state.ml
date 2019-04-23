@@ -137,10 +137,10 @@ let init_players num_players money =
     | id when id > num_players -> acc
     | id ->
       prompt ("Enter player " ^ (string_of_int) id ^ "'s name.");
-      let input = read_line () in
-      ANSITerminal.(print_string [ANSITerminal.black; Background White] array_choice);
-      prompt ("Choose player " ^ (string_of_int) id ^ "'s avatar.");
-      let rec get_int_id () = 
+      let name = read_line () in
+      ANSITerminal.(print_string [ANSITerminal.default] array_choice);
+      prompt ("Choose " ^ name ^ "'s avatar.");
+      let rec get_int_id () =
         try
           let input = read_line () in
           if input = "quit" then exit 0 else
@@ -154,7 +154,6 @@ let init_players num_players money =
         if avatar_int_id <= 10 && avatar_int_id >= 1 then avatar_int_id
         else get_int_id () in
       let valid_id = get_valid_id () - 1 in
-      let name = input in
       let curr_player =
         {
           id;
