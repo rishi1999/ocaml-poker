@@ -343,11 +343,18 @@ let winner st =
 let go_next_round st =
   if is_hand_complete st then
     let winner_pl_id = try (fst (winner st)).id with Tie -> -2 in
+    let hand_quality = snd (winner st) in
     let winner_pl' = find_participant st winner_pl_id in
     let winner_pl = {
       winner_pl' with
       money = winner_pl'.money + st.table.pot
     } in
+
+    let string = "The winner is " ^ winner_pl.name
+                 ^ " with " ^ Hand_evaluator.rank_mapper hand_quality ^ "!" in
+    ANSITerminal.(print_string [yellow] string);
+    print_newline ();
+    print_newline ();
 
     let participants =
       let rec update_player target new_player acc = function
