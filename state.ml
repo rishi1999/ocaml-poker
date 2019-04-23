@@ -149,7 +149,7 @@ let init_players num_players money =
         | Failure _ -> print_endline "Please enter a valid integer from 1 - 10";
           prompt ("Choose player " ^ (string_of_int) id ^ "'s avatar.");
           get_int_id (); in
-      let rec get_valid_id () = 
+      let rec get_valid_id () =
         let avatar_int_id = get_int_id () in
         if avatar_int_id <= 10 && avatar_int_id >= 1 then avatar_int_id
         else get_int_id () in
@@ -743,19 +743,12 @@ let load json =
 
   parse json
 
-let show st =
-  print_endline "Your hand is: ";
-  Card.card_printer (Player.cards (find_participant st
-                                     (st.player_turn)));
-  Legal st
-
 let command_to_function = Command.(function
     | Check -> check
     | Bet amt -> bet' amt
     | Call -> call
     | Raise amt -> raise' amt
     | Fold -> fold
-    | Show -> show
     | Save -> save
     | _ -> failwith "ERROR: unsupported command"
   )

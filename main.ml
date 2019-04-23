@@ -118,7 +118,7 @@ let print_current_state st =
     print_string [yellow] (Player.name player);
     print_string [yellow] "'s turn";
     print_newline ();
-    print_string [black; Background White] 
+    print_string [black; Background White]
       (avatar_array.(Player.avatar_id player));
     print_string [yellow] "Wins: ";
     print_string [yellow] (string_of_int player.wins);
@@ -232,6 +232,14 @@ let play_game st =
           keep_playing st
 
         | Quit -> exit 0
+
+        | Show ->
+          clear_screen ();
+          print_endline "Your hand is: ";
+          Card.card_printer (Player.cards (State.find_participant st
+                                             (st.player_turn)));
+          let _ = read_line () in
+          keep_playing st
 
         | comm ->
           let func = State.command_to_function comm in
