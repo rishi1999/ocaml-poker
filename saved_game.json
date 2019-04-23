@@ -1,13 +1,1 @@
-{"game_type":0,
-  "num_players":2,
-  "table":[{"pot":7,"blind":5,
-    "participants":[{"id":2,"card1":30,"card2":25,"money":495},
-      {"id":1,"card1":36,"card2":15,"money":498}]}],
-      "board":[],
-  "player_turn":1,
-  "button":2,
-"players_in":[1,2],
-"players_played":[1,2],
-"bet":[{"bet_player":2,"bet_amount":5,"bet_paid_amt":[{"id":2,"paid":5},{"id":1,"paid":2}]}],
-"avail_action":["call","raise","fold"],
-"winner":[-1]}
+{"game_type":0,"num_players":3,"table":{"pot":15,"blind":5,"participants":[{"id":1,"name":"Mike","card1":4,"card2":41,"money":495,"avatar_id":1,"wins":0,"losses":0,"consecutive_wins":0,"orig_id":1},{"id":2,"name":"John","card1":49,"card2":2,"money":495,"avatar_id":3,"wins":0,"losses":0,"consecutive_wins":0,"orig_id":3},{"id":3,"name":"Pablo","card1":33,"card2":37,"money":495,"avatar_id":3,"wins":0,"losses":0,"consecutive_wins":0,"orig_id":3}],"board":[47,18,31,9]},"player_turn":1,"button":3,"players_in":[1,2,3],"players_played":[],"bet":{"bet_player":0,"bet_amount":0,"bet_paid_amt":[{"id":1,"paid":0},{"id":2,"paid":0},{"id":3,"paid":0}]},"avail_action":["check","bet","fold","show"],"winner":{"player":-1,"rank":0}}
