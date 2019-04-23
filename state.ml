@@ -348,22 +348,26 @@ let go_next_round st =
       winner_pl' with
       money = winner_pl'.money + st.table.pot
     } in
-    let rec update_player target new_player acc = function
-      | [] -> acc
-      | h :: t -> if h.id = target then
-          update_player target new_player (new_player :: acc) t
-        else update_player target new_player (h :: acc) t in
+
     let participants =
+      let rec update_player target new_player acc = function
+        | [] -> acc
+        | h :: t -> if h.id = target then
+            update_player target new_player (new_player :: acc) t
+          else update_player target new_player (h :: acc) t in
       update_player winner_pl_id winner_pl [] st.table.participants in
+
     let table = {
       st.table with
       participants;
     } |> Table.clear_round in
+
     let button = if st.button + 1 > st.num_players then 1
       else st.button + 1 in
+
     let players_in = hand_order st.num_players button in
 
-    let interim_state = {
+    {
       st with
       table = Table.deal (table);
       bet = init_bet players_in;
@@ -372,8 +376,10 @@ let go_next_round st =
       players_in = players_in;
       players_played = [];
       winner = (winner_pl_id, (snd (winner st)));
-    } in
-    interim_state |> filter_busted_players |> pay_blinds |> get_avail_action
+    }
+
+    |> filter_busted_players |> pay_blinds |> get_avail_action
+
   else
     {
       st with
