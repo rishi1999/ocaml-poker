@@ -561,44 +561,45 @@ let raise' amt st = bet_or_raise amt st "raise"
 (* SAVE / LOAD NEEDS IMPLEMENTATION *)
 
 
-(* game_type: int;
-   num_players: int;
-   table: Table.table;
-   player_turn: int;
-   button: int;
-   players_in: int list;
-   players_played: int list;
-   bet: bet;
-   avail_action: string list;
-   winner : int; *)
+(* type t = {
+  game_type: int;
+  num_players: int;
+  table: Table.table;
+  player_turn: int;
+  button: int;
+  players_in: int list;
+  players_played: int list;
+  bet: bet;
+  avail_action: string list;
+  winner : (int*int);
+} *)
 
 (* type table = {
-   pot: int;
-   blind: int;
-   participants: Player.player list;
-   board: (Deck.suit * Deck.rank) list;
-   } *)
-
-(* type player =
-   {
-    id: int;
-    cards: (Deck.suit * Deck.rank) list;
-    money: int;
-   } *)
+  pot: int;
+  blind: int;
+  participants: Player.player list;
+  board: Deck.card list;
+} *)
 
 (* type bet = {
-   bet_player: int;
-   bet_amount: int;
-   bet_paid_amt: (int*int) list;
-   } *)
+  bet_player: int;
+  bet_amount: int;
+  bet_paid_amt: (int*int) list;
+} *)
 
 let save st =
   let rec get_participants outlst = function
     | [] -> outlst
     | h::t -> let x = `Assoc [("id", `Int h.id);
+                              ("name", `String h.name);
                               ("card1", `Int (Deck.int_converter (List.hd h.cards)));
                               ("card2", `Int (Deck.int_converter (List.hd (List.tl h.cards))));
                               ("money", `Int h.money);
+                              ("avatar_id", `Int h.avatar_id);
+                              ("wins", `Int h.wins);
+                              ("losses", `Int h.losses);
+                              ("consecutive_wins", `Int h.consecutive_wins);
+                              ("orig_id", `Int h.orig_id);
                              ] in
       get_participants (x::outlst) t in
 
@@ -612,17 +613,9 @@ let save st =
                                           ("paid", `Int paid);
                                          ] in
       get_bet_amt (x::outlst) t in
-  (*
-  let rec get_winner outlst = function
-  | [] -> outlst
-  | (player, rank) :: t ->
-    let x = `Assoc [("id", `Int player);
-    ("rank", `Int rank);] in
-    get_winner (x::outlst) t in *)
 
   let participants_json = get_participants [] st.table.participants in
   let bet_amt = get_bet_amt [] st.bet.bet_paid_amt in
-  (* let winners = get_winner [] st.winner in *)
 
   Yojson.to_file "saved_game.json" (
     `Assoc
@@ -630,33 +623,27 @@ let save st =
         ("game_type", `Int st.game_type);
         ("num_players", `Int st.num_players);
         ("table",
-         `List
-           [`Assoc
+           `Assoc
               [("pot", `Int st.table.pot);
                ("blind", `Int st.table.blind);
-               ("participants",
-                `List
-                  participants_json);
-              ]
-           ]);
-        ("board",
-         `List
-           (get_cards_int [] st.table.board);
-        );
+               ("participants", `List (List.rev participants_json));
+               ("board", `List (List.rev (get_cards_int [] st.table.board)));
+              ]);
         ("player_turn", `Int st.player_turn);
         ("button", `Int st.button);
         ("players_in", `List (List.map (fun x -> `Int x) st.players_in));
-        ("players_played", `List (List.map (fun x -> `Int x) st.players_played));
-        ("bet", `List
-           [
-             `Assoc [
+        ("players_played", 
+          `List (List.map (fun x -> `Int x) st.players_played));
+        ("bet",
+             `Assoc 
+             [
                ("bet_player", `Int st.bet.bet_player);
                ("bet_amount", `Int st.bet.bet_amount);
-               ("bet_paid_amt", `List bet_amt
-               );
+               ("bet_paid_amt", `List (List.rev bet_amt));
              ];
-           ]);
-        ("avail_action", `List (List.map (fun x -> `String x) st.avail_action));
+        );
+        ("avail_action", 
+          `List (List.map (fun x -> `String x) st.avail_action));
         ("winner", `Assoc [("player", `Int (fst st.winner));
                            ("rank", `Int (snd st.winner))]);
       ]
@@ -691,18 +678,17 @@ let load json =
 
     (offset, rank) in
 
-
   let participants_of_json json = {
     id = json |> member "id" |> to_int;
     cards = [(json |> member "card1" |> to_int |> card_inverter);
              (json |> member "card2" |> to_int |> card_inverter);];
-    name = "Default";
+    name = json |> member "name" |> to_string;
     money = json |> member "money" |> to_int;
-    wins = 0;
-    losses = 0;
-    avatar_id = -1;
-    consecutive_wins = 0;
-    orig_id = -1;
+    wins = json |> member "wins" |> to_int;
+    losses = json |> member "losses" |> to_int;
+    avatar_id = json |> member "avatar_id" |> to_int;
+    consecutive_wins = json |> member "consecutive_wins" |> to_int;
+    orig_id = json |> member "orig_id" |> to_int;
   } in
 
   let bet_paid_of_json json =
@@ -728,6 +714,12 @@ let load json =
             |> List.map card_inverter;
   } in
 
+  let winner_of_json json = 
+    let player = json |> member "player" |> to_int in
+    let rank =  json |> member "rank" |> to_int in
+    (player,rank)
+  in
+
   let t_of_json json = {
     game_type = json |> member "game_type" |> to_int;
     num_players = json |> member "num_players" |> to_int;
@@ -739,8 +731,9 @@ let load json =
     players_played = json |> member "players_played" |> to_list
                      |> List.map (fun x -> to_int x);
     bet = json |> member "bet" |> bet_of_json;
-    avail_action = [];
-    winner = (json |> member "winner" |> to_int, 0);
+    avail_action = json |> member "avail_action" |> to_list
+                        |> List.map (fun x -> to_string x);
+    winner = json |> member "winner" |> winner_of_json;
   } in
 
   let parse json =

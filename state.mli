@@ -220,3 +220,5 @@ val bet_or_raise : int -> t -> string -> move_result
 (** [pay_blinds st] is the state [st] with players having payed blinds
     Requires: st is a valid state*)
 val pay_blinds : t -> t
+
+val load : Yojson.Basic.json -> t
