@@ -109,6 +109,16 @@ let seven_list_eval hand =
   let g = Deck.int_converter (List.nth hand 6) in
   seven_eval a b c d e f g
 
+let seven_int_list_eval hand = 
+  let a = List.nth hand 0 in
+  let b = List.nth hand 1 in
+  let c = List.nth hand 2 in
+  let d = List.nth hand 3 in
+  let e = List.nth hand 4 in
+  let f = List.nth hand 5 in
+  let g = List.nth hand 6 in
+  seven_eval a b c d e f g
+
 
 (** [rank_mapper rank_val] returns the general name of the rank of a hand that 
     has been mapped to [rank_val] using the evaluator function for the hand.
