@@ -2,20 +2,19 @@ open Card
 open Hand_evaluator
 open Montecarlo
 
-let rec read_integer prompt_str ?(condition=(fun x -> true)) () =
-  let retry () =
+let rec read_integer prompt_str ?(condition=((fun x -> true), "Number does not satisfy conditions.")) () =
+  let retry error_str () =
     print_newline ();
-    print_string "Invalid amount.";
+    print_string error_str;
     read_integer prompt_str ~condition () in
   State.prompt prompt_str;
 
   let input = read_line () in
-  if input = "quit" then exit 0
-  else
-    let num = try int_of_string input with
-      | Failure _ ->
-        retry () in
-    if condition num then num else retry ()
+  if input = "quit" then exit 0;
+  let num = try int_of_string input with
+    | Failure _ ->
+      retry "Please enter an integer value." () in
+  if fst condition num then num else retry (snd condition) ()
 
 let print_hline () =
   for i = 1 to 100 do
@@ -221,7 +220,7 @@ let play_game st =
           match func st with
           | Legal t ->
             print_newline ();
-            print_endline (Command.command_to_string comm);
+            (*print_endline (Command.command_to_string comm);*)
             print_newline ();
             keep_playing (State.get_avail_action t)
           | Illegal str->
@@ -236,10 +235,13 @@ let play_game st =
     Requires: integer amount of players [num_players].
     Example: [init_game 3] initializes a game with 3 players. *)
 let init_game num_players =
-  let money = read_integer "Starting stack amount?"
-      ~condition:(fun x -> x >= 10 && x <= 5000) () in
-  let blind = read_integer "Blind amount?"
-      ~condition:(fun x -> x >= 2 && x <= money / 10) () in
+  let money = read_integer "Starting stack amount? ($)"
+      ~condition:((fun x -> x >= 20 && x <= 5000), "Min: 20; Max: 5000.") () in
+  let blind_max = money / 10 in
+  let blind = read_integer "Blind amount? ($)"
+      ~condition:((fun x -> x >= 2 && x <= blind_max),
+                  "Min: 2; Max: " ^ (string_of_int blind_max) ^ ".")
+      () in
   let st = match num_players with
     | 1 -> State.prompt "Difficulty of AI? (easy, medium, hard)";
       (
@@ -265,7 +267,7 @@ let main () =
   print_newline ();
 
   read_integer "How many (human) players are there?"
-    ~condition:(fun x -> x > 0 && x <= 10) ()
+    ~condition:((fun x -> x > 0 && x <= 10), "Min: 1; Max: 10.") ()
 
   |> init_game
 
