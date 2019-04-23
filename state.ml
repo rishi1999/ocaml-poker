@@ -22,6 +22,7 @@ type t = {
   avail_action: string list;
   winner : (int*int);
 }
+
 exception Tie
 
 let prompt str =
@@ -135,7 +136,9 @@ let init_players num_players money =
     | id when id > num_players -> acc
     | id ->
       prompt ("Enter player " ^ (string_of_int) id ^ "'s name.");
-      let name = read_line () in
+      let input = read_line () in
+      if input = "quit" then exit 0;
+      let name = input in
       let curr_player =
         {
           id;
@@ -199,6 +202,20 @@ let get_avail_action st =
               print_endline
                 "Not enough players remaining with sufficient funds.";
               print_newline ();
+
+              let lst = st.table.participants in
+
+              List.iter
+                (fun x ->
+                   print_endline
+
+                     ((find_participant st x.id).name ^ " ended with $" ^
+                      (string_of_int (find_stack x.id st.table.participants)) ^
+                      "!");
+                ) lst;
+              print_newline ();
+
+
               ANSITerminal.(print_string [yellow] "Game Over!");
               print_newline ();
               print_newline ();
@@ -342,38 +359,54 @@ let winner st =
     returns the state with the next round. *)
 let go_next_round st =
   if is_hand_complete st then
-    let winner_pl_id = try (fst (winner st)).id with Tie -> -2 in
-    let winner_pl' = find_participant st winner_pl_id in
+    let winner_pl = fst (winner st) in
+    let hand_quality = snd (winner st) in
+
     let winner_pl = {
-      winner_pl' with
-      money = winner_pl'.money + st.table.pot
+      winner_pl with
+      money = winner_pl.money + st.table.pot
     } in
-    let rec update_player target new_player acc = function
-      | [] -> acc
-      | h :: t -> if h.id = target then
-          update_player target new_player (new_player :: acc) t
-        else update_player target new_player (h :: acc) t in
+
+    let string = "The winner is " ^ winner_pl.name
+                 ^ " with " ^ Hand_evaluator.rank_mapper hand_quality ^ "!" in
+    print_newline ();
+    ANSITerminal.(print_string [yellow] string);
+    print_newline ();
+    print_newline ();
+
+    let winner_pl_id = winner_pl.id in
+
     let participants =
+      let rec update_player target new_player acc = function
+        | [] -> acc
+        | h :: t -> if h.id = target then
+            update_player target new_player (new_player :: acc) t
+          else update_player target new_player (h :: acc) t in
       update_player winner_pl_id winner_pl [] st.table.participants in
+
     let table = {
       st.table with
       participants;
     } |> Table.clear_round in
+
     let button = if st.button + 1 > st.num_players then 1
       else st.button + 1 in
+
     let players_in = hand_order st.num_players button in
 
-    let interim_state = {
+    {
       st with
-      table = Table.deal (table);
+      table = Table.deal table;
       bet = init_bet players_in;
       player_turn = List.nth players_in 0;
-      button = button;
-      players_in = players_in;
+      button;
+      players_in;
       players_played = [];
-      winner = (winner_pl_id, (snd (winner st)));
-    } in
-    interim_state |> filter_busted_players |> pay_blinds |> get_avail_action
+      winner = (winner_pl_id, hand_quality);
+    }
+
+    |> filter_busted_players |> pay_blinds |> get_avail_action
+
   else
     {
       st with
