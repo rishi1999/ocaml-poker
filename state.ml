@@ -200,6 +200,20 @@ let get_avail_action st =
               print_endline
                 "Not enough players remaining with sufficient funds.";
               print_newline ();
+
+              let lst = st.table.participants in
+
+              List.iter
+                (fun x ->
+                   print_endline
+
+                     ((find_participant st x.id).name ^ " ended with $" ^
+                      (string_of_int (find_stack x.id st.table.participants)) ^
+                      "!");
+                ) lst;
+              print_newline ();
+
+
               ANSITerminal.(print_string [yellow] "Game Over!");
               print_newline ();
               print_newline ();
@@ -355,6 +369,8 @@ let go_next_round st =
                  ^ " with " ^ Hand_evaluator.rank_mapper hand_quality ^ "!" in
     print_newline ();
     ANSITerminal.(print_string [yellow] string);
+    print_newline ();
+    print_newline ();
 
     let winner_pl_id = winner_pl.id in
 

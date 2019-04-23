@@ -197,7 +197,7 @@ let play_game st =
           match func st with
           | Legal t ->
             print_newline ();
-            print_endline (Command.command_to_string comm);
+            (*print_endline (Command.command_to_string comm);*)
             print_newline ();
             keep_playing (State.get_avail_action t)
           | Illegal str->
