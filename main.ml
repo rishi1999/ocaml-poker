@@ -9,20 +9,6 @@ let clear_screen () =
   | 0 -> ()
   | _ -> exit 2
 
-let rec read_integer prompt_str ?(condition=((fun x -> true), "Number does not satisfy conditions.")) () =
-  let retry error_str () =
-    print_newline ();
-    print_string error_str;
-    read_integer prompt_str ~condition () in
-  State.prompt prompt_str;
-
-  let input = read_line () in
-  if input = "quit" then exit 0;
-  let num = try int_of_string input with
-    | Failure _ ->
-      retry "Please enter an integer value." () in
-  if fst condition num then num else retry (snd condition) ()
-
 let print_hline () =
   for i = 1 to 100 do
     print_char '-'
@@ -118,7 +104,7 @@ let print_current_state st =
     print_string [yellow] (Player.name player);
     print_string [yellow] "'s turn";
     print_newline ();
-    print_string [black; Background White]
+    print_string [default]
       (avatar_array.(Player.avatar_id player));
     print_string [yellow] "Wins: ";
     print_string [yellow] (string_of_int player.wins);
@@ -253,6 +239,7 @@ let play_game st =
             print_newline ();
             print_endline str;
             print_newline ();
+            Unix.sleep 2;
             keep_playing (State.get_avail_action st)
   in
   keep_playing st
@@ -261,10 +248,10 @@ let play_game st =
     Requires: integer amount of players [num_players].
     Example: [init_game 3] initializes a game with 3 players. *)
 let init_game num_players =
-  let money = read_integer "Starting stack amount? ($)"
+  let money = State.read_integer "Starting stack amount? ($)"
       ~condition:((fun x -> x >= 20 && x <= 5000), "Min: 20; Max: 5000.") () in
   let blind_max = money / 10 in
-  let blind = read_integer "Blind amount? ($)"
+  let blind = State.read_integer "Blind amount? ($)"
       ~condition:((fun x -> x >= 2 && x <= blind_max),
                   "Min: 2; Max: " ^ (string_of_int blind_max) ^ ".")
       () in
@@ -295,7 +282,7 @@ let load_or_playnew value =
       play_game loaded_game
     )
   else
-    read_integer "How many (human) players are there?"
+    State.read_integer "How many (human) players are there?"
       ~condition:((fun x -> x > 0 && x <= 10), "Min: 1; Max: 10.") ()
 
     |> init_game
@@ -308,7 +295,7 @@ let main () =
   ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
   print_newline ();
 
-  read_integer "Load or Play Game? Load: 0 Play: 1"
+  State.read_integer "Load or Play Game? Load: 0 Play: 1"
     ~condition:((fun x -> x >= 0 && x <= 1), "Load: 0, Play: 1.") ()
   |> load_or_playnew
     

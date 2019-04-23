@@ -31,6 +31,23 @@ let prompt str =
   print_endline str;
   ANSITerminal.(print_string [blue] "> ")
 
+let rec read_integer prompt_str
+    ?(condition=((fun x -> true),
+                 "Number does not satisfy conditions.")) () =
+  let retry error_str () =
+    print_newline ();
+    print_string error_str;
+    read_integer prompt_str ~condition () in
+  prompt prompt_str;
+
+  let input = read_line () in
+  if input = "quit" then exit 0;
+  let num = try int_of_string input with
+    | Failure _ ->
+      retry "Please enter an integer value." () in
+  if fst condition num then num else retry (snd condition) ()
+
+
 (** [get_next_player] st returns the id of the player that has
     to act next.
     Requires: st.players_in is not an empty list *)
@@ -137,10 +154,10 @@ let init_players num_players money =
     | id when id > num_players -> acc
     | id ->
       prompt ("Enter player " ^ (string_of_int) id ^ "'s name.");
-      let input = read_line () in
-      ANSITerminal.(print_string [ANSITerminal.black; Background White] array_choice);
-      prompt ("Choose player " ^ (string_of_int) id ^ "'s avatar.");
-      let rec get_int_id () = 
+      let name = read_line () in
+      ANSITerminal.(print_string [ANSITerminal.default] array_choice);
+      prompt ("Choose " ^ name ^ "'s avatar.");
+      let rec get_int_id () =
         try
           let input = read_line () in
           if input = "quit" then exit 0 else
@@ -154,7 +171,6 @@ let init_players num_players money =
         if avatar_int_id <= 10 && avatar_int_id >= 1 then avatar_int_id
         else get_int_id () in
       let valid_id = get_valid_id () - 1 in
-      let name = input in
       let curr_player =
         {
           id;
