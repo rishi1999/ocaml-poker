@@ -244,7 +244,8 @@ let get_avail_action st =
                    print_endline
 
                      ((find_participant st x.id).name ^ " ended with $" ^
-                      (string_of_int (find_stack x.id st.table.participants)) ^
+                      (string_of_int ((find_stack x.id st.table.participants)
+                      + st.table.blind*3/2)) ^
                       "!");
                 ) lst;
               print_newline ();
@@ -284,12 +285,18 @@ let filter_busted_players st =
   let rec helper outlst = function
     | [] -> outlst
     | h::t ->
-      let player_money = (find_participant st h).money in
-      if player_money > 0 then helper (h::outlst) t
+      if h.money > 0 then helper (h::outlst) t
       else
         helper (outlst) t in
+  
+  let updated_participants = List.rev (helper [] st.table.participants) in
+  let updated_table =
+  {
+    st.table with
+    participants = updated_participants;
+  } in
   {st with
-   players_in = List.rev (helper [] st.players_in)}
+    table = updated_table}
 
 let init_state game_type num_players money blind =
   {
@@ -397,11 +404,12 @@ let go_next_round st =
       ) winner_pls in
 
     let celebration_str = if num_winners = 1 then
-        "The winner is " ^ (List.hd winner_pls).name
+        (List.hd winner_pls).name ^ " wins $" ^ string_of_int profit
         ^ " with " ^ Hand_evaluator.rank_mapper (List.hd hand_qualities) ^ "!"
       else
         let names = List.map (fun pl -> pl.name) winner_pls in
-        "Winners:\n" ^ (List.fold_left (fun a b -> a ^ "    " ^ b) "" names)
+        "Winners:\n" ^ (List.fold_left (fun a b -> a ^ "    " ^ b) "" names) 
+        ^ " and each earned $" ^ string_of_int profit ^ "!"
     in
     print_newline ();
     print_newline ();
@@ -525,7 +533,8 @@ let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
     if amt < st.table.blind then
       Illegal "You have to bet at least the blind!"
-    else if comm_str = "raise" && amt < 2*st.bet.bet_amount then
+    else if comm_str = "raise" && (amt < 2*st.bet.bet_amount &&
+      amt <> (find_participant st st.player_turn).money) then
       Illegal "You have to raise at least twice the bet!"
     else if amt > (find_stack st.player_turn st.table.participants) then
       Illegal "You don't have enough money to do that!"
@@ -556,16 +565,18 @@ let raise' amt st = bet_or_raise amt st "raise"
 let save file_name st =
   let rec get_participants outlst = function
     | [] -> outlst
-    | h::t -> let x = `Assoc [("id", `Int h.id);
-                              ("name", `String h.name);
-                              ("card1", `Int (Deck.int_converter (List.hd h.cards)));
-                              ("card2", `Int (Deck.int_converter (List.hd (List.tl h.cards))));
-                              ("money", `Int h.money);
-                              ("avatar_id", `Int h.avatar_id);
-                              ("wins", `Int h.wins);
-                              ("losses", `Int h.losses);
-                              ("consecutive_wins", `Int h.consecutive_wins);
-                              ("orig_id", `Int h.orig_id);
+    | h::t -> let x = `Assoc
+     [
+      ("id", `Int h.id);
+      ("name", `String h.name);
+      ("card1", `Int (Deck.int_converter (List.hd h.cards)));
+      ("card2", `Int (Deck.int_converter (List.hd (List.tl h.cards))));
+      ("money", `Int h.money);
+      ("avatar_id", `Int h.avatar_id);
+      ("wins", `Int h.wins);
+      ("losses", `Int h.losses);
+      ("consecutive_wins", `Int h.consecutive_wins);
+      ("orig_id", `Int h.orig_id);
                              ] in
       get_participants (x::outlst) t in
 

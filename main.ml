@@ -209,7 +209,7 @@ let play_game st =
           keep_playing (State.get_avail_action st)
       else failwith "AI next move not defined"
 
-    (* Medium Bot *)
+    (* Medium / Hard Bot *)
     else if ((State.game_type st) = 2 || (State.game_type st) = 3) &&
             State.player_turn st = 2 then
       let iterations = ref 4000 in
@@ -217,14 +217,14 @@ let play_game st =
         if game_type = 2 then iterations := 4000
         else iterations := 50000 in
       change_difficulty (State.game_type st);
-      let next_action = Montecarlo.declare_action (State.find_participant st 2)
+      let next_action = Montecarlo.declare_action_2p (State.find_participant st 2)
           (Player.cards (State.find_participant st 2)) st !iterations in
       let action = fst next_action in
       print_endline action;
       let amt = snd next_action in
       print_int amt;
       print_newline();
-      if action = "raise" then
+      if action = "raise" || action = "bet" then
         match Command.parse (action ^ " " ^ string_of_int amt) with
         | comm ->
           (match State.command_to_function comm st with
@@ -319,15 +319,15 @@ let init_game num_players =
                   "Min: 2; Max: " ^ (string_of_int blind_max) ^ ".")
       () in
   let st = match num_players with
-    | 1 -> (*State.prompt "Difficulty of AI? (easy, medium, hard)";
+    | 1 -> State.prompt "Difficulty of AI? (easy, medium, hard)";
              (
              let game_type = match read_line () with
              | "easy" -> 1
              | "medium" -> 2
              | "hard" -> 3
-             | _ -> failwith "ERROR: not a valid difficulty" in*)
-      State.init_state 1(*game_type*) 2 money blind
-    (*)*)
+             | _ -> failwith "ERROR: not a valid difficulty" in
+      State.init_state game_type 2 money blind
+    )
     | x when x > 0 -> State.init_state 0 x money blind
     | _ -> failwith "ERROR: negative number of players" in
   clear_screen ();
