@@ -75,14 +75,13 @@ let parse str =
     else if head = "call" then Call
     else if head = "show" then Show
     else if head = "save" then Save
-    else if head = "bet" then Bet (tail |> List.hd |>
-                                   try int_of_string with
-                                   | Failure _ -> raise Malformed
-                                  )
-    else if head = "raise" then Raise (tail |> List.hd |>
-                                       try int_of_string with
-                                       | Failure _ -> raise Malformed
-                                      )
+    else if head = "bet" then
+      try Bet (tail |> List.hd |> int_of_string) with
+      | Failure _ -> raise Malformed
+    else if head = "raise" then
+      try Raise (tail |> List.hd |> int_of_string) with
+      | Failure _ -> raise Malformed
+
     else if head = "quit" then Quit
     else raise Malformed
 
