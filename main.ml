@@ -353,16 +353,16 @@ let init_game num_players =
                   "Min: 2; Max: " ^ (string_of_int blind_max) ^ ".")
       () in
   let st = match num_players with
-    | 1 -> State.prompt "Difficulty of AI? (easy, medium, hard)";
-      (
-        let game_type = match read_line () with
-          | "easy" -> 1
-          | "medium" -> 2
-          | "hard" -> 3
-          | _ -> print_string "ERROR: not a valid difficulty";
-            exit 0; in
-        State.init_state game_type 2 money blind
-      )
+    | 1 ->
+      let difficulty = State.read_string "Difficulty of AI? (easy, medium, hard)"
+          ~condition:((fun x -> x = "easy" || x = "medium" || x = "hard"),
+                      "Options: easy, medium, hard.") () in
+      let game_type = match difficulty with
+        | "easy" -> 1
+        | "medium" -> 2
+        | "hard" -> 3
+        | _ -> failwith "ERROR: invalid difficulty" in
+      State.init_state game_type 2 money blind
     | x when x > 0 -> State.init_state 0 x money blind
     | _ -> failwith "ERROR: negative number of players" in
   clear_screen ();
