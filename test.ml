@@ -6,7 +6,6 @@ open Deck
 open State
 open Command
 
-
 let make_new_deck =
   Deck.deck_init
 
@@ -15,8 +14,8 @@ let make_new_deck =
 let empty_table = {
   pot=0;
   blind=5;
-  participants = [{id = 1; name = "Wilson"; cards = []; money = 500};
-                  {id = 2; name = "Lucy"; cards = []; money = 500}];
+  participants = [{id = 1; name = "Wilson"; cards = []; money = 500; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0};
+                  {id = 2; name = "Lucy"; cards = []; money = 500; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}];
   board = [];
 }
 
@@ -39,24 +38,66 @@ let deck_tests =
         assert_equal 4 (List.length (pick_cards 4)));
   ]
 
-let james = {id = 0; name = "James"; cards = []; money = 32}
-let bob = {id = 1; name = "Bob"; cards = []; money = 23}
-let julian = {id = 2; name = "Julian"; cards = [(Diamonds, Five)]; money = 32}
+let james = {id = 0; name = "James"; cards = []; money = 32; wins = 1; losses = 1; avatar_id = 1; orig_id = 1; consecutive_wins = 0}
+let bob = {id = 1; name = "Bob"; cards = [(Hearts, Five)]; money = 23; wins = 2; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 2}
+let julian = {id = 2; name = "Julian"; cards = [(Diamonds, Five)]; money = 35; wins = 1; losses = 0; avatar_id = 10; orig_id = 2; consecutive_wins = 1}
 
 let player_tests =
   [
     "ID Test1" >:: (fun _->
         print_endline "player"; assert_equal 0  (id james));
-
     "ID Test2" >:: (fun _->
         assert_equal 1  (id bob));
-
+    "ID Test3" >:: (fun _->
+        assert_equal 2  (id julian));
+    "Name Test1" >:: (fun _->
+        assert_equal "James"  (name james));
+    "Name Test2" >:: (fun _->
+        assert_equal "Bob"  (name bob));
+    "Name Test3" >:: (fun _->
+        assert_equal "Julian"  (name julian));
     "Card Test1" >:: (fun _->
         assert_equal  [(Diamonds, Five)] (cards julian));
-
+    "Card Test2" >:: (fun _->
+        assert_equal  [] (cards james));
+    "Card Test3" >:: (fun _->
+        assert_equal  [(Hearts, Five)] (cards bob));
     "Money Test1" >:: (fun _->
-        assert_equal  32 (money julian));
-
+        assert_equal  35 (money julian));
+    "Money Test2" >:: (fun _->
+        assert_equal  23 (money bob));
+    "Money Test3" >:: (fun _->
+        assert_equal  32 (money james));
+    "Avatar Test1" >:: (fun _->
+        assert_equal  1 (avatar_id james));
+    "Avatar Test2" >:: (fun _->
+        assert_equal  0 (avatar_id bob));
+    "Avatar Test3" >:: (fun _->
+        assert_equal  10 (avatar_id julian));
+    "Orig_idTest1" >:: (fun _->
+        assert_equal  1 (avatar_id james));
+    "Orig_idTest2" >:: (fun _->
+        assert_equal  0 (avatar_id bob));
+    "Orig_idTest3" >:: (fun _->
+        assert_equal  2 (avatar_id julian));
+    "ConsecutiveTest1" >:: (fun _->
+        assert_equal  0 (consec_wins james));
+    "ConsecutiveTest2" >:: (fun _->
+        assert_equal  2 (consec_wins bob));
+    "ConsecutiveTest3" >:: (fun _->
+        assert_equal  1 (consec_wins julian));
+    "WinTest1" >:: (fun _->
+        assert_equal  1 (wins james));
+    "WinTest2" >:: (fun _->
+        assert_equal  2 (wins bob));
+    "WinTest3" >:: (fun _->
+        assert_equal  1 (wins julian));
+    "LossTest1" >:: (fun _->
+        assert_equal  1 (losses james));
+    "LossTest2" >:: (fun _->
+        assert_equal  0 (losses bob));
+    "LossTest3" >:: (fun _->
+        assert_equal  0 (losses julian));
   ]
 
 let command_tests = [
@@ -107,8 +148,8 @@ let command_tests = [
 ]
 
 let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}
-let james = {id = 0; name = "James"; cards = []; money = 32}
-let bob = {id = 1; name = "Bob"; cards = []; money = 32}
+let james = {id = 0; name = "James"; cards = []; money = 32; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}
+let bob = {id = 1; name = "Bob"; cards = []; money = 32; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}
 let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}
 let table2 = deal table1
 
@@ -134,9 +175,9 @@ let james_cards = match table1_players with
   | _ -> failwith "table2 not dealt"
 
 let empty : Deck.card list = []
-let jimmy = {id = 1; name = "Jimmy"; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32}
-let bobby = {id = 2; name = "Bobby"; cards = [(Spades, Two);(Clubs, Two)]; money = 32}
-let alice = {id = 3; name = "Alice"; cards = [(Spades, Three); (Hearts, Four)]; money = 42}
+let jimmy = {id = 1; name = "Jimmy"; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}
+let bobby = {id = 2; name = "Bobby"; cards = [(Spades, Two);(Clubs, Two)]; money = 32; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}
+let alice = {id = 3; name = "Alice"; cards = [(Spades, Three); (Hearts, Four)]; money = 42; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}
 let state_table_1 = {pot = 0; blind = 2; participants = [jimmy; bobby; alice];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
@@ -168,8 +209,8 @@ let get_state move_result =
   match move_result with
   | Legal t -> t
   | Illegal failed -> failwith failed
-let init_players = [{id = 1; name = "Wilson"; cards = []; money = 500};
-                    {id = 2; name = "Lucy"; cards = []; money = 500}]
+let init_players = [{id = 1; name = "Wilson"; cards = []; money = 500; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0};
+                    {id = 2; name = "Lucy"; cards = []; money = 500; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}]
 let state_1 = get_avail_action (pay_blinds {game_type = 0;num_players = 2; table = empty_table;
                                             player_turn = 1; button = 1; players_in = [1;2];
                                             players_played = [];
@@ -226,8 +267,8 @@ let state_tests =
 let table_tests =
   [
     "participants test" >:: (fun _ ->
-        assert_equal [{id = 1; name = "Wilson"; cards = []; money = 500};
-                      {id = 2; name = "Lucy"; cards = []; money = 500}] 
+        assert_equal [{id = 1; name = "Wilson"; cards = []; money = 500; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0};
+                      {id = 2; name = "Lucy"; cards = []; money = 500; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}]
           (participants
              empty_table));
     "deal_test_1" >:: (fun _->

@@ -187,7 +187,7 @@ let play_game st =
     (* Medium Bot *)
     else if (State.game_type st) = 2 && State.player_turn st = 2 then
       let next_action = Montecarlo.declare_action (State.find_participant st 2)
-          (Player.cards (State.find_participant st 2)) st 50000 in
+          (Player.cards (State.find_participant st 2)) st 10000 in
       let action = fst next_action in
       print_endline action;
       let amt = snd next_action in
