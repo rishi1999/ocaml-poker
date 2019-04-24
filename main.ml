@@ -208,10 +208,10 @@ let play_game st =
       else failwith "AI next move not defined"
 
     (* Medium Bot *)
-    else if ((State.game_type st) = 2 || (State.game_type st) = 3) && 
+    else if ((State.game_type st) = 2 || (State.game_type st) = 3) &&
             State.player_turn st = 2 then
       let iterations = ref 4000 in
-      let change_difficulty game_type = 
+      let change_difficulty game_type =
         if game_type = 2 then iterations := 4000
         else iterations := 50000 in
       change_difficulty (State.game_type st);
@@ -369,9 +369,7 @@ let load_or_new value =
 (** [main ()] prompts the user for the number of players,
     then starts the game. *)
 let main () =
-
-  print_newline ();
-  print_newline ();
+  clear_screen ();
   ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
   print_newline ();
 
