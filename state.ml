@@ -357,54 +357,41 @@ let winner st =
   let all_part = st.table.participants in
   let p_in = st.players_in in
 
-  (** ranks returns a list of ranks of the hands of the list players*)
-  let rec ranks participants (board : Deck.card list) lst =
-    match participants with
-    | [] -> List.rev lst
-    | p :: t -> ranks t board ((seven_list_eval (p.cards @ board)) :: lst)
-  in
+  if List.length p_in = 1 then (find_participant st (List.hd p_in), 0)
+  else
 
-  (** best_rank gets the best rank in the list of hands*)
-  let rec best_player ls acc = match ls with
-    | [] -> acc
-    | a :: t when a < acc -> best_player t a
-    | a :: t when a > acc -> best_player t acc
-    | _ -> raise Tie
-  in
+    (** ranks returns a list of ranks of the hands of the list players*)
+    let rec ranks participants board acc =
+      match participants with
+      | [] -> List.rev acc
+      | p :: t -> ranks t board ((seven_list_eval (p.cards @ board)) :: acc)
+    in
+    (** best_rank gets the best rank in the list of hands*)
+    let rec best_player ls acc = match ls with
+      | [] -> acc
+      | a :: t when a < acc -> best_player t a
+      | a :: t when a > acc -> best_player t acc
+      | _ -> raise Tie
+    in
 
-  (** [get_player_in target ls acc] is the integer position
-      of the list of the best player. *)
-  let rec get_player_int target ls acc = match ls with
-    | a :: b when a = target -> acc
-    | a :: b -> get_player_int target b (acc + 1)
-    | [] -> failwith "ERROR: no best player" in
+    (** [get_player_in target ls acc] is the integer position
+        of the list of the best player. *)
+    let rec get_player_int target ls acc = match ls with
+      | a :: b when a = target -> acc
+      | a :: b -> get_player_int target b (acc + 1)
+      | [] -> failwith "ERROR: no best player" in
 
-  let part = get_players_in p_in all_part [] in
-  let rlist = ranks part board [] in
-  let best_rank = (best_player rlist 7463) in
-  let num_winner = get_player_int best_rank rlist 0 in
-
-  (List.nth part num_winner, best_rank)
+    let part = get_players_in p_in all_part [] in
+    let rlist = ranks part board [] in
+    let best_rank = (best_player rlist 7463) in
+    let num_winner = get_player_int best_rank rlist 0 in
+    (List.nth part num_winner, best_rank)
 
 (** [go_next_round] st ends the current round or the current hand and
     returns the state with the next round. *)
 let go_next_round st =
   if is_hand_complete st then
-
-    let _ = "ignore" in
-    print_newline ();
-    print_endline "If this is the only debug message printed,
-there is a bug in the next line of code
-(in State.go_next_round).";
-    print_newline ();
-
     let winner_pl = fst (winner st) in
-
-    print_newline ();
-    print_endline "If this message was printed,
-you have conquered the bug -- congrats!";
-    print_newline ();
-
     let hand_quality = snd (winner st) in
 
     let winner_pl = {
@@ -594,27 +581,27 @@ let save file_name st =
         ("game_type", `Int st.game_type);
         ("num_players", `Int st.num_players);
         ("table",
-           `Assoc
-              [("pot", `Int st.table.pot);
-               ("blind", `Int st.table.blind);
-               ("participants", `List (List.rev participants_json));
-               ("board", `List (List.rev (get_cards_int [] st.table.board)));
-              ]);
+         `Assoc
+           [("pot", `Int st.table.pot);
+            ("blind", `Int st.table.blind);
+            ("participants", `List (List.rev participants_json));
+            ("board", `List (List.rev (get_cards_int [] st.table.board)));
+           ]);
         ("player_turn", `Int st.player_turn);
         ("button", `Int st.button);
         ("players_in", `List (List.map (fun x -> `Int x) st.players_in));
-        ("players_played", 
-          `List (List.map (fun x -> `Int x) st.players_played));
+        ("players_played",
+         `List (List.map (fun x -> `Int x) st.players_played));
         ("bet",
-             `Assoc 
-             [
-               ("bet_player", `Int st.bet.bet_player);
-               ("bet_amount", `Int st.bet.bet_amount);
-               ("bet_paid_amt", `List (List.rev bet_amt));
-             ];
+         `Assoc
+           [
+             ("bet_player", `Int st.bet.bet_player);
+             ("bet_amount", `Int st.bet.bet_amount);
+             ("bet_paid_amt", `List (List.rev bet_amt));
+           ];
         );
-        ("avail_action", 
-          `List (List.map (fun x -> `String x) st.avail_action));
+        ("avail_action",
+         `List (List.map (fun x -> `String x) st.avail_action));
         ("winner", `Assoc [("player", `Int (fst st.winner));
                            ("rank", `Int (snd st.winner))]);
         ("deck", `List (List.map (fun x -> `Int x)
@@ -688,7 +675,7 @@ let load json =
             |> List.map card_inverter;
   } in
 
-  let winner_of_json json = 
+  let winner_of_json json =
     let player = json |> member "player" |> to_int in
     let rank =  json |> member "rank" |> to_int in
     (player,rank)
@@ -706,7 +693,7 @@ let load json =
                      |> List.map (fun x -> to_int x);
     bet = json |> member "bet" |> bet_of_json;
     avail_action = json |> member "avail_action" |> to_list
-                        |> List.map (fun x -> to_string x);
+                   |> List.map (fun x -> to_string x);
     winner = json |> member "winner" |> winner_of_json;
   } in
 

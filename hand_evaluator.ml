@@ -120,13 +120,13 @@ let seven_int_list_eval hand =
   seven_eval a b c d e f g
 
 
-(** [rank_mapper rank_val] returns the general name of the rank of a hand that 
+(** [rank_mapper rank_val] returns the general name of the rank of a hand that
     has been mapped to [rank_val] using the evaluator function for the hand.
     Example: [rank_mapper 1] is "Royal Flush" (as the hand has been mapped
     to the highest rank so it must contain the Ace, King, Queen, Jack and Ten
     of a suit.
     Requires: [rank_val] is between 1 and 7462)  *)
-let rank_mapper rank_val =  if rank_val = 0 then "Rank not yet evaluated"
+let rank_mapper rank_val =  if rank_val = 0 then "Nothing (because everyone else folded)"
   else if rank_val = 1 then "Royal Flush"
   else if rank_val <= 10 then "Straight Flush"
   else if rank_val <= 166 then "Four of a Kind"
