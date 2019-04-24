@@ -65,24 +65,6 @@ let print_single_player st num_of_player =
     )
   ) player
 
-(*let print_players_in st =
-  let lst = State.players_in st in
-  ANSITerminal.(
-    List.iter
-      (fun x ->
-         print_string
-           (
-             if x = (State.player_turn st) then [green]
-             else if x = (State.button st) then [red]
-             else [default]
-           )
-           ((State.find_participant st x).name ^ " ($" ^
-            (string_of_int (State.find_stack x st.table.participants)) ^
-            ")    ");
-      ) lst;
-    print_newline ()
-  )*)
-
 let print_table st num =
   print_newline ();
   print_newline ();
@@ -98,34 +80,29 @@ let print_table st num =
   print_hline 91 ();
   print_newline ();
 
-  if num = 1 || num = 2 then
-    print_endline "           ▯▯o";
-  if num = 3 || num = 4 then
-    print_endline "           ▯▯o                ▯▯o";
-  if num = 5 || num = 6 then
-    print_endline "           ▯▯o                ▯▯o                ▯▯o" ;
-  if num = 7 || num = 8 then
-    print_endline "           ▯▯o                ▯▯o                ▯▯o                ▯▯o" ;
-  if num = 9 || num = 10 then
-    print_endline "           ▯▯o                ▯▯o                ▯▯o                ▯▯o                ▯▯o" ;
-  print_endline "Cards on the board: ";
+  let print_players_ascii num () =
+    let player_ascii = "           ▯▯o" in
+    let gap_ascii = "     " in
+    print_string player_ascii;
+    for i = 2 to num do
+      print_string gap_ascii;
+      print_string player_ascii
+    done;
+    print_newline (); in
+
+  let num_top = (num + 1) / 2 in
+  print_players_ascii num_top ();
+
   (Card.card_printer (Table.board (State.table st)));
   print_newline ();
   print_newline ();
-  if num = 1 then
-    print_newline();
-  if num = 2 || num = 3 then
-    print_endline "           ▯▯o";
-  if num = 4 || num = 5 then
-    print_endline "           ▯▯o                ▯▯o";
-  if num = 6 || num = 7 then
-    print_endline "           ▯▯o                ▯▯o                ▯▯o" ;
-  if num = 8 || num = 9 then
-    print_endline "           ▯▯o                ▯▯o                ▯▯o               ▯▯o" ;
-  if num = 10 then
-    print_endline "           ▯▯o                ▯▯o                ▯▯o                ▯▯o                ▯▯o" ;
+
+  let num_bottom = num - num_top in
+  print_players_ascii num_bottom ();
+
   print_hline 91 ();
   print_newline ();
+
   if num >=2 then print_single_player st 1;
   if num >=4 then print_single_player st 3;
   if num >=6 then print_single_player st 5;
