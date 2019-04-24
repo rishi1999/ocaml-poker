@@ -5,9 +5,9 @@ open Avatar
 
 
 let clear_screen () =
-  match Sys.command "clear" with
-  | 0 -> ()
-  | _ -> exit 2
+  (*match Sys.command "clear" with
+    | 0 -> ()
+    | _ -> exit 2*) ()
 
 let print_hline () =
   for i = 1 to 100 do
@@ -274,12 +274,12 @@ let init_game num_players =
 let load_or_playnew value =
   if value = 0 then
     (match (Sys.file_exists "saved_game.json") with
-    | false ->
-      print_endline "There is no saved game!";
-      exit 0
-    | true ->
-      let loaded_game = State.load (Yojson.Basic.from_file "saved_game.json") in
-      play_game loaded_game
+     | false ->
+       print_endline "There is no saved game!";
+       exit 0
+     | true ->
+       let loaded_game = State.load (Yojson.Basic.from_file "saved_game.json") in
+       play_game loaded_game
     )
   else
     State.read_integer "How many (human) players are there?"
@@ -298,6 +298,6 @@ let main () =
   State.read_integer "Load or Play Game? Load: 0 Play: 1"
     ~condition:((fun x -> x >= 0 && x <= 1), "Load: 0, Play: 1.") ()
   |> load_or_playnew
-    
+
 (* Execute the game engine. *)
 let () = main ()
