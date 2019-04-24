@@ -2,6 +2,7 @@ open Card
 open Hand_evaluator
 open Montecarlo
 open Avatar
+open Hand_analysis
 
 
 let clear_screen () =
@@ -49,16 +50,18 @@ let print_string_list = print_list print_string
 let print_int_list = print_list print_int
 let print_single_player (st:State.t) num_of_player =
   let player = Table.nth_participant st.table num_of_player in
+
   ANSITerminal.(
     (fun x ->
        print_string
          (
+           let num_spaces = (10 - String.length (Player.name x)) in
            if Player.id x = (State.player_turn st) then [green]
            else if Player.id x = (State.button st) then [red]
            else [default]
          )
          (Player.name x ^ ": $" ^
-          (string_of_int (Player.money x)));
+          (string_of_int (Player.money x) ^ "   "));
     )
   ) player
 
@@ -82,6 +85,24 @@ let print_players_in st =
 
 let print_table st =
   print_single_player st 0;
+  if st.num_players >=3 then print_single_player st 2;
+  if st.num_players >=5 then print_single_player st 4;
+  if st.num_players >=7 then print_single_player st 6;
+  if st.num_players >=9 then print_single_player st 8;
+  print_newline ();
+  print_endline "________________________________________________________________________";
+  print_newline ();
+  print_endline "Cards on the board: ";
+  (Card.card_printer (Table.board (State.table st)));
+  print_newline ();
+  print_newline ();
+  print_endline "________________________________________________________________________";
+  print_newline ();
+  if st.num_players >=2 then print_single_player st 1;
+  if st.num_players >=4 then print_single_player st 3;
+  if st.num_players >=6 then print_single_player st 5;
+  if st.num_players >=8 then print_single_player st 7;
+  if st.num_players >=10 then print_single_player st 9;
   print_newline ()
 
 let print_player_bets st =
@@ -100,6 +121,7 @@ let print_player_bets st =
   let sorted = List.sort compare lst in
   helper sorted;
   print_newline ()
+
 
 let print_current_state st =
   (*print_table st;*)
@@ -121,8 +143,6 @@ let print_current_state st =
   );
   print_newline ();
   print_newline ();
-  print_endline "Cards on the board: ";
-  (Card.card_printer (Table.board (State.table st)));
   print_newline ();
   print_players_in st;
   print_newline ();
@@ -140,6 +160,7 @@ let play_game st =
 
   let rec keep_playing st =
 
+    print_table st;
     if (fst (State.winning_player st)) >= 0 then
       (
         clear_screen ();
@@ -161,9 +182,11 @@ let play_game st =
       if List.mem "check" (State.avail_action st) then
         match State.check st with
         | Legal t ->
-          print_newline ();
-          print_endline (Command.command_to_string Check);
-          print_newline ();
+          if (fst (State.winning_player st)) < 0 then (
+            clear_screen ();
+            print_endline (player.name ^ " " ^ Command.command_to_string Check);
+            print_newline ()
+          );
           keep_playing (State.get_avail_action t)
         | Illegal str->
           print_newline ();
@@ -245,13 +268,22 @@ let play_game st =
              print_endline "You have not entered a valid name!";
              keep_playing st
            | file_name ->
-             print_string (file_name^".json has been saved!\n");
+             print_string (file_name ^ ".json has been saved!\n");
              keep_playing (State.save file_name st))
 
         | Show ->
           print_endline "Your hand is: ";
           Card.card_printer (Player.cards (State.find_participant st
                                              (st.player_turn)));
+          print_newline ();
+          print_newline ();
+          if List.length (Table.board (State.table st)) = 0 then
+            print_endline
+              ("The Chen strength of your hand is " ^
+               (string_of_float (Hand_analysis.chen_formula player.cards)));
+          print_newline ();
+          print_newline ();
+          print_endline "press enter to continue...";
           ignore (read_line ());
           clear_screen ();
           keep_playing st
@@ -285,15 +317,15 @@ let init_game num_players =
                   "Min: 2; Max: " ^ (string_of_int blind_max) ^ ".")
       () in
   let st = match num_players with
-    | 1 -> State.prompt "Difficulty of AI? (easy, medium, hard)";
-      (
-        let game_type = match read_line () with
-          | "easy" -> 1
-          | "medium" -> 2
-          | "hard" -> 3
-          | _ -> failwith "ERROR: not a valid difficulty" in
-        State.init_state game_type 2 money blind
-      )
+    | 1 -> (*State.prompt "Difficulty of AI? (easy, medium, hard)";
+             (
+             let game_type = match read_line () with
+             | "easy" -> 1
+             | "medium" -> 2
+             | "hard" -> 3
+             | _ -> failwith "ERROR: not a valid difficulty" in*)
+      State.init_state 1(*game_type*) 2 money blind
+    (*)*)
     | x when x > 0 -> State.init_state 0 x money blind
     | _ -> failwith "ERROR: negative number of players" in
   clear_screen ();
@@ -337,6 +369,7 @@ let load_or_new value =
 (** [main ()] prompts the user for the number of players,
     then starts the game. *)
 let main () =
+
   print_newline ();
   print_newline ();
   ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
