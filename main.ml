@@ -91,7 +91,7 @@ let print_table st num =
 
   let num_top = (num + 1) / 2 in
   let num_bottom = num - num_top in
-  let table_length = num_top * 20 in
+  let table_length = max (num_top * 20) 80 in
 
 
   print_newline ();
