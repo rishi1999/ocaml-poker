@@ -359,7 +359,8 @@ let init_game num_players =
           | "easy" -> 1
           | "medium" -> 2
           | "hard" -> 3
-          | _ -> failwith "ERROR: not a valid difficulty" in
+          | _ -> print_string "ERROR: not a valid difficulty";
+            exit 0; in
         State.init_state game_type 2 money blind
       )
     | x when x > 0 -> State.init_state 0 x money blind
