@@ -26,7 +26,7 @@ let print_intro () =
   print_string "    The player whose turn it is is shown in ";
   ANSITerminal.(print_string [green] "green");
   print_endline ".";
-  print_string "    The button is shown in ";
+  print_string "    Players who are out are shown in ";
   ANSITerminal.(print_string [red] "red");
   print_endline ".";
   print_newline ();
@@ -49,14 +49,21 @@ let print_list func = function
 let print_string_list = print_list print_string
 let print_int_list = print_list print_int
 
-let print_single_player st num_of_player =
-  let pl = Table.nth_participant (State.table st) num_of_player in
+let print_single_player st number_of_players id =
+  let table = State.table st in
+  let pl = Table.nth_participant
+      table
+      (
+        (
+          List.nth (State.hand_order number_of_players st.button) (id - 1)
+        ) - 1
+      ) in
   ANSITerminal.save_cursor ();
   ANSITerminal.(
     print_string
       (
         if pl.id = (State.player_turn st) then [green]
-        else if pl.id = (State.button st) then [red]
+        else if not (List.mem pl.id (State.players_in st)) then [red]
         else [default]
       )
       (pl.name ^ ": $" ^
@@ -71,7 +78,9 @@ let print_table st num =
     let rec print_player_info' count =
       match count with
       | i when i + 1 > num -> ()
-      | i -> print_single_player st i;
+      (* note: table printing logic is 0-based, game-wide ids are 1-based,
+         so we pass in (i + 1) below. *)
+      | i -> print_single_player st num (i + 1);
         print_player_info' (i + 2) in
     ANSITerminal.move_cursor 5 0;
     print_player_info' (
