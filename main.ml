@@ -10,12 +10,12 @@ let clear_screen () =
   | 0 -> ()
   | _ -> exit 2
 
-(*let print_hline () =
+let print_hline () =
   for i = 1 to 100 do
     print_char '-'
   done;
   print_newline ();
-  print_newline ()*)
+  print_newline ()
 
 let print_error_message str () =
   print_endline str;
@@ -50,8 +50,8 @@ let print_list func = function
 let print_string_list = print_list print_string
 let print_int_list = print_list print_int
 
-let print_single_player (st:State.t) num_of_player =
-  let player = Table.nth_participant st.table num_of_player in
+let print_single_player st num_of_player =
+  let player = Table.nth_participant (State.table st) num_of_player in
 
   ANSITerminal.(
     (fun x ->
@@ -67,7 +67,7 @@ let print_single_player (st:State.t) num_of_player =
     )
   ) player
 
-let print_players_in st =
+(*let print_players_in st =
   let lst = State.players_in st in
   ANSITerminal.(
     List.iter
@@ -83,53 +83,53 @@ let print_players_in st =
             ")    ");
       ) lst;
     print_newline ()
-  )
+  )*)
 
-let print_table st =
+let print_table st num =
   print_newline ();
   print_newline ();
   print_newline ();
-  print_single_player st 0;
-  if st.num_players >=3 then print_single_player st 2;
-  if st.num_players >=5 then print_single_player st 4;
-  if st.num_players >=7 then print_single_player st 6;
-  if st.num_players >=9 then print_single_player st 8;
+  if num >=1 then print_single_player st 0;
+  if num >=3 then print_single_player st 2;
+  if num >=5 then print_single_player st 4;
+  if num >=7 then print_single_player st 6;
+  if num >=9 then print_single_player st 8;
   print_newline ();
   print_endline "___________________________________________________________________________________________";
   print_newline ();
-  if st.num_players = 1 || st.num_players = 2 then
+  if num = 1 || num = 2 then
     print_endline "           ▯▯o";
-  if st.num_players = 3 || st.num_players = 4 then
+  if num = 3 || num = 4 then
     print_endline "           ▯▯o                ▯▯o";
-  if st.num_players = 5 || st.num_players = 6 then
+  if num = 5 || num = 6 then
     print_endline "           ▯▯o                ▯▯o                ▯▯o" ;
-  if st.num_players = 7 || st.num_players = 8 then
+  if num = 7 || num = 8 then
     print_endline "           ▯▯o                ▯▯o                ▯▯o                ▯▯o" ;
-  if st.num_players = 9 || st.num_players = 10 then
+  if num = 9 || num = 10 then
     print_endline "           ▯▯o                ▯▯o                ▯▯o                ▯▯o                ▯▯o" ;
   print_endline "Cards on the board: ";
   (Card.card_printer (Table.board (State.table st)));
   print_newline ();
   print_newline ();
-  if st.num_players = 1 then
+  if num = 1 then
     print_newline();
-  if st.num_players = 2 || st.num_players = 3 then
+  if num = 2 || num = 3 then
     print_endline "           ▯▯o";
-  if st.num_players = 4 || st.num_players = 5 then
+  if num = 4 || num = 5 then
     print_endline "           ▯▯o                ▯▯o";
-  if st.num_players = 6 || st.num_players = 7 then
+  if num = 6 || num = 7 then
     print_endline "           ▯▯o                ▯▯o                ▯▯o" ;
-  if st.num_players = 8 || st.num_players = 9 then
+  if num = 8 || num = 9 then
     print_endline "           ▯▯o                ▯▯o                ▯▯o               ▯▯o" ;
-  if st.num_players = 10 then
+  if num = 10 then
     print_endline "           ▯▯o                ▯▯o                ▯▯o                ▯▯o                ▯▯o" ;
   print_endline "___________________________________________________________________________________________";
   print_newline ();
-  if st.num_players >=2 then print_single_player st 1;
-  if st.num_players >=4 then print_single_player st 3;
-  if st.num_players >=6 then print_single_player st 5;
-  if st.num_players >=8 then print_single_player st 7;
-  if st.num_players >=10 then print_single_player st 9;
+  if num >=2 then print_single_player st 1;
+  if num >=4 then print_single_player st 3;
+  if num >=6 then print_single_player st 5;
+  if num >=8 then print_single_player st 7;
+  if num >=10 then print_single_player st 9;
   print_newline ()
 
 let print_player_bets st =
@@ -151,7 +151,6 @@ let print_player_bets st =
 
 
 let print_current_state st =
-  (*print_table st;*)
   ANSITerminal.(
     let player = State.find_participant st (State.player_turn st) in
     print_newline ();
@@ -190,7 +189,6 @@ let play_game st =
 
   let rec keep_playing st =
 
-    print_table st;
     if (List.length (State.winning_players st)) > 0 then
       (
         clear_screen ();
@@ -202,6 +200,7 @@ let play_game st =
         keep_playing (State.continue_game st)
       );
 
+    print_table st st.num_players;
     print_current_state st;
     State.prompt "";
 
