@@ -165,8 +165,7 @@ let print_current_state st =
     let player = State.find_participant st (State.player_turn st) in
     print_newline ();
     print_string [yellow] (Player.name player);
-    print_string [yellow] "'s turn";
-    print_newline ();
+    print_string [yellow] "'s turn:";
     print_newline ();
     print_string [default]
       (avatar_array.(Player.avatar_id player));
@@ -177,18 +176,16 @@ let print_current_state st =
     print_string [yellow] "Losses: ";
     print_string [yellow] (string_of_int player.losses);
     print_newline ();
-  );
-  print_newline ();
-  print_newline ();
-  print_newline ();
-  (*
-      print_players_in st;
-      print_newline ();
-  *)
-  print_player_bets st;
-  print_newline ();
-  print_string "Available actions: ";
-  print_string_list ("quit" :: (State.avail_action st))
+    print_newline ();
+    print_newline ();
+    print_string [yellow] ("$" ^ (string_of_int st.table.pot) ^
+                           " has been added to the pot.");
+    print_newline ();
+    print_player_bets st;
+    print_newline ();
+    print_string [default] "Available actions: ";
+    print_string_list ("quit" :: (State.avail_action st))
+  )
 
 
 
@@ -357,14 +354,14 @@ let init_game num_players =
       () in
   let st = match num_players with
     | 1 -> State.prompt "Difficulty of AI? (easy, medium, hard)";
-             (
-             let game_type = match read_line () with
-             | "easy" -> 1
-             | "medium" -> 2
-             | "hard" -> 3
-             | _ -> failwith "ERROR: not a valid difficulty" in
-      State.init_state game_type 2 money blind
-    )
+      (
+        let game_type = match read_line () with
+          | "easy" -> 1
+          | "medium" -> 2
+          | "hard" -> 3
+          | _ -> failwith "ERROR: not a valid difficulty" in
+        State.init_state game_type 2 money blind
+      )
     | x when x > 0 -> State.init_state 0 x money blind
     | _ -> failwith "ERROR: negative number of players" in
   clear_screen ();
