@@ -19,24 +19,24 @@ exception Malformed
     Requires: command is a valid command
     Example: [command_to_string Check] is "checked!" *)
 let command_to_string = function
-  | Show -> "showed cards!"
-  | Save -> "saved!"
+  | Show -> "ERROR_show(thisshouldnotbeprinted)"
+  | Save -> "ERROR_save(thisshouldnotbeprinted)"
   | Check -> "checked!"
   | Fold -> "folded!"
   | Call -> "called!"
-  | Bet _ -> "bet!"
-  | Raise _ -> "raised!"
-  | Stack -> "looked at stack!"
-  | Quit -> "quit!"
+  | Bet x -> "bet $" ^ (string_of_int x) ^ "!"
+  | Raise x -> "raised $" ^ (string_of_int x) ^ "!"
+  | Stack -> "ERROR_stack(thisshouldnotbeprinted)"
+  | Quit -> "ERROR_quit(thisshouldnotbeprinted)"
 
 (** [parse str] parses a player's input into a [command], as follows.
     The first word (i.e., consecutive sequence of non-space characters)
     of [str] becomes the verb. The rest of the words,
     if any, become the object phrase.
-    Examples: 
+    Examples:
     - [parse "    bet 10  "] is [Bet "10"]
-    - [parse "quit"] is [Quit]. 
-    Requires: [str] contains only alphanumeric (A-Z, a-z, 0-9) and space 
+    - [parse "quit"] is [Quit].
+    Requires: [str] contains only alphanumeric (A-Z, a-z, 0-9) and space
     characters (only ASCII character code 32; not tabs or newlines, etc.).
     Raises: [Empty] if [str] is the empty string or contains only spaces.
     Raises: [Malformed] if the command is malformed. A command

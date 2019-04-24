@@ -25,10 +25,13 @@ let print_intro () =
   ANSITerminal.(print_string [red] "red");
   print_endline ".";
   print_newline ();
+  print_newline ();
   ANSITerminal.(print_string [yellow] "LET'S PLAY!");
   print_newline ();
   print_newline ();
-  print_newline ()
+  print_endline "press enter to continue...";
+  ignore (read_line ());
+  clear_screen ()
 
 let print_list func = function
   | h :: t ->
@@ -94,7 +97,7 @@ let print_player_bets st =
   print_newline ()
 
 let print_current_state st =
-  print_table st;
+  (*print_table st;*)
   ANSITerminal.(
     let player = State.find_participant st (State.player_turn st) in
     print_string [yellow] (Player.name player);
@@ -131,7 +134,6 @@ let play_game st =
   print_intro ();
 
   let rec keep_playing st =
-    clear_screen ();
 
     if (fst (State.winning_player st)) >= 0 then
       (
@@ -140,6 +142,8 @@ let play_game st =
 
     print_current_state st;
     State.prompt "";
+
+    let player = State.(find_participant st (player_turn st)) in
 
     (* Easy Bot *)
     if (State.game_type st) = 1 && State.player_turn st = 2 then
@@ -199,7 +203,6 @@ let play_game st =
              keep_playing (State.get_avail_action t);
            | Illegal s -> failwith s)
     else
-
       match read_line () with
       | curr_cmd ->
         match Command.parse curr_cmd with
@@ -211,6 +214,7 @@ let play_game st =
         | exception Command.Empty ->
           print_newline ();
           print_endline "Please enter a command.";
+          print_newline ();
           keep_playing st
 
         | Quit -> exit 0
@@ -231,19 +235,23 @@ let play_game st =
           print_endline "Your hand is: ";
           Card.card_printer (Player.cards (State.find_participant st
                                              (st.player_turn)));
-          let _ = read_line () in
+          ignore (read_line ());
+          clear_screen ();
           keep_playing st
 
         | comm ->
           let func = State.command_to_function comm in
-          match func st with
+          let move_result = func st in
+          clear_screen ();
+          match move_result with
           | Legal t ->
-            print_newline ();
-            (*print_endline (Command.command_to_string comm);*)
-            print_newline ();
+            if (fst (State.winning_player st)) < 0 then (
+              print_endline (player.name ^ " " ^ Command.command_to_string comm);
+              print_newline ()
+            );
             keep_playing (State.get_avail_action t)
+
           | Illegal str->
-            print_newline ();
             print_endline str;
             print_newline ();
             Unix.sleep 2;
@@ -274,8 +282,7 @@ let init_game num_players =
       )
     | x when x > 0 -> State.init_state 0 x money blind
     | _ -> failwith "ERROR: negative number of players" in
-  print_newline ();
-  print_newline ();
+  clear_screen ();
   play_game st
 
 let load_or_playnew value =

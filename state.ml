@@ -400,12 +400,12 @@ let go_next_round st =
       wins = winner_pl.wins + 1;
     } in
 
-    let string = "The winner is " ^ winner_pl.name
-                 ^ " with " ^ Hand_evaluator.rank_mapper hand_quality ^ "!" in
-    print_newline ();
-    ANSITerminal.(print_string [yellow] string);
+    let celebration_str = "The winner is " ^ winner_pl.name
+                          ^ " with " ^ Hand_evaluator.rank_mapper hand_quality ^ "!" in
     print_newline ();
     print_newline ();
+    ANSITerminal.(print_string [yellow] celebration_str);
+    ignore (read_line ());
 
     let winner_pl_id = winner_pl.id in
 
@@ -414,7 +414,7 @@ let go_next_round st =
         | [] -> acc
         | h :: t -> if h.id = target then
             update_player target new_player (new_player :: acc) t
-          else update_player target new_player 
+          else update_player target new_player
               (
                 {
                   h with
