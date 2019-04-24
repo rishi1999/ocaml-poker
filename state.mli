@@ -1,7 +1,9 @@
+open Yojson.Basic
+
 (** [bet] is the bet situation of the current round:
     [bet_player] : the player that has bet / raised the last
     [bet_amount] : the current bet amount that the next player has to match
-    [bet_paid_amt] : the current bet situation 
+    [bet_paid_amt] : the current bet situation
     in form (player, bet_amount) list
 *)
 type bet = {
@@ -43,7 +45,7 @@ val read_string : string -> ?condition:(string -> bool) * string -> unit -> stri
 
 (** [prompt str] prompts the user for input, using the string [str].
     Requires: [str] is a valid string.
-    Example: [prompt "Please enter some text."] prints to the screen: 
+    Example: [prompt "Please enter some text."] prints to the screen:
 
     Please enter some text.
     >
@@ -223,6 +225,6 @@ val bet_or_raise : int -> t -> string -> move_result
     Requires: st is a valid state*)
 val pay_blinds : t -> t
 
-val load : Yojson.Basic.json -> t
+val load : json -> t
 
 val save : string -> t -> t
