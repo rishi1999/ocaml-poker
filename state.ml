@@ -158,8 +158,10 @@ let init_players num_players money =
   let rec init_players' acc money = function
     | id when id > num_players -> acc
     | id ->
-      prompt ("Enter player " ^ (string_of_int) id ^ "'s name.");
-      let name = read_line () in
+      let name = read_string ("Enter player " ^(string_of_int) id^ "'s name.") 
+          ~condition:((fun x -> String.length x <= 10
+                                && String.length x >= 1)
+                     ,"Length of name must be less than 10") () in
       ANSITerminal.(print_string [ANSITerminal.default] array_choice);
       let prompt_str = "Choose " ^ name ^ "'s avatar." in
 
@@ -357,7 +359,7 @@ let rec get_players_in part players_in ls = match players_in with
   | a :: t -> get_players_in part t ls
   | [] -> List.rev ls
 
-let winner_new st = 
+let winner_new st =
   let board = st.table.board in
   let all_part = st.table.participants in
   let p_in = st.players_in in
@@ -427,6 +429,7 @@ let go_next_round st =
       winner_pl with
       money = winner_pl.money + st.table.pot;
       wins = winner_pl.wins + 1;
+      consecutive_wins = winner_pl.consecutive_wins + 1;
     } in
 
     let celebration_str = "The winner is " ^ winner_pl.name
@@ -448,6 +451,7 @@ let go_next_round st =
                 {
                   h with
                   losses = h.losses + 1;
+                  consecutive_wins = 0;
                 }
                 :: acc) t in
       update_player winner_pl_id winner_pl [] st.table.participants in
