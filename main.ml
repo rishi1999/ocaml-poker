@@ -73,7 +73,7 @@ let print_table st num =
       | i when i + 1 > num -> ()
       | i -> print_single_player st i;
         print_player_info' (i + 2) in
-    ANSITerminal.set_cursor 5 (-1);
+    ANSITerminal.move_cursor 5 0;
     print_player_info' (
       if side = "top" then 0
       else if side = "bottom" then 1
@@ -96,6 +96,7 @@ let print_table st num =
   print_newline ();
   print_newline ();
 
+  ANSITerminal.move_bol ();
   print_player_info "top";
   print_hline (num_top * 20) ();
   print_players_ascii num_top ();
