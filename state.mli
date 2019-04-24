@@ -1,4 +1,4 @@
-open Yojson.Basic
+open Yojson
 
 (** [bet] is the bet situation of the current round:
     [bet_player] : the player that has bet / raised the last
@@ -225,6 +225,6 @@ val bet_or_raise : int -> t -> string -> move_result
     Requires: st is a valid state*)
 val pay_blinds : t -> t
 
-val load : json -> t
+val load : Basic.json -> t
 
 val save : string -> t -> t
