@@ -5,16 +5,16 @@ open Avatar
 
 
 let clear_screen () =
-  (*match Sys.command "clear" with
-    | 0 -> ()
-    | _ -> exit 2*) ()
+  match Sys.command "clear" with
+  | 0 -> ()
+  | _ -> exit 2
 
-let print_hline () =
+(*let print_hline () =
   for i = 1 to 100 do
     print_char '-'
   done;
   print_newline ();
-  print_newline ()
+  print_newline ()*)
 
 let print_intro () =
   print_endline "Tips:";
@@ -77,8 +77,7 @@ let print_players_in st =
   )
 
 let print_table (st:State.t) =
-  (*print_single_player st ;*)
-  print_hline ()
+  (*print_single_player st ;*) ()
 
 let print_player_bets st =
   let lst = State.bet_paid_amt st in
@@ -137,11 +136,9 @@ let play_game st =
 
     if (fst (State.winning_player st)) >= 0 then
       (
-        print_hline ();
         keep_playing (State.continue_game st)
       );
 
-    print_hline ();
     print_current_state st;
     State.prompt "";
 
