@@ -16,6 +16,11 @@ let clear_screen () =
   print_newline ();
   print_newline ()*)
 
+let print_error_message str () =
+  print_endline str;
+  Unix.sleep 2;
+  clear_screen ()
+
 let print_intro () =
   print_endline "Tips:";
   print_string "    The player whose turn it is is shown in ";
@@ -137,6 +142,12 @@ let play_game st =
 
     if (fst (State.winning_player st)) >= 0 then
       (
+        clear_screen ();
+        print_string "~ ";
+        ANSITerminal.(print_string [yellow] "New Game!");
+        print_string " ~";
+        print_newline ();
+        print_newline ();
         keep_playing (State.continue_game st)
       );
 
@@ -203,18 +214,19 @@ let play_game st =
              keep_playing (State.get_avail_action t);
            | Illegal s -> failwith s)
     else
-      match read_line () with
+      match
+        let input = read_line () in
+        clear_screen ();
+        input
+      with
       | curr_cmd ->
         match Command.parse curr_cmd with
         | exception Command.Malformed ->
-          print_newline ();
-          print_endline "Not a valid command.";
+          print_error_message "Not a valid command." ();
           keep_playing st
 
         | exception Command.Empty ->
-          print_newline ();
-          print_endline "Please enter a command.";
-          print_newline ();
+          print_error_message "Must enter a command." ();
           keep_playing st
 
         | Quit -> exit 0
@@ -231,7 +243,6 @@ let play_game st =
              keep_playing (State.save file_name st))
 
         | Show ->
-          clear_screen ();
           print_endline "Your hand is: ";
           Card.card_printer (Player.cards (State.find_participant st
                                              (st.player_turn)));
@@ -242,7 +253,6 @@ let play_game st =
         | comm ->
           let func = State.command_to_function comm in
           let move_result = func st in
-          clear_screen ();
           match move_result with
           | Legal t ->
             if (fst (State.winning_player st)) < 0 then (
@@ -252,9 +262,7 @@ let play_game st =
             keep_playing (State.get_avail_action t)
 
           | Illegal str->
-            print_endline str;
-            print_newline ();
-            Unix.sleep 2;
+            print_error_message str ();
             keep_playing (State.get_avail_action st)
   in
   keep_playing st
