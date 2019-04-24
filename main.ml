@@ -10,12 +10,10 @@ let clear_screen () =
   | 0 -> ()
   | _ -> exit 2
 
-let print_hline () =
-  for i = 1 to 100 do
-    print_char '-'
-  done;
-  print_newline ();
-  print_newline ()
+let print_hline length () =
+  for i = 1 to length do
+    print_char '_'
+  done
 
 let print_error_message str () =
   print_endline str;
@@ -89,14 +87,17 @@ let print_table st num =
   print_newline ();
   print_newline ();
   print_newline ();
+
   if num >=1 then print_single_player st 0;
   if num >=3 then print_single_player st 2;
   if num >=5 then print_single_player st 4;
   if num >=7 then print_single_player st 6;
   if num >=9 then print_single_player st 8;
   print_newline ();
-  print_endline "___________________________________________________________________________________________";
+
+  print_hline 91 ();
   print_newline ();
+
   if num = 1 || num = 2 then
     print_endline "           ▯▯o";
   if num = 3 || num = 4 then
@@ -123,7 +124,7 @@ let print_table st num =
     print_endline "           ▯▯o                ▯▯o                ▯▯o               ▯▯o" ;
   if num = 10 then
     print_endline "           ▯▯o                ▯▯o                ▯▯o                ▯▯o                ▯▯o" ;
-  print_endline "___________________________________________________________________________________________";
+  print_hline 91 ();
   print_newline ();
   if num >=2 then print_single_player st 1;
   if num >=4 then print_single_player st 3;
