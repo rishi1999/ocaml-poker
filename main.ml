@@ -30,8 +30,6 @@ let print_intro () =
   print_newline ();
   print_newline ()
 
-
-
 let print_list func = function
   | h :: t ->
     func h;
@@ -42,21 +40,19 @@ let print_list func = function
 let print_string_list = print_list print_string
 let print_int_list = print_list print_int
 let print_single_player (st:State.t) num_of_player =
-  let x = Table.nth_participant st.table num_of_player
-  in
+  let player = Table.nth_participant st.table num_of_player in
   ANSITerminal.(
     (fun x ->
        print_string
          (
-           if x = (State.player_turn st) then [green]
-           else if x = (State.button st) then [red]
+           if Player.id x = (State.player_turn st) then [green]
+           else if Player.id x = (State.button st) then [red]
            else [default]
          )
-         ((State.find_participant st x).name ^ " ($" ^
-          (string_of_int (State.find_stack x st.table.participants)) ^
-          ")    ");
+         (Player.name x ^ ": $" ^
+          (string_of_int (Player.money x)));
     )
-  )
+  ) player
 
 let print_players_in st =
   let lst = State.players_in st in
@@ -76,8 +72,9 @@ let print_players_in st =
     print_newline ()
   )
 
-let print_table (st:State.t) =
-  (*print_single_player st ;*) ()
+let print_table st =
+  print_single_player st 0;
+  print_newline ()
 
 let print_player_bets st =
   let lst = State.bet_paid_amt st in
@@ -103,8 +100,10 @@ let print_current_state st =
     print_string [yellow] (Player.name player);
     print_string [yellow] "'s turn";
     print_newline ();
+    print_newline ();
     print_string [default]
       (avatar_array.(Player.avatar_id player));
+    print_newline ();
     print_string [yellow] "Wins: ";
     print_string [yellow] (string_of_int player.wins);
     print_newline ();
