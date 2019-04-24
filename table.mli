@@ -43,8 +43,11 @@ val participants : table -> Player.player list
     board = [(Spade, Ace)]}] = [(Spade, Ace)] *)
 val board : table -> (Deck.card) list
 
-(** [nth_participant tb n] gets the number [n] player in the table [tb]
-    Requires : [tb] is a valid table*)
+(** [nth_participant tb n] gets the number [n] player in the table [tb]. 
+    It is 0-based, so the first player in the list is retrieved using n = 0.
+    Requires : [tb] is a valid table,
+    n is a valid index for the participants list. 
+    Example: [nth_participant table 2] is the third player in the game. *)
 val nth_participant : table -> int -> Player.player
 
 (** [next_round_players tab] returns the table [tab] with blind
@@ -81,7 +84,7 @@ val deal: table -> table
     Example: [add_to_board {pot = 0; blind = 1;
     participants = [{id = 1; cards = []; money = 20}];
     board = []}] = 
-    [{id = 1; cards = []; money = 20}] = 
+    [{id = 1; cards = []; money = 20}] =
     {pot = 0; blind = 1;
     participants = [{id = 1; cards = []; money = 20}];
     board = [(Spade, Ace);(Spades, Two);(Hearts, Three)]} = *)
@@ -91,7 +94,7 @@ val add_to_board:  table -> table
     Requires [p] is a valid player list
     Example: [clear_players {pot = 0; blind = 1;
     participants = [{id= 1; cards= [(Spades, Ace);(Clubs, Ace)]; money = 20}];
-    board = []}] = 
+    board = []}] =
     {pot = 0; blind = 1;
     participants = [{id= 1; cards= []; money = 20}];
     board = []} *)
