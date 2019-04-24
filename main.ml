@@ -2,6 +2,7 @@ open Card
 open Hand_evaluator
 open Montecarlo
 open Avatar
+open Hand_analysis
 
 
 let clear_screen () =
@@ -268,6 +269,12 @@ let play_game st =
           print_endline "Your hand is: ";
           Card.card_printer (Player.cards (State.find_participant st
                                              (st.player_turn)));
+          print_newline ();
+          print_newline ();
+          if List.length (Table.board (State.table st)) = 0 then
+            print_endline
+              ("The Chen strength of your hand is " ^
+               (string_of_float (Hand_analysis.chen_formula player.cards)));
           print_newline ();
           print_newline ();
           print_endline "press enter to continue...";
