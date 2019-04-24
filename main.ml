@@ -91,14 +91,17 @@ let print_table st num =
 
   let num_top = (num + 1) / 2 in
   let num_bottom = num - num_top in
+  let table_length = num_top * 20 in
 
 
   print_newline ();
   print_newline ();
 
-  ANSITerminal.move_bol ();
+  ANSITerminal.set_cursor 5 (-1);
   print_player_info "top";
-  print_hline (num_top * 20) ();
+  ANSITerminal.set_cursor 5 (-1);
+  print_hline table_length ();
+  ANSITerminal.set_cursor 5 (-1);
   print_players_ascii num_top ();
 
   print_newline ();
@@ -110,12 +113,25 @@ let print_table st num =
   print_newline ();
   print_newline ();
 
-  let cursor_x = if num_bottom < num_top then 10 else 0 in
+  let cursor_x = if num_bottom < num_top then 15 else 5 in
   ANSITerminal.set_cursor cursor_x (-1);
   print_players_ascii num_bottom ();
-  print_hline (num_top * 20) ();
+  ANSITerminal.set_cursor 5 (-1);
+  print_hline table_length ();
   ANSITerminal.set_cursor cursor_x (-1);
-  print_player_info "bottom"
+  print_player_info "bottom";
+
+  ANSITerminal.move_cursor 0 (-17);
+  for i = 1 to 16 do
+    ANSITerminal.set_cursor 5 (-1);
+    ANSITerminal.print_string [] "|";
+    ANSITerminal.move_cursor (table_length - 1) 0;
+    ANSITerminal.print_string [] "|";
+    ANSITerminal.set_cursor 5 (-1);
+    ANSITerminal.move_cursor 0 1
+  done;
+  ANSITerminal.move_cursor 0 1
+
 
 let print_player_bets st =
   let lst = State.bet_paid_amt st in
