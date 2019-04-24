@@ -568,36 +568,7 @@ let bet_or_raise amt st comm_str =
 let bet' amt st = bet_or_raise amt st "bet"
 let raise' amt st = bet_or_raise amt st "raise"
 
-(* SAVE / LOAD NEEDS IMPLEMENTATION *)
-
-
-(* type t = {
-  game_type: int;
-  num_players: int;
-  table: Table.table;
-  player_turn: int;
-  button: int;
-  players_in: int list;
-  players_played: int list;
-  bet: bet;
-  avail_action: string list;
-  winner : (int*int);
-} *)
-
-(* type table = {
-  pot: int;
-  blind: int;
-  participants: Player.player list;
-  board: Deck.card list;
-} *)
-
-(* type bet = {
-  bet_player: int;
-  bet_amount: int;
-  bet_paid_amt: (int*int) list;
-} *)
-
-let save st =
+let save file_name st =
   let rec get_participants outlst = function
     | [] -> outlst
     | h::t -> let x = `Assoc [("id", `Int h.id);
@@ -627,7 +598,7 @@ let save st =
   let participants_json = get_participants [] st.table.participants in
   let bet_amt = get_bet_amt [] st.bet.bet_paid_amt in
 
-  Yojson.to_file "saved_game.json" (
+  Yojson.to_file (file_name ^ ".json") (
     `Assoc
       [
         ("game_type", `Int st.game_type);
@@ -658,7 +629,7 @@ let save st =
                            ("rank", `Int (snd st.winner))]);
       ]
   );
-  Legal st
+  st
 
 let load json =
 
@@ -758,6 +729,5 @@ let command_to_function = Command.(function
     | Call -> call
     | Raise amt -> raise' amt
     | Fold -> fold
-    | Save -> save
     | _ -> failwith "ERROR: unsupported command"
   )

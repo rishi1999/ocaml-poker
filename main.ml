@@ -219,6 +219,17 @@ let play_game st =
 
         | Quit -> exit 0
 
+        | Save ->
+          print_endline "Please enter the file name.";
+          print_string  "> ";
+          (match read_line () with
+          | exception End_of_file ->
+            print_endline "You have not entered a valid name!";
+            keep_playing st
+          | file_name ->
+            print_string (file_name^".json has been saved!\n");
+            keep_playing (State.save file_name st))
+
         | Show ->
           clear_screen ();
           print_endline "Your hand is: ";
@@ -272,14 +283,24 @@ let init_game num_players =
   play_game st
 
 let load_or_playnew value =
-  if value = 0 then
-    (match (Sys.file_exists "saved_game.json") with
-    | false ->
-      print_endline "There is no saved game!";
-      exit 0
-    | true ->
-      let loaded_game = State.load (Yojson.Basic.from_file "saved_game.json") in
-      play_game loaded_game
+  if value = 1 then
+    (
+      print_string "Please enter the name of the game file you want to load";
+      print_string " without the extension (.json)\n";
+      print_string  "> ";
+      (match read_line () with
+      | exception End_of_file -> ()
+      | file_name ->
+        let extended = file_name ^ ".json" in
+        (match (Sys.file_exists extended) with
+        | false ->
+          print_string extended;
+          print_endline " is not in current directory!";
+          exit 0
+        | true ->
+          extended |> Yojson.Basic.from_file |> State.load |> play_game
+        )
+       )
     )
   else
     State.read_integer "How many (human) players are there?"
@@ -295,8 +316,8 @@ let main () =
   ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
   print_newline ();
 
-  State.read_integer "Load or Play Game? Load: 0 Play: 1"
-    ~condition:((fun x -> x >= 0 && x <= 1), "Load: 0, Play: 1.") ()
+  State.read_integer "Play new game or load game? Play New: 0 Load: 1"
+    ~condition:((fun x -> x >= 0 && x <= 1), "Play: 0, Load: 1") ()
   |> load_or_playnew
     
 (* Execute the game engine. *)
