@@ -13,7 +13,8 @@ let clear_screen () =
 let print_hline length () =
   for i = 1 to length do
     print_char '_'
-  done
+  done;
+  print_newline ()
 
 let print_error_message str () =
   print_endline str;
@@ -49,89 +50,60 @@ let print_string_list = print_list print_string
 let print_int_list = print_list print_int
 
 let print_single_player st num_of_player =
-  let player = Table.nth_participant (State.table st) num_of_player in
+  let pl = Table.nth_participant (State.table st) num_of_player in
 
   ANSITerminal.(
-    (fun x ->
-       print_string
-         (
-           if Player.id x = (State.player_turn st) then [green]
-           else if Player.id x = (State.button st) then [red]
-           else [default]
-         )
-         ((Player.name x) ^ ": $" ^
-          (string_of_int (Player.money x) ^ "   "));
-
-    )
-  ) player
-
-(*let print_players_in st =
-  let lst = State.players_in st in
-  ANSITerminal.(
-    List.iter
-      (fun x ->
-         print_string
-           (
-             if x = (State.player_turn st) then [green]
-             else if x = (State.button st) then [red]
-             else [default]
-           )
-           ((State.find_participant st x).name ^ " ($" ^
-            (string_of_int (State.find_stack x st.table.participants)) ^
-            ")    ");
-      ) lst;
-    print_newline ()
-  )*)
+    print_string
+      (
+        if pl.id = (State.player_turn st) then [green]
+        else if pl.id = (State.button st) then [red]
+        else [default]
+      )
+      (pl.name ^ ": $" ^
+       (string_of_int pl.money ^ "   "));
+  )
 
 let print_table st num =
-  print_newline ();
+
   print_newline ();
   print_newline ();
 
-  if num >=1 then print_single_player st 0;
-  if num >=3 then print_single_player st 2;
-  if num >=5 then print_single_player st 4;
-  if num >=7 then print_single_player st 6;
-  if num >=9 then print_single_player st 8;
+  let print_player_info side =
+    let rec print_player_info' count =
+      match count with
+      | i when i + 1 > num -> ()
+      | i -> print_single_player st i;
+        print_player_info' (i + 2) in
+    print_player_info' (
+      if side = "top" then 0
+      else if side = "bottom" then 1
+      else failwith "ERROR: undefined table side"
+    );
+    print_newline () in
+
+  print_player_info "top";
+  print_hline 91 ();
+
+  let print_players_ascii num () =
+    let player_ascii = "    ▯▯    " in
+    print_string player_ascii;
+    for i = 2 to num do
+      print_string player_ascii
+    done;
+    print_newline (); in
+
+  let num_top = (num + 1) / 2 in
+  print_players_ascii num_top ();
+
+  Card.card_printer (Table.board (State.table st));
   print_newline ();
+  print_newline ();
+
+  let num_bottom = num - num_top in
+  print_players_ascii num_bottom ();
 
   print_hline 91 ();
-  print_newline ();
-
-  if num = 1 || num = 2 then
-    print_endline "           ▯▯o";
-  if num = 3 || num = 4 then
-    print_endline "           ▯▯o                ▯▯o";
-  if num = 5 || num = 6 then
-    print_endline "           ▯▯o                ▯▯o                ▯▯o" ;
-  if num = 7 || num = 8 then
-    print_endline "           ▯▯o                ▯▯o                ▯▯o                ▯▯o" ;
-  if num = 9 || num = 10 then
-    print_endline "           ▯▯o                ▯▯o                ▯▯o                ▯▯o                ▯▯o" ;
-  print_endline "Cards on the board: ";
-  (Card.card_printer (Table.board (State.table st)));
-  print_newline ();
-  print_newline ();
-  if num = 1 then
-    print_newline();
-  if num = 2 || num = 3 then
-    print_endline "           ▯▯o";
-  if num = 4 || num = 5 then
-    print_endline "           ▯▯o                ▯▯o";
-  if num = 6 || num = 7 then
-    print_endline "           ▯▯o                ▯▯o                ▯▯o" ;
-  if num = 8 || num = 9 then
-    print_endline "           ▯▯o                ▯▯o                ▯▯o               ▯▯o" ;
-  if num = 10 then
-    print_endline "           ▯▯o                ▯▯o                ▯▯o                ▯▯o                ▯▯o" ;
-  print_hline 91 ();
-  print_newline ();
-  if num >=2 then print_single_player st 1;
-  if num >=4 then print_single_player st 3;
-  if num >=6 then print_single_player st 5;
-  if num >=8 then print_single_player st 7;
-  if num >=10 then print_single_player st 9;
-  print_newline ()
+  print_player_info "bottom"
 
 let print_player_bets st =
   let lst = State.bet_paid_amt st in
