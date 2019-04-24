@@ -161,7 +161,7 @@ let init_players num_players money =
       let name = read_string ("Enter player " ^(string_of_int) id^ "'s name.")
           ~condition:((fun x -> String.length x <= 10
                                 && String.length x >= 1)
-                     ,"Length of name must be less than 10") () in
+                     ,"Max length: 10 characters.") () in
       ANSITerminal.(print_string [ANSITerminal.default] array_choice);
       let prompt_str = "Choose " ^ name ^ "'s avatar." in
 
@@ -426,10 +426,7 @@ let go_next_round st =
     let hand_qualities = List.map (fun (_,r) -> r) (winners st) in
 
     let num_winners = List.length winner_pls in
-    print_int num_winners;
     let profit = st.table.pot / num_winners in
-    print_int profit;
-    print_endline "yonkles";
 
     (* note: any money that doesn't divide well is given to the house *)
     let winner_pls = List.map (fun pl ->

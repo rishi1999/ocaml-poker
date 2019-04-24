@@ -49,10 +49,6 @@ let print_list func = function
 
 let print_string_list = print_list print_string
 let print_int_list = print_list print_int
-let rec make_name_10 string =
-  if String.length string <10 then make_name_10 (" "^string)
-  else if String.length string = 10 then string
-  else failwith "string has more than 10 length"
 
 let print_single_player (st:State.t) num_of_player =
   let player = Table.nth_participant st.table num_of_player in
@@ -65,7 +61,7 @@ let print_single_player (st:State.t) num_of_player =
            else if Player.id x = (State.button st) then [red]
            else [default]
          )
-         ((make_name_10 (Player.name x)) ^ ": $" ^
+         ((Player.name x) ^ ": $" ^
           (string_of_int (Player.money x) ^ "   "));
 
     )
