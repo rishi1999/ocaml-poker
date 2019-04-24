@@ -39,6 +39,8 @@ type t = {
 
 val read_integer : string -> ?condition:(int -> bool) * string -> unit -> int
 
+val read_string : string -> ?condition:(string -> bool) * string -> unit -> string
+
 (** [prompt str] prompts the user for input, using the string [str].
     Requires: [str] is a valid string.
     Example: [prompt "Please enter some text."] prints to the screen: 
@@ -202,7 +204,7 @@ val calculate_pay_amt : t -> int
     has an id of target. *)
 val find_participant : t -> int -> Player.player
 
-(** [find_stack id st] is the amount of money that the player 
+(** [find_stack id st] is the amount of money that the player
     with id [id] has in state [st].
     Requires: valid state [st], valid player id [id].
     Example: [find_stack 2 st] is the amount of money that the big blind has

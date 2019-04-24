@@ -294,7 +294,7 @@ let init_game num_players =
   play_game st
 
 let load_or_playnew value =
-  if value = 1 then
+  if value = "load" then
     (
       print_string "Please enter the name of the game file you want to load";
       print_string " without the extension (.json)\n";
@@ -327,8 +327,8 @@ let main () =
   ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
   print_newline ();
 
-  State.read_integer "Play new game or load game? Play New: 0 Load: 1"
-    ~condition:((fun x -> x >= 0 && x <= 1), "Play: 0, Load: 1") ()
+  State.read_string "Play new game or load game?"
+    ~condition:((fun x -> List.mem x ["new"; "load"]), "Options: new, load.") ()
   |> load_or_playnew
 
 (* Execute the game engine. *)

@@ -31,22 +31,27 @@ let prompt str =
   print_endline str;
   ANSITerminal.(print_string [blue] "> ")
 
-let rec read_integer prompt_str
-    ?(condition=((fun x -> true),
-                 "Number does not satisfy conditions.")) () =
+let rec read_input prompt_str condition type_converter () =
   let retry error_str () =
     print_newline ();
     print_string error_str;
-    read_integer prompt_str ~condition () in
+    read_input prompt_str condition type_converter () in
   prompt prompt_str;
 
   let input = read_line () in
   if input = "quit" then exit 0;
-  let num = try int_of_string input with
+  let var = try (fst type_converter) input with
     | Failure _ ->
-      retry "Please enter an integer value." () in
-  if fst condition num then num else retry (snd condition) ()
+      retry (snd type_converter) () in
+  if fst condition var then var else retry (snd condition) ()
 
+let read_integer prompt_str ?(condition=((fun x -> true),
+                                         "Number does not satisfy conditions.")) () =
+  read_input prompt_str condition (int_of_string, "Please enter an integer value.") ()
+
+let read_string prompt_str ?(condition=((fun x -> true),
+                                        "String does not satisfy conditions.")) () =
+  read_input prompt_str condition ((fun x -> x), "Please enter a valid string.") ()
 
 (** [get_next_player] st returns the id of the player that has
     to act next.
