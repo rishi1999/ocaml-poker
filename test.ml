@@ -24,14 +24,23 @@ let empty_table = {
 let deck_tests = 
   [
     "pick first card" >:: (fun _ -> deck_init ();
-                            print_endline "deck";assert_equal (pick_cards 1) 
+                            assert_equal (pick_cards 1) 
                               [(Clubs, Two)]);
-    "pick second card" >:: (fun _ -> deck_init();
-                             assert_equal (pick_cards 2) [(Clubs, Two); 
-                                                          (Clubs, Three)]);
-
+    "pick two cards" >:: (fun _ -> deck_init();
+                           assert_equal (pick_cards 2) [(Clubs, Two); 
+                                                        (Clubs, Three)]);
+    "pick 0 cards" >:: (fun _ -> deck_init();
+                         assert_equal (pick_cards 0) []);
     "convert 9C" >:: (fun _ -> 
         assert_equal 28 (int_converter (Clubs, Nine)));
+    "convert 9C" >:: (fun _ -> 
+        assert_equal 13 (int_converter (Diamonds, Five)));
+    "convert 9C" >:: (fun _ -> 
+        assert_equal 10 (int_converter (Hearts, Four)));
+    "convert 9C" >:: (fun _ -> 
+        assert_equal 51 (int_converter (Spades, Ace)));
+    "convert 9C" >:: (fun _ -> 
+        assert_equal 7 (int_converter (Spades, Three)));
     "pick_card_test" >:: (fun _ ->
         assert_equal 4 (List.length (pick_cards 4)));
     "int_converter Test 1" >:: (fun _ ->
@@ -75,11 +84,11 @@ let player_tests =
     "Avatar Test3" >:: (fun _->
         assert_equal  10 (avatar_id julian));
     "Orig_idTest1" >:: (fun _->
-        assert_equal  1 (avatar_id james));
+        assert_equal  1 (orig_id james));
     "Orig_idTest2" >:: (fun _->
-        assert_equal  0 (avatar_id bob));
+        assert_equal  0 (orig_id bob));
     "Orig_idTest3" >:: (fun _->
-        assert_equal  2 (avatar_id julian));
+        assert_equal  2 (orig_id julian));
     "ConsecutiveTest1" >:: (fun _->
         assert_equal  0 (consec_wins james));
     "ConsecutiveTest2" >:: (fun _->
@@ -100,6 +109,10 @@ let player_tests =
         assert_equal  0 (losses julian));
   ]
 
+(* The series of tests for montecarlo simulations. Note that due to
+   the random nature of montecarlo, we are unable to make unit tests here
+   as our montecarlo functions work  on randomized seed values. *)
+
 let command_tests = [
   "test parse empty" >:: (fun _ -> 
       print_endline "command"; assert_raises (Empty) (fun () -> parse ""));
@@ -118,7 +131,9 @@ let command_tests = [
   "test parse save malformed with spaces" >:: (fun _ -> 
       assert_raises (Malformed) (fun () -> parse "save      l"));
   "test parse bet malformed with spaces" >:: (fun _ -> 
-      assert_raises (Malformed) (fun () -> parse "bet      l"));
+      assert_raises (Malformed) (fun () -> parse "bet  "));
+  "test parse raise malformed with spaces" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "raise  "));
   "test parse go malformed" >:: (fun _ -> 
       assert_raises (Malformed) (fun () -> parse "go "));
   "test parse go malformed" >:: (fun _ -> 
@@ -152,9 +167,9 @@ let command_tests = [
   "test command to string6" >:: (fun command ->
       assert_equal Call (parse "call"));
   "test command to string7" >:: (fun command ->
-      assert_equal Save (parse "call"));
+      assert_equal Save (parse "save"));
   "test command to string8" >:: (fun command ->
-      assert_equal Show (parse "call"));
+      assert_equal Show (parse "show"));
   "test command to string9" >:: (fun command ->
       assert_equal (Bet 10) (parse "bet 10"));
   "test command to string10" >:: (fun command ->
@@ -215,7 +230,7 @@ let state1 =
     players_played = [];
     bet = state_bet_1;
     avail_action = ["fold"];
-    winner = (-1,0);
+    winners = [(-1,0)];
   }
 let state2 = {state1 with players_in = [2]}
 let state3 = {state1 with players_in = [3]}
@@ -232,7 +247,7 @@ let state_1 = get_avail_action (pay_blinds {game_type = 0;num_players = 2; table
                                             players_played = [];
                                             bet = init_bet [1;2];
                                             avail_action = ["bet"; "check"; "fold"];
-                                            winner = (-1,0);
+                                            winners = [(-1,0)];
                                            })
 let state_2 = get_state (State.call state_1)
 (*let state_3 = get_state (State.bet_or_raise 50 state_2 "bet")
