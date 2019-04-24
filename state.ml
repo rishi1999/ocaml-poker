@@ -376,48 +376,6 @@ let winners st =
         min accu rank) 7463 ranked_players in
     List.filter (fun (id,rank) -> rank = min_rank) ranked_players
 
-(*let winner st =
-  let board = st.table.board in
-  let all_part = st.table.participants in
-  let p_in = st.players_in in
-  let rec winner_printer list = match list with
-    |[] -> ()
-    | h ::t -> print_endline (string_of_int h); winner_printer t in
-  let test = winner_printer p_in in
-  let rec player_printer list = match list with
-    |[] -> ()
-    | h ::t -> print_endline (h.name); player_printer t in
-  let test = player_printer all_part in
-  if List.length p_in = 1 then (find_participant st (List.hd p_in), 0)
-  else
-
-    (** ranks returns a list of ranks of the hands of the list players*)
-    let rec ranks participants board acc =
-      match participants with
-      | [] -> List.rev acc
-      | p :: t -> ranks t board ((seven_list_eval (p.cards @ board)) :: acc)
-    in
-    (** best_rank gets the best rank in the list of hands*)
-    let rec best_player ls acc = match ls with
-      | [] -> acc
-      | a :: t when a < acc -> best_player t a
-      | a :: t when a > acc -> best_player t acc
-      | _ -> raise Tie
-    in
-
-    (** [get_player_in target ls acc] is the integer position
-        of the list of the best player. *)
-    let rec get_player_int target ls acc = match ls with
-      | a :: b when a = target -> acc
-      | a :: b -> get_player_int target b (acc + 1)
-      | [] -> failwith "ERROR: no best player" in
-
-    let part = get_players_in p_in all_part [] in
-    let rlist = ranks part board [] in
-    let best_rank = (best_player rlist 7463) in
-    let num_winner = get_player_int best_rank rlist 0 in
-    (List.nth part num_winner, best_rank)*)
-
 (** [go_next_round] st ends the current round or the current hand and
     returns the state with the next round. *)
 let go_next_round st =
