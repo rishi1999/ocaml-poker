@@ -158,8 +158,10 @@ let init_players num_players money =
   let rec init_players' acc money = function
     | id when id > num_players -> acc
     | id ->
-      prompt ("Enter player " ^ (string_of_int) id ^ "'s name.");
-      let name = read_line () in
+      let name = read_string ("Enter player " ^(string_of_int) id^ "'s name.") 
+          ~condition:((fun x -> String.length x <= 10
+                                && String.length x >= 1)
+                     ,"Length of name must be less than 10") () in
       ANSITerminal.(print_string [ANSITerminal.default] array_choice);
       let prompt_str = "Choose " ^ name ^ "'s avatar." in
 
@@ -357,11 +359,35 @@ let rec get_players_in part players_in ls = match players_in with
   | a :: t -> get_players_in part t ls
   | [] -> List.rev ls
 
+let winner_new st = 
+  let board = st.table.board in
+  let all_part = st.table.participants in
+  let p_in = st.players_in in
+  if List.length p_in = 1 then [(find_participant st (List.hd p_in), 0)]
+  else
+    let players_in = List.filter (fun player -> List.mem player.id p_in) all_part in
+    let rec player_ranker participants outlist =
+      match participants with
+      | [] -> List.rev outlist
+      | p :: t -> let rank = seven_list_eval (p.cards @ board) in
+        player_ranker t ((p,rank) :: outlist) in
+    let ranked_players = player_ranker players_in [] in
+    let min_rank = List.fold_left (fun accu (id,rank) -> 
+        if rank < accu then rank else accu) 7463 ranked_players in
+    List.filter (fun (id,rank) -> rank = min_rank) ranked_players
+
 let winner st =
   let board = st.table.board in
   let all_part = st.table.participants in
   let p_in = st.players_in in
-
+  let rec winner_printer list = match list with
+    |[] -> ()
+    | h ::t -> print_endline (string_of_int h); winner_printer t in
+  let test = winner_printer p_in in
+  let rec player_printer list = match list with
+    |[] -> ()
+    | h ::t -> print_endline (h.name); player_printer t in
+  let test = player_printer all_part in
   if List.length p_in = 1 then (find_participant st (List.hd p_in), 0)
   else
 
