@@ -48,6 +48,10 @@ let print_list func = function
 
 let print_string_list = print_list print_string
 let print_int_list = print_list print_int
+let rec print_spaces n = 
+  if n = 2 then print_string " "
+  else print_string " "; print_spaces (n-1)
+
 let print_single_player (st:State.t) num_of_player =
   let player = Table.nth_participant st.table num_of_player in
 
@@ -62,6 +66,8 @@ let print_single_player (st:State.t) num_of_player =
          )
          (Player.name x ^ ": $" ^
           (string_of_int (Player.money x) ^ "   "));
+       print_spaces (15 - (String.length (Player.name x ^ ": $" ^
+                                          (string_of_int (Player.money x) ^ "   "))))
     )
   ) player
 
@@ -92,10 +98,32 @@ let print_table st =
   print_newline ();
   print_endline "________________________________________________________________________";
   print_newline ();
+  if st.num_players = 1 || st.num_players = 2 then
+    print_endline "▯▯o";
+  if st.num_players = 3 || st.num_players = 4 then
+    print_endline "▯▯o           ▯▯o";
+  if st.num_players = 5 || st.num_players = 6 then
+    print_endline "▯▯o           ▯▯o           ▯▯o" ;
+  if st.num_players = 7 || st.num_players = 8 then
+    print_endline "▯▯o           ▯▯o           ▯▯o           ▯▯o" ;
+  if st.num_players = 9 || st.num_players = 10 then
+    print_endline "▯▯o           ▯▯o           ▯▯o           ▯▯o           ▯▯o" ;
   print_endline "Cards on the board: ";
   (Card.card_printer (Table.board (State.table st)));
   print_newline ();
   print_newline ();
+  if st.num_players = 1 then
+    print_newline();
+  if st.num_players = 2 || st.num_players = 3 then
+    print_endline "▯▯o";
+  if st.num_players = 4 || st.num_players = 5 then
+    print_endline "▯▯o           ▯▯o";
+  if st.num_players = 6 || st.num_players = 7 then
+    print_endline "▯▯o           ▯▯o           ▯▯o" ;
+  if st.num_players = 8 || st.num_players = 9 then
+    print_endline "▯▯o           ▯▯o           ▯▯o           ▯▯o" ;
+  if st.num_players = 10 then
+    print_endline "▯▯o           ▯▯o           ▯▯o           ▯▯o           ▯▯o" ;
   print_endline "________________________________________________________________________";
   print_newline ();
   if st.num_players >=2 then print_single_player st 1;
