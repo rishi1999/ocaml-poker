@@ -215,7 +215,7 @@ let state1 =
     players_played = [];
     bet = state_bet_1;
     avail_action = ["fold"];
-    winner = (-1,0);
+    winners = [(-1,0)];
   }
 let state2 = {state1 with players_in = [2]}
 let state3 = {state1 with players_in = [3]}
@@ -232,7 +232,7 @@ let state_1 = get_avail_action (pay_blinds {game_type = 0;num_players = 2; table
                                             players_played = [];
                                             bet = init_bet [1;2];
                                             avail_action = ["bet"; "check"; "fold"];
-                                            winner = (-1,0);
+                                            winners = [(-1,0)];
                                            })
 let state_2 = get_state (State.call state_1)
 (*let state_3 = get_state (State.bet_or_raise 50 state_2 "bet")
