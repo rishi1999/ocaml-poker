@@ -36,11 +36,48 @@ type t = {
   players_played: int list;
   bet: bet;
   avail_action: string list;
-  winner: (int*int);
+  winner: (int * int);
 }
 
+(** [read_integer prompt_str ~condition:(cond, msg) ()] is the integer read
+    in from user input. First, [prompt_str] is displayed first to inorm
+    the user of what the program is looking for. If the user enters iput
+    that does not satisfy the condition [cond], the program will dislay
+    the warning message [msg], and ask the user to try entering a value
+    again. If the user enters input that is not an integer, the program
+    will complain that they are not entering input of the correct type, 
+    and ask them to input a valid again. 
+
+    If a condition is not provided, a function that always evaluates to 
+    true regardless of the input is used by default, so the input will
+    always pass the condition. 
+
+    Requires: N/A. 
+
+    Example: [read_integer "Please input something." ()] will ask the 
+    user to input something, and will continue to do so until 
+    they have entered a valid integer, at which point, it will
+    evaluate to said integer. *)
 val read_integer : string -> ?condition:(int -> bool) * string -> unit -> int
 
+(** [read_string prompt_str ~condition:(cond, msg) ()] is the string 
+    read in from user input. First, [prompt_str] is displayed to inform 
+    the user of what the program is looking for. If the user enters input
+    that does not satisfy the condition [cond], the program will display
+    the warning message [msg], and ask the user to try entering a value
+    again.
+
+    If a condition is not provided, a function that always evaluates to
+    true regardless of the input is used by default, so the input will
+    always pass the condition.
+
+    Requires: N/A.
+
+    Example: [read_string "Please input something."
+    ~condition:((fun x -> x = "Hello!"), "Please greet me.") ()]
+    will ask the user to input something, and will continue to
+    do so until they have entered exactly the string ["Hello!"],
+    at which point, it will evaluate to ["Hello!"]. *)
 val read_string : string -> ?condition:(string -> bool) * string -> unit -> string
 
 (** [prompt str] prompts the user for input, using the string [str].
