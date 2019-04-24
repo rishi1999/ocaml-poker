@@ -51,7 +51,7 @@ let print_int_list = print_list print_int
 
 let print_single_player st num_of_player =
   let pl = Table.nth_participant (State.table st) num_of_player in
-
+  ANSITerminal.save_cursor ();
   ANSITerminal.(
     print_string
       (
@@ -61,12 +61,11 @@ let print_single_player st num_of_player =
       )
       (pl.name ^ ": $" ^
        (string_of_int pl.money ^ "   "));
-  )
+  );
+  ANSITerminal.restore_cursor ();
+  ANSITerminal.move_cursor 20 0
 
 let print_table st num =
-
-  print_newline ();
-  print_newline ();
 
   let print_player_info side =
     let rec print_player_info' count =
@@ -74,6 +73,7 @@ let print_table st num =
       | i when i + 1 > num -> ()
       | i -> print_single_player st i;
         print_player_info' (i + 2) in
+    ANSITerminal.set_cursor 5 (-1);
     print_player_info' (
       if side = "top" then 0
       else if side = "bottom" then 1
@@ -81,11 +81,8 @@ let print_table st num =
     );
     print_newline () in
 
-  print_player_info "top";
-  print_hline 91 ();
-
   let print_players_ascii num () =
-    let player_ascii = "    ▯▯    " in
+    let player_ascii = "         ▯▯         " in
     print_string player_ascii;
     for i = 2 to num do
       print_string player_ascii
@@ -93,16 +90,30 @@ let print_table st num =
     print_newline (); in
 
   let num_top = (num + 1) / 2 in
+  let num_bottom = num - num_top in
+
+
+  print_newline ();
+  print_newline ();
+
+  print_player_info "top";
+  print_hline (num_top * 20) ();
   print_players_ascii num_top ();
 
+  print_newline ();
+  print_newline ();
+
   Card.card_printer (Table.board (State.table st));
+
+  print_newline ();
   print_newline ();
   print_newline ();
 
-  let num_bottom = num - num_top in
+  let cursor_x = if num_bottom < num_top then 10 else 0 in
+  ANSITerminal.set_cursor cursor_x (-1);
   print_players_ascii num_bottom ();
-
-  print_hline 91 ();
+  print_hline (num_top * 20) ();
+  ANSITerminal.set_cursor cursor_x (-1);
   print_player_info "bottom"
 
 let print_player_bets st =

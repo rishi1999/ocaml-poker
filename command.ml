@@ -19,15 +19,15 @@ exception Malformed
     Requires: command is a valid command
     Example: [command_to_string Check] is "checked!" *)
 let command_to_string = function
-  | Show -> "ERROR_show(thisshouldnotbeprinted)"
-  | Save -> "ERROR_save(thisshouldnotbeprinted)"
+  | Show -> failwith "Show should not be printed"
+  | Save -> failwith "Save should not be printed"
   | Check -> "checked!"
   | Fold -> "folded!"
   | Call -> "called!"
   | Bet x -> "bet $" ^ (string_of_int x) ^ "!"
   | Raise x -> "raised $" ^ (string_of_int x) ^ "!"
-  | Stack -> "ERROR_stack(thisshouldnotbeprinted)"
-  | Quit -> "ERROR_quit(thisshouldnotbeprinted)"
+  | Stack -> failwith "Stack should not be printed"
+  | Quit -> failwith "Quit should not be printed"
 
 (** [parse str] parses a player's input into a [command], as follows.
     The first word (i.e., consecutive sequence of non-space characters)
@@ -75,8 +75,14 @@ let parse str =
     else if head = "call" then Call
     else if head = "show" then Show
     else if head = "save" then Save
-    else if head = "bet" then Bet (tail |> List.hd |> int_of_string)
-    else if head = "raise" then Raise (tail |> List.hd |> int_of_string)
+    else if head = "bet" then Bet (tail |> List.hd |>
+                                   try int_of_string with
+                                   | Failure _ -> raise Malformed
+                                  )
+    else if head = "raise" then Raise (tail |> List.hd |>
+                                       try int_of_string with
+                                       | Failure _ -> raise Malformed
+                                      )
     else if head = "quit" then Quit
     else raise Malformed
 
