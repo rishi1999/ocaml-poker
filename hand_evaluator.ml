@@ -126,7 +126,8 @@ let seven_int_list_eval hand =
     to the highest rank so it must contain the Ace, King, Queen, Jack and Ten
     of a suit.
     Requires: [rank_val] is between 1 and 7462)  *)
-let rank_mapper rank_val =  if rank_val = 0 then "Nothing (because everyone else folded)"
+let rank_mapper rank_val =  if rank_val = 0 then 
+    "Nothing (because everyone else folded)"
   else if rank_val = 1 then "Royal Flush"
   else if rank_val <= 10 then "Straight Flush"
   else if rank_val <= 166 then "Four of a Kind"
