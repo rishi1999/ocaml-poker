@@ -18,7 +18,7 @@ let print_hline length () =
 
 let print_error_message str () =
   print_endline str;
-  Unix.sleep 2;
+  Unix.sleep 1;
   clear_screen ()
 
 let print_intro () =
