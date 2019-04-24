@@ -48,9 +48,10 @@ let print_list func = function
 
 let print_string_list = print_list print_string
 let print_int_list = print_list print_int
-let rec print_spaces n = 
-  if n = 2 then print_string " "
-  else print_string " "; print_spaces (n-1)
+let rec make_name_10 string =
+  if String.length string <10 then make_name_10 (" "^string)
+  else if String.length string = 10 then string
+  else failwith "string has more than 10 length"
 
 let print_single_player (st:State.t) num_of_player =
   let player = Table.nth_participant st.table num_of_player in
@@ -59,15 +60,13 @@ let print_single_player (st:State.t) num_of_player =
     (fun x ->
        print_string
          (
-           let num_spaces = (10 - String.length (Player.name x)) in
            if Player.id x = (State.player_turn st) then [green]
            else if Player.id x = (State.button st) then [red]
            else [default]
          )
-         (Player.name x ^ ": $" ^
+         ((make_name_10 (Player.name x)) ^ ": $" ^
           (string_of_int (Player.money x) ^ "   "));
-       print_spaces (15 - (String.length (Player.name x ^ ": $" ^
-                                          (string_of_int (Player.money x) ^ "   "))))
+
     )
   ) player
 
@@ -90,24 +89,27 @@ let print_players_in st =
   )
 
 let print_table st =
+  print_newline ();
+  print_newline ();
+  print_newline ();
   print_single_player st 0;
   if st.num_players >=3 then print_single_player st 2;
   if st.num_players >=5 then print_single_player st 4;
   if st.num_players >=7 then print_single_player st 6;
   if st.num_players >=9 then print_single_player st 8;
   print_newline ();
-  print_endline "________________________________________________________________________";
+  print_endline "___________________________________________________________________________________________";
   print_newline ();
   if st.num_players = 1 || st.num_players = 2 then
-    print_endline "▯▯o";
+    print_endline "           ▯▯o";
   if st.num_players = 3 || st.num_players = 4 then
-    print_endline "▯▯o           ▯▯o";
+    print_endline "           ▯▯o                ▯▯o";
   if st.num_players = 5 || st.num_players = 6 then
-    print_endline "▯▯o           ▯▯o           ▯▯o" ;
+    print_endline "           ▯▯o                ▯▯o                ▯▯o" ;
   if st.num_players = 7 || st.num_players = 8 then
-    print_endline "▯▯o           ▯▯o           ▯▯o           ▯▯o" ;
+    print_endline "           ▯▯o                ▯▯o                ▯▯o                ▯▯o" ;
   if st.num_players = 9 || st.num_players = 10 then
-    print_endline "▯▯o           ▯▯o           ▯▯o           ▯▯o           ▯▯o" ;
+    print_endline "           ▯▯o                ▯▯o                ▯▯o                ▯▯o                ▯▯o" ;
   print_endline "Cards on the board: ";
   (Card.card_printer (Table.board (State.table st)));
   print_newline ();
@@ -115,16 +117,16 @@ let print_table st =
   if st.num_players = 1 then
     print_newline();
   if st.num_players = 2 || st.num_players = 3 then
-    print_endline "▯▯o";
+    print_endline "           ▯▯o";
   if st.num_players = 4 || st.num_players = 5 then
-    print_endline "▯▯o           ▯▯o";
+    print_endline "           ▯▯o                ▯▯o";
   if st.num_players = 6 || st.num_players = 7 then
-    print_endline "▯▯o           ▯▯o           ▯▯o" ;
+    print_endline "           ▯▯o                ▯▯o                ▯▯o" ;
   if st.num_players = 8 || st.num_players = 9 then
-    print_endline "▯▯o           ▯▯o           ▯▯o           ▯▯o" ;
+    print_endline "           ▯▯o                ▯▯o                ▯▯o               ▯▯o" ;
   if st.num_players = 10 then
-    print_endline "▯▯o           ▯▯o           ▯▯o           ▯▯o           ▯▯o" ;
-  print_endline "________________________________________________________________________";
+    print_endline "           ▯▯o                ▯▯o                ▯▯o                ▯▯o                ▯▯o" ;
+  print_endline "___________________________________________________________________________________________";
   print_newline ();
   if st.num_players >=2 then print_single_player st 1;
   if st.num_players >=4 then print_single_player st 3;
