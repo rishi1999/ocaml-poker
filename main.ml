@@ -176,8 +176,10 @@ let print_current_state st =
   print_newline ();
   print_newline ();
   print_newline ();
-  (*)  print_players_in st;
-    print_newline (); *)
+  (*
+      print_players_in st;
+      print_newline ();
+  *)
   print_player_bets st;
   print_newline ();
   print_string "Available actions: ";

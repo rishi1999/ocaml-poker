@@ -372,7 +372,7 @@ let winners st =
       | p :: t -> let rank = seven_list_eval (p.cards @ board) in
         player_ranker t ((p,rank) :: outlist) in
     let ranked_players = player_ranker players_in [] in
-    let min_rank = List.fold_left (fun accu (id,rank) -> 
+    let min_rank = List.fold_left (fun accu (id,rank) ->
         min accu rank) 7463 ranked_players in
     List.filter (fun (id,rank) -> rank = min_rank) ranked_players
 
@@ -426,12 +426,16 @@ let go_next_round st =
     let hand_qualities = List.map (fun (_,r) -> r) (winners st) in
 
     let num_winners = List.length winner_pls in
+    print_int num_winners;
+    let profit = st.table.pot / num_winners in
+    print_int profit;
+    print_endline "yonkles";
 
     (* note: any money that doesn't divide well is given to the house *)
     let winner_pls = List.map (fun pl ->
         {
           pl with
-          money = pl.money + st.table.pot / num_winners;
+          money = pl.money + profit;
           wins = pl.wins + 1;
           consecutive_wins = pl.consecutive_wins + 1;
         }
@@ -451,14 +455,16 @@ let go_next_round st =
 
     let winner_pl_ids = List.map (fun pl -> pl.id) winner_pls in
 
-    let participants = List.map (fun pl ->
-        if List.mem pl winner_pls then pl
-        else {
+    let loser_pls = List.filter (fun pl -> not (List.mem pl.id winner_pl_ids))
+        st.table.participants |> List.map (fun pl ->
+        {
           pl with
           losses = pl.losses + 1;
           consecutive_wins = 0;
         }
-      ) st.table.participants in
+      ) in
+
+    let participants = winner_pls @ loser_pls in
 
     let table = {
       st.table with
