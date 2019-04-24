@@ -208,9 +208,15 @@ let play_game st =
       else failwith "AI next move not defined"
 
     (* Medium Bot *)
-    else if (State.game_type st) = 2 && State.player_turn st = 2 then
+    else if ((State.game_type st) = 2 || (State.game_type st) = 3) && 
+            State.player_turn st = 2 then
+      let iterations = ref 4000 in
+      let change_difficulty game_type = 
+        if game_type = 2 then iterations := 4000
+        else iterations := 50000 in
+      change_difficulty (State.game_type st);
       let next_action = Montecarlo.declare_action (State.find_participant st 2)
-          (Player.cards (State.find_participant st 2)) st 5000 in
+          (Player.cards (State.find_participant st 2)) st !iterations in
       let action = fst next_action in
       print_endline action;
       let amt = snd next_action in

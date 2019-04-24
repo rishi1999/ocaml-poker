@@ -372,8 +372,8 @@ let winners st =
       | p :: t -> let rank = seven_list_eval (p.cards @ board) in
         player_ranker t ((p,rank) :: outlist) in
     let ranked_players = player_ranker players_in [] in
-    let min_rank = List.fold_left (fun accu (id,rank) ->
-        if rank < accu then rank else accu) 7463 ranked_players in
+    let min_rank = List.fold_left (fun accu (id,rank) -> 
+        min accu rank) 7463 ranked_players in
     List.filter (fun (id,rank) -> rank = min_rank) ranked_players
 
 (*let winner st =
