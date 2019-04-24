@@ -84,26 +84,28 @@ let print_players_in st =
   )
 
 let print_table (st:State.t) = 
-  print_single_player st ;
+  if (st.num_players>1) then print_single_player st 1;
   print_endline "----------------------------------------------------------";
-  print_endline ""
-
-let print_player_bets st =
-  let lst = State.bet_paid_amt st in
-  let rec helper = function
-    | [] -> ()
-    | (a,b) :: t -> if b != 0 then
-        (
-          let p = State.find_participant st a in
-          print_string p.name;
-          print_string " added $";
-          print_int b;
-          print_endline " to the pot.";
-          helper t
-        ) in
-  let sorted = List.sort compare lst in
-  helper sorted;
-  print_newline ()
+  print_endline "|                                                        |";
+  print_endline "|                                                        |";
+  print_endline "|                                                        |";
+  print_endline "|                                                        |";
+  let print_player_bets st =
+    let lst = State.bet_paid_amt st in
+    let rec helper = function
+      | [] -> ()
+      | (a,b) :: t -> if b != 0 then
+          (
+            let p = State.find_participant st a in
+            print_string p.name;
+            print_string " added $";
+            print_int b;
+            print_endline " to the pot.";
+            helper t
+          ) in
+    let sorted = List.sort compare lst in
+    helper sorted;
+    print_newline ()
 
 let print_current_state st =
   print_table st;
