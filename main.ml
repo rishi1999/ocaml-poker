@@ -35,6 +35,7 @@ let print_intro () =
   ANSITerminal.(print_string [yellow] "LET'S PLAY!");
   print_newline ();
   print_newline ();
+  print_endline "make sure to go full screen!";
   print_endline "press enter to continue...";
   ignore (read_line ());
   clear_screen ()
@@ -157,6 +158,7 @@ let print_current_state st =
   (*print_table st;*)
   ANSITerminal.(
     let player = State.find_participant st (State.player_turn st) in
+    print_newline ();
     print_string [yellow] (Player.name player);
     print_string [yellow] "'s turn";
     print_newline ();
@@ -174,8 +176,8 @@ let print_current_state st =
   print_newline ();
   print_newline ();
   print_newline ();
-  print_players_in st;
-  print_newline ();
+  (*)  print_players_in st;
+    print_newline (); *)
   print_player_bets st;
   print_newline ();
   print_string "Available actions: ";
