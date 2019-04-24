@@ -158,8 +158,10 @@ let init_players num_players money =
   let rec init_players' acc money = function
     | id when id > num_players -> acc
     | id ->
-      prompt ("Enter player " ^ (string_of_int) id ^ "'s name.");
-      let name = read_line () in
+      let name = read_string ("Enter player " ^(string_of_int) id^ "'s name.") 
+          ~condition:((fun x -> String.length x <= 10
+                                && String.length x >= 1)
+                     ,"Length of name must be less than 10") () in
       ANSITerminal.(print_string [ANSITerminal.default] array_choice);
       let prompt_str = "Choose " ^ name ^ "'s avatar." in
 

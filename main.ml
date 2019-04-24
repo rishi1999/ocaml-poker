@@ -49,16 +49,18 @@ let print_string_list = print_list print_string
 let print_int_list = print_list print_int
 let print_single_player (st:State.t) num_of_player =
   let player = Table.nth_participant st.table num_of_player in
+
   ANSITerminal.(
     (fun x ->
        print_string
          (
+           let num_spaces = (10 - String.length (Player.name x)) in
            if Player.id x = (State.player_turn st) then [green]
            else if Player.id x = (State.button st) then [red]
            else [default]
          )
          (Player.name x ^ ": $" ^
-          (string_of_int (Player.money x)));
+          (string_of_int (Player.money x) ^ "   "));
     )
   ) player
 
@@ -82,6 +84,24 @@ let print_players_in st =
 
 let print_table st =
   print_single_player st 0;
+  if st.num_players >=3 then print_single_player st 2;
+  if st.num_players >=5 then print_single_player st 4;
+  if st.num_players >=7 then print_single_player st 6;
+  if st.num_players >=9 then print_single_player st 8;
+  print_newline ();
+  print_endline "________________________________________________________________________";
+  print_newline ();
+  print_endline "Cards on the board: ";
+  (Card.card_printer (Table.board (State.table st)));
+  print_newline ();
+  print_newline ();
+  print_endline "________________________________________________________________________";
+  print_newline ();
+  if st.num_players >=2 then print_single_player st 1;
+  if st.num_players >=4 then print_single_player st 3;
+  if st.num_players >=6 then print_single_player st 5;
+  if st.num_players >=8 then print_single_player st 7;
+  if st.num_players >=10 then print_single_player st 9;
   print_newline ()
 
 let print_player_bets st =
@@ -100,6 +120,7 @@ let print_player_bets st =
   let sorted = List.sort compare lst in
   helper sorted;
   print_newline ()
+
 
 let print_current_state st =
   (*print_table st;*)
@@ -121,8 +142,6 @@ let print_current_state st =
   );
   print_newline ();
   print_newline ();
-  print_endline "Cards on the board: ";
-  (Card.card_printer (Table.board (State.table st)));
   print_newline ();
   print_players_in st;
   print_newline ();
@@ -140,6 +159,7 @@ let play_game st =
 
   let rec keep_playing st =
 
+    print_table st;
     if (fst (State.winning_player st)) >= 0 then
       (
         clear_screen ();
@@ -246,6 +266,7 @@ let play_game st =
           print_endline "Your hand is: ";
           Card.card_printer (Player.cards (State.find_participant st
                                              (st.player_turn)));
+          print_endline "Press Enter to go back to the table";
           ignore (read_line ());
           clear_screen ();
           keep_playing st
@@ -331,6 +352,7 @@ let load_or_new value =
 (** [main ()] prompts the user for the number of players,
     then starts the game. *)
 let main () =
+
   print_newline ();
   print_newline ();
   ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
