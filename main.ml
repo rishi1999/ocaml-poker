@@ -161,7 +161,7 @@ let play_game st =
   let rec keep_playing st =
 
     print_table st;
-    if (fst (State.winning_player st)) >= 0 then
+    if (List.length (State.winning_players st)) > 0 then
       (
         clear_screen ();
         print_string "~ ";
@@ -182,7 +182,7 @@ let play_game st =
       if List.mem "check" (State.avail_action st) then
         match State.check st with
         | Legal t ->
-          if (fst (State.winning_player st)) < 0 then (
+          if (List.length (State.winning_players st)) = 0 then (
             clear_screen ();
             print_endline (player.name ^ " " ^ Command.command_to_string Check);
             print_newline ()
@@ -287,7 +287,7 @@ let play_game st =
           let move_result = func st in
           match move_result with
           | Legal t ->
-            if (fst (State.winning_player st)) < 0 then (
+            if (List.length (State.winning_players st)) = 0 then (
               print_endline (player.name ^ " " ^ Command.command_to_string comm);
               print_newline ()
             );

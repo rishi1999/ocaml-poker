@@ -21,7 +21,7 @@ type t = {
   players_played: int list;
   bet: bet;
   avail_action: string list;
-  winner : (int*int);
+  winners: (int * int) list;
 }
 
 exception Tie
@@ -158,7 +158,7 @@ let init_players num_players money =
   let rec init_players' acc money = function
     | id when id > num_players -> acc
     | id ->
-      let name = read_string ("Enter player " ^(string_of_int) id^ "'s name.") 
+      let name = read_string ("Enter player " ^(string_of_int) id^ "'s name.")
           ~condition:((fun x -> String.length x <= 10
                                 && String.length x >= 1)
                      ,"Length of name must be less than 10") () in
@@ -302,7 +302,7 @@ let init_state game_type num_players money blind =
     players_played = [];
     bet = init_bet (init_players_in num_players);
     avail_action = ["bet"; "check"; "fold"];
-    winner = (-1,0);
+    winners = [];
   } |> filter_busted_players |> pay_blinds |> get_avail_action
 
 let game_type st = st.game_type
@@ -359,7 +359,7 @@ let rec get_players_in part players_in ls = match players_in with
   | a :: t -> get_players_in part t ls
   | [] -> List.rev ls
 
-let winner_new st =
+let winners st =
   let board = st.table.board in
   let all_part = st.table.participants in
   let p_in = st.players_in in
@@ -376,7 +376,7 @@ let winner_new st =
         if rank < accu then rank else accu) 7463 ranked_players in
     List.filter (fun (id,rank) -> rank = min_rank) ranked_players
 
-let winner st =
+(*let winner st =
   let board = st.table.board in
   let all_part = st.table.participants in
   let p_in = st.players_in in
@@ -416,45 +416,49 @@ let winner st =
     let rlist = ranks part board [] in
     let best_rank = (best_player rlist 7463) in
     let num_winner = get_player_int best_rank rlist 0 in
-    (List.nth part num_winner, best_rank)
+    (List.nth part num_winner, best_rank)*)
 
 (** [go_next_round] st ends the current round or the current hand and
     returns the state with the next round. *)
 let go_next_round st =
   if is_hand_complete st then
-    let winner_pl = fst (winner st) in
-    let hand_quality = snd (winner st) in
+    let winner_pls = List.map (fun (p,_) -> p) (winners st) in
+    let hand_qualities = List.map (fun (_,r) -> r) (winners st) in
 
-    let winner_pl = {
-      winner_pl with
-      money = winner_pl.money + st.table.pot;
-      wins = winner_pl.wins + 1;
-      consecutive_wins = winner_pl.consecutive_wins + 1;
-    } in
+    let num_winners = List.length winner_pls in
 
-    let celebration_str = "The winner is " ^ winner_pl.name
-                          ^ " with " ^ Hand_evaluator.rank_mapper hand_quality ^ "!" in
+    (* note: any money that doesn't divide well is given to the house *)
+    let winner_pls = List.map (fun pl ->
+        {
+          pl with
+          money = pl.money + st.table.pot / num_winners;
+          wins = pl.wins + 1;
+          consecutive_wins = pl.consecutive_wins + 1;
+        }
+      ) winner_pls in
+
+    let celebration_str = if num_winners = 1 then
+        "The winner is " ^ (List.hd winner_pls).name
+        ^ " with " ^ Hand_evaluator.rank_mapper (List.hd hand_qualities) ^ "!"
+      else
+        let names = List.map (fun pl -> pl.name) winner_pls in
+        "Winners:\n" ^ (List.fold_left (fun a b -> a ^ "    " ^ b) "" names)
+    in
     print_newline ();
     print_newline ();
     ANSITerminal.(print_string [yellow] celebration_str);
     ignore (read_line ());
 
-    let winner_pl_id = winner_pl.id in
+    let winner_pl_ids = List.map (fun pl -> pl.id) winner_pls in
 
-    let participants =
-      let rec update_player target new_player acc = function
-        | [] -> acc
-        | h :: t -> if h.id = target then
-            update_player target new_player (new_player :: acc) t
-          else update_player target new_player
-              (
-                {
-                  h with
-                  losses = h.losses + 1;
-                  consecutive_wins = 0;
-                }
-                :: acc) t in
-      update_player winner_pl_id winner_pl [] st.table.participants in
+    let participants = List.map (fun pl ->
+        if List.mem pl winner_pls then pl
+        else {
+          pl with
+          losses = pl.losses + 1;
+          consecutive_wins = 0;
+        }
+      ) st.table.participants in
 
     let table = {
       st.table with
@@ -474,7 +478,7 @@ let go_next_round st =
       button;
       players_in;
       players_played = [];
-      winner = (winner_pl_id, hand_quality);
+      winners = List.map2 (fun id r -> (id,r)) winner_pl_ids hand_qualities;
     }
 
     |> filter_busted_players |> pay_blinds |> get_avail_action
@@ -488,9 +492,12 @@ let go_next_round st =
       players_played = [];
     }
 
-let continue_game st = {st with winner = (-1,0)}
+let continue_game st = {
+  st with
+  winners = [];
+}
 
-let winning_player st = st.winner
+let winning_players st = st.winners
 
 let calculate_pay_amt st =
   let cur_bet_size = st.bet.bet_amount in
@@ -615,6 +622,9 @@ let save file_name st =
   let participants_json = get_participants [] st.table.participants in
   let bet_amt = get_bet_amt [] st.bet.bet_paid_amt in
 
+  let winner_pl_ids = List.map (fun (p,_) -> `Int p.id) (winners st) in
+  let hand_qualities = List.map (fun (_,r) -> `Int r) (winners st) in
+
   Yojson.to_file (file_name ^ ".json") (
     `Assoc
       [
@@ -642,8 +652,8 @@ let save file_name st =
         );
         ("avail_action",
          `List (List.map (fun x -> `String x) st.avail_action));
-        ("winner", `Assoc [("player", `Int (fst st.winner));
-                           ("rank", `Int (snd st.winner))]);
+        ("winners", `Assoc [("players", `List (winner_pl_ids));
+                            ("ranks", `List (hand_qualities))]);
         ("deck", `List (List.map (fun x -> `Int x)
                           (List.map (Deck.int_converter) !Deck.current_deck))
         );
@@ -715,10 +725,10 @@ let load json =
             |> List.map card_inverter;
   } in
 
-  let winner_of_json json =
-    let player = json |> member "player" |> to_int in
-    let rank =  json |> member "rank" |> to_int in
-    (player,rank)
+  let winners_of_json json =
+    let players = json |> member "players" |> to_list |> List.map to_int in
+    let ranks =  json |> member "ranks" |> to_list |> List.map to_int in
+    List.map2 (fun pl r -> (pl,r)) players ranks
   in
 
   let t_of_json json = {
@@ -734,7 +744,7 @@ let load json =
     bet = json |> member "bet" |> bet_of_json;
     avail_action = json |> member "avail_action" |> to_list
                    |> List.map (fun x -> to_string x);
-    winner = json |> member "winner" |> winner_of_json;
+    winners = json |> member "winners" |> winners_of_json;
   } in
 
   let parse json =
