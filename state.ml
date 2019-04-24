@@ -396,7 +396,8 @@ let go_next_round st =
 
     let winner_pl = {
       winner_pl with
-      money = winner_pl.money + st.table.pot
+      money = winner_pl.money + st.table.pot;
+      wins = winner_pl.wins + 1;
     } in
 
     let string = "The winner is " ^ winner_pl.name
@@ -413,7 +414,13 @@ let go_next_round st =
         | [] -> acc
         | h :: t -> if h.id = target then
             update_player target new_player (new_player :: acc) t
-          else update_player target new_player (h :: acc) t in
+          else update_player target new_player 
+              (
+                {
+                  h with 
+                  losses = h.losses + 1;
+                }
+                :: acc) t in
       update_player winner_pl_id winner_pl [] st.table.participants in
 
     let table = {
@@ -605,8 +612,8 @@ let save file_name st =
         ("winner", `Assoc [("player", `Int (fst st.winner));
                            ("rank", `Int (snd st.winner))]);
         ("deck", `List (List.map (fun x -> `Int x)
-          (List.map (Deck.int_converter) !Deck.current_deck))
-          );
+                          (List.map (Deck.int_converter) !Deck.current_deck))
+        );
       ]
   );
   st
@@ -699,7 +706,7 @@ let load json =
 
   let parse json =
     Deck.current_deck := json |> member "deck" |> to_list |> List.map to_int |>
-                       List.map (card_inverter);
+                         List.map (card_inverter);
     try t_of_json json
     with Type_error (s, _) -> failwith ("Parsing error: " ^ s) in
 
