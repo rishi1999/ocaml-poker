@@ -11,11 +11,4 @@ let win_descrp = [|
 |]
 
 let dyndescrp player = let index = player.consecutive_wins in
-  let style = match index with
-    | 1 -> blue
-    | 2 -> green
-    | 3 -> yellow
-    | 4 -> red
-    | 5 -> magenta
-    | _ -> black in
-  ANSITerminal.(print_string [style; Background White] win_descrp.(index))
+  win_descrp.(index)
