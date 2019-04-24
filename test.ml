@@ -101,7 +101,6 @@ let player_tests =
   ]
 
 let command_tests = [
-
   "test parse empty" >:: (fun _ -> 
       print_endline "command"; assert_raises (Empty) (fun () -> parse ""));
   "test parse empty with spaces" >:: (fun _ -> 
@@ -110,8 +109,22 @@ let command_tests = [
       assert_raises (Malformed) (fun () -> parse "quit l"));
   "test parse quit malformed with spaces" >:: (fun _ -> 
       assert_raises (Malformed) (fun () -> parse "quit      l"));
+  "test parse call malformed with spaces" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "call      l"));
+  "test parse check malformed with spaces" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "check      l"));
+  "test parse show malformed with spaces" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "show      l"));
+  "test parse save malformed with spaces" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "save      l"));
+  "test parse bet malformed with spaces" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "bet      l"));
   "test parse go malformed" >:: (fun _ -> 
       assert_raises (Malformed) (fun () -> parse "go "));
+  "test parse go malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "bet "));
+  "test parse go malformed" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "raise "));
   "test parse different verb malformed" >:: (fun _ -> 
       assert_raises (Malformed) (fun () -> parse "pie clock tower "));
   "test parse take malformed" >:: (fun _ -> 
@@ -126,25 +139,28 @@ let command_tests = [
       assert_raises (Malformed) (fun () -> parse "unlock"));
   "test parse score malformed" >:: (fun _ -> 
       assert_raises (Malformed) (fun () -> parse "score chicken"));
-  "test command to string" >:: (fun _ -> 
+  "test command to string1" >:: (fun _ -> 
       assert_equal "checked!" (command_to_string Check));
-  "test command to string" >:: (fun command -> 
+  "test command to string2" >:: (fun command -> 
       assert_equal Quit (parse "quit"));
-  "test command to string" >:: (fun command -> 
+  "test command to string3" >:: (fun command -> 
       assert_equal Check (parse "check"));
-  "test command to string" >:: (fun command -> 
+  "test command to string4" >:: (fun command -> 
       assert_equal Stack (parse "stack"));
-  "test command to string" >:: (fun command -> 
+  "test command to string5" >:: (fun command -> 
       assert_equal Fold (parse "fold"));
-  "test command to string" >:: (fun command ->
+  "test command to string6" >:: (fun command ->
       assert_equal Call (parse "call"));
-  "test command to string" >:: (fun command ->
+  "test command to string7" >:: (fun command ->
+      assert_equal Save (parse "call"));
+  "test command to string8" >:: (fun command ->
+      assert_equal Show (parse "call"));
+  "test command to string9" >:: (fun command ->
       assert_equal (Bet 10) (parse "bet 10"));
-  "test command to string" >:: (fun command ->
+  "test command to string10" >:: (fun command ->
       assert_equal (Raise 10) (parse "raise 10"));
   "test command to string with extra spaces" >:: (fun command ->
       assert_equal (Raise 10) (parse "raise     10"));
-
 ]
 
 let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}

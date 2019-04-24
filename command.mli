@@ -1,8 +1,9 @@
 
-(* The type of a bet amount. *)
+(** The type of a [bet_amount]. *)
 type bet_amount = int
 
-(* The type of a command *)
+(** The type [command] represents a player command that is decomposed into
+    a verb and possibly an object phrase. *)
 type command =
   | Check
   | Fold
