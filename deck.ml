@@ -4,7 +4,7 @@
 type rank = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack
           | Queen | King | Ace
 
-(** [Suit] is the type of a card's suit. *)
+(** [suit] is the type of a card's suit. *)
 type suit = Clubs | Diamonds | Hearts | Spades
 
 (** [card] is a card with a suit and a rank*)
@@ -52,7 +52,15 @@ let const_int_deck =  [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15;
                        29; 30; 31; 32; 33; 34; 35; 36; 37; 38; 39; 40; 41; 
                        42; 43; 44; 45; 46; 47; 48;49; 50; 51]
 
-
+(** [pick_efficent number used] returns a list containing [number] random cards 
+    from a deck does not contain any [used] cards.
+    Example: [pick_efficient 1 (Spades,Ace) could be (Hearts, Three).
+    Note that we say could be and not guarranteed to be as pick_efficient 
+    randomly initializes the seed value for the random number generator
+    before shuffling the deck.
+    Requires: [used] is an int list comprising integers from 0 (inclusive) to
+    51 (inclusive).
+    Requires: [number] is >=0 *)
 let pick_efficient number used = 
   let new_deck = List.filter (fun x -> not (List.mem x used)) const_int_deck in
   let shuffle_list compare list =

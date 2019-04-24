@@ -24,14 +24,23 @@ let empty_table = {
 let deck_tests = 
   [
     "pick first card" >:: (fun _ -> deck_init ();
-                            print_endline "deck";assert_equal (pick_cards 1) 
+                            assert_equal (pick_cards 1) 
                               [(Clubs, Two)]);
-    "pick second card" >:: (fun _ -> deck_init();
-                             assert_equal (pick_cards 2) [(Clubs, Two); 
-                                                          (Clubs, Three)]);
-
+    "pick two cards" >:: (fun _ -> deck_init();
+                           assert_equal (pick_cards 2) [(Clubs, Two); 
+                                                        (Clubs, Three)]);
+    "pick 0 cards" >:: (fun _ -> deck_init();
+                         assert_equal (pick_cards 0) []);
     "convert 9C" >:: (fun _ -> 
         assert_equal 28 (int_converter (Clubs, Nine)));
+    "convert 9C" >:: (fun _ -> 
+        assert_equal 13 (int_converter (Diamonds, Five)));
+    "convert 9C" >:: (fun _ -> 
+        assert_equal 10 (int_converter (Hearts, Four)));
+    "convert 9C" >:: (fun _ -> 
+        assert_equal 51 (int_converter (Spades, Ace)));
+    "convert 9C" >:: (fun _ -> 
+        assert_equal 7 (int_converter (Spades, Three)));
     "pick_card_test" >:: (fun _ ->
         assert_equal 4 (List.length (pick_cards 4)));
     "int_converter Test 1" >:: (fun _ ->
@@ -99,6 +108,10 @@ let player_tests =
     "LossTest3" >:: (fun _->
         assert_equal  0 (losses julian));
   ]
+
+(* The series of tests for montecarlo simulations. Note that due to
+   the random nature of montecarlo, we are unable to make unit tests here
+   as our montecarlo functions work  on randomized seed values. *)
 
 let command_tests = [
   "test parse empty" >:: (fun _ -> 
