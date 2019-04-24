@@ -217,15 +217,37 @@ let estimate_win_rate_mcs_2p num_simulations hole board =
     to 51 (inclusive), [iterations] is a positive value and [state] is
     a valid record of type State.t *)
 let declare_action_2p bot hole_cards state iterations = 
-  let valid_actions = state.avail_action in
+  let valid_actions = State.avail_action (State.get_avail_action state) in
   let win_rate = estimate_win_rate_mcs_2p iterations 
       hole_cards (state.table.board) in
   let can_call = List.mem "call" valid_actions in
-  let call_amount = if can_call then calculate_pay_amt state else 0 in
+  let call_amount = if can_call then calculate_pay_amt state else -1 in
   if bot.money = 0 then 
     ("check", 0)
   else
-  if win_rate >= 0.85 then ("raise", bot.money)
-  else if win_rate > 0.75 then ("raise", 2 * state.bet.bet_amount)
-  else if win_rate > 0.5 then ("call" , call_amount)
-  else if can_call && call_amount = 0 then ("check", 0) else ("fold",0)
+  if win_rate >= 0.85 then
+    if List.mem "bet" valid_actions then
+      ("bet", bot.money/2)
+    else
+      ("raise", bot.money)
+  else if win_rate > 0.75 then
+    if List.mem "bet" valid_actions then
+      ("bet", bot.money/5)
+    else
+      ("raise", (Pervasives.min (2 * state.bet.bet_amount) bot.money))
+  else if win_rate > 0.5 then 
+    if call_amount = -1 then
+      ("check", 0)
+    else 
+      ("call" , call_amount)
+  else if win_rate > 0.3 then
+    if call_amount = -1 then
+      ("check", 0)
+    else
+      if (call_amount < bot.money / 30) then
+        ("call", call_amount)
+      else
+        ("fold", 0)
+  else if (List.mem "check" valid_actions) && call_amount = -1
+    then ("check", 0) 
+  else ("fold",0) 
