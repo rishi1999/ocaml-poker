@@ -44,6 +44,8 @@ let command_to_string = function
     "stack" nor "check" nor "bet" nor "raise"
     or if the verb is "quit" and there is a non-empty object phrase,
     or if the verb is "call" and there is a non-empty object phrase,
+    or if the verb is "show" and there is a non-empty object phrase,
+    or if the verb is "save" and there is a non-empty object phrase,
     or if the verb is "check" and there is a non-empty object phrase,
     or if the verb is "stack" and there is a non-empty object phrase,
     or if the verb is "fold" and there is a non-empty object phrase,
