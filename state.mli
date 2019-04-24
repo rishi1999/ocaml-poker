@@ -22,9 +22,9 @@ type bet = {
     [players_in] : the list of players that are currently playing the hand
     [bet] : current bet situation in this round
     [avail_action] : the available actions that the current player can act
-    [winner] : is a tuple of (player_id, rank) where player_id is the player
-    with the winning hand and the rank is the rank of the hand evaluated by
-    hand evaluator.
+    [winners] : is a list of tuples of (player_id, rank) where 
+    player_id is a player with the winning hand and the rank 
+    is the rank of the hand evaluated by hand evaluator.
 *)
 type t = {
   game_type: int;
@@ -36,7 +36,7 @@ type t = {
   players_played: int list;
   bet: bet;
   avail_action: string list;
-  winner: (int * int);
+  winners: (int * int) list;
 }
 
 (** [read_integer prompt_str ~condition:(cond, msg) ()] is the integer read
@@ -45,23 +45,23 @@ type t = {
     that does not satisfy the condition [cond], the program will dislay
     the warning message [msg], and ask the user to try entering a value
     again. If the user enters input that is not an integer, the program
-    will complain that they are not entering input of the correct type, 
-    and ask them to input a valid again. 
+    will complain that they are not entering input of the correct type,
+    and ask them to input a valid again.
 
-    If a condition is not provided, a function that always evaluates to 
+    If a condition is not provided, a function that always evaluates to
     true regardless of the input is used by default, so the input will
-    always pass the condition. 
+    always pass the condition.
 
-    Requires: N/A. 
+    Requires: N/A.
 
-    Example: [read_integer "Please input something." ()] will ask the 
-    user to input something, and will continue to do so until 
+    Example: [read_integer "Please input something." ()] will ask the
+    user to input something, and will continue to do so until
     they have entered a valid integer, at which point, it will
     evaluate to said integer. *)
 val read_integer : string -> ?condition:(int -> bool) * string -> unit -> int
 
-(** [read_string prompt_str ~condition:(cond, msg) ()] is the string 
-    read in from user input. First, [prompt_str] is displayed to inform 
+(** [read_string prompt_str ~condition:(cond, msg) ()] is the string
+    read in from user input. First, [prompt_str] is displayed to inform
     the user of what the program is looking for. If the user enters input
     that does not satisfy the condition [cond], the program will display
     the warning message [msg], and ask the user to try entering a value
@@ -134,15 +134,16 @@ val players_in : t -> int list
     with three players. *)
 val button : t -> int
 
-(** [continue_game st] is [st] with no winner set.
+(** [continue_game st] is [st] with no winners set.
     Requires: valid state [st].
-    Example: [continue_game st] is a state with winner set to -1
-    instead of the previous winner. *)
+    Example: [continue_game st] is a state with winners set to [[]]
+    instead of the previous winners. *)
 val continue_game : t -> t
 
-(** [winning_player st] is the player that has won the hand in state [st].
+(** [winning_players st] is the list of players that
+    have won the hand in state [st].
     Requires: valid state [st]. *)
-val winning_player : t -> (int*int)
+val winning_players : t -> (int * int) list
 
 (** [bet st] is the amount currently being bet
     in the game being played in [st].
@@ -220,15 +221,15 @@ val fold : t -> move_result
     Example: [command_to_function Check] is [State.check]. *)
 val command_to_function : Command.command -> (t -> move_result)
 
-(** [winner st] is the player that wins the round and the rank of
-    the winning hand, in the form (player, rank).
+(** [winners st] is the list of players that win the round and the ranks of
+    the winning hand, in the form [[(player, rank)]].
     Requires: state has a nonempty list of players.
     Requires: there are 5 hole cards.
     Throws "cannot determine winner" exception if called on
     list of empty players or hole cards less than 5.
-    Example: [winner st] is [(1,28)] if player 1 wins with a hand
+    Example: [winners st] is [[(1,28)]] if player 1 wins with a hand
     of value 28. *)
-val winner : t -> (Player.player*int)
+val winners : t -> (Player.player * int) list
 
 (** [get_avail_action st] is the list of valid commands
     the player can currently execute.
