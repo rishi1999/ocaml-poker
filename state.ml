@@ -698,8 +698,10 @@ let load json =
   } in
 
   let parse json =
-    Deck.current_deck := json |> member "deck" |> to_list |> List.map to_int |>
+    current_deck := json |> member "deck" |> to_list |> List.map to_int |>
                        List.map (card_inverter);
+    deck_size := List.length (!current_deck);
+    print_int (Deck.int_converter (List.nth !current_deck 0));
     try t_of_json json
     with Type_error (s, _) -> failwith ("Parsing error: " ^ s) in
 
