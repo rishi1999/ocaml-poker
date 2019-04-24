@@ -23,7 +23,7 @@ type bet = {
     [bet] : current bet situation in this round
     [avail_action] : the available actions that the current player can act
     [winners] : is a list of tuples of (player_id, rank) where 
-    player_id is a player with the winning hand and the rank 
+    player_id is a player with the winning hand and the rank
     is the rank of the hand evaluated by hand evaluator.
 *)
 type t = {
@@ -142,7 +142,9 @@ val continue_game : t -> t
 
 (** [winning_players st] is the list of players that
     have won the hand in state [st].
-    Requires: valid state [st]. *)
+    Requires: valid state [st].
+    Example: [winning_players st] is (1, 4000)
+    if player 1 won with a hand of rank 4000. *)
 val winning_players : t -> (int * int) list
 
 (** [bet st] is the amount currently being bet
@@ -167,8 +169,8 @@ val avail_action : t -> string list
 val init_state : int -> int -> int -> int -> t
 
 (** [init_bet lst] is the initial bet for an initial list [lst] of players
-    REquires: [lst] must be a list of integers ranging from 1 to n
-    number of players*)
+    Requires: [lst] must be a list of integers ranging from [1] to [n]
+    number of players. *)
 val init_bet : int list -> bet
 
 (** [hand_order num_players button] is an integer list
@@ -253,14 +255,14 @@ val find_stack : int -> Player.player list -> int
 
 (** [bet_or_raise] amt st comm_str returns a state where the player has
     bet or raised, according to the string comm_str and returns the next state
-    Requires: st is a vaild state
-              the player has at least amt in his stack
-              comm_str is either "bet" or "raise"
+    Requires: [st] is a valid state,
+              the player has at least [amt] in his stack,
+              [comm_str] is either ["bet"] or ["raise"].
 *)
 val bet_or_raise : int -> t -> string -> move_result
 
 (** [pay_blinds st] is the state [st] with players having payed blinds
-    Requires: st is a valid state*)
+    Requires: st is a valid state. *)
 val pay_blinds : t -> t
 
 val load : Basic.json -> t
