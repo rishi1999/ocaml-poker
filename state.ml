@@ -4,6 +4,7 @@ open Player
 open Hand_evaluator
 open Yojson.Basic.Util
 open Avatar
+open Dynamicinterface
 
 type bet = {
   bet_player: int;
@@ -400,12 +401,16 @@ let go_next_round st =
           money = pl.money + profit;
           wins = pl.wins + 1;
           consecutive_wins = pl.consecutive_wins + 1;
+          avatar_id = if pl.consecutive_wins < 5 
+            then 9 + pl.consecutive_wins + 1
+            else pl.avatar_id
         }
       ) winner_pls in
 
     let celebration_str = if num_winners = 1 then
         (List.hd winner_pls).name ^ " wins $" ^ string_of_int profit
         ^ " with " ^ Hand_evaluator.rank_mapper (List.hd hand_qualities) ^ "!"
+        ^ "\n" ^ dyndescrp (List.hd winner_pls)
       else
         let names = List.map (fun pl -> pl.name) winner_pls in
         "Winners:\n" ^ (List.fold_left (fun a b -> a ^ "    " ^ b) "" names) 
@@ -424,6 +429,7 @@ let go_next_round st =
           pl with
           losses = pl.losses + 1;
           consecutive_wins = 0;
+          avatar_id = pl.orig_id;
         }
       ) in
 

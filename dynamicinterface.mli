@@ -1,1 +1,1 @@
-val dyndescrp : Player.player -> unit
+val dyndescrp : Player.player -> string

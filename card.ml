@@ -175,9 +175,11 @@ let card_printer cardlist =
 
   let rec print_all_lines count original_list = function
     | [] when count = 8 -> ()
-    | [] -> print_newline ();
+    | [] -> print_newline (); ANSITerminal.set_cursor 10 (-1);
       print_all_lines (count + 1) original_list original_list
     | (h, suit) :: t -> (suit_color suit |> card_printer) (List.nth h count);
       print_string "    ";
       print_all_lines count original_list t in
-  print_all_lines 0 card_ascii card_ascii
+  ANSITerminal.set_cursor 10 (-1);
+  print_all_lines 0 card_ascii card_ascii;
+  ANSITerminal.move_bol ()
