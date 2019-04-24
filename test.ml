@@ -84,11 +84,11 @@ let player_tests =
     "Avatar Test3" >:: (fun _->
         assert_equal  10 (avatar_id julian));
     "Orig_idTest1" >:: (fun _->
-        assert_equal  1 (avatar_id james));
+        assert_equal  1 (orig_id james));
     "Orig_idTest2" >:: (fun _->
-        assert_equal  0 (avatar_id bob));
+        assert_equal  0 (orig_id bob));
     "Orig_idTest3" >:: (fun _->
-        assert_equal  2 (avatar_id julian));
+        assert_equal  2 (orig_id julian));
     "ConsecutiveTest1" >:: (fun _->
         assert_equal  0 (consec_wins james));
     "ConsecutiveTest2" >:: (fun _->
@@ -131,7 +131,9 @@ let command_tests = [
   "test parse save malformed with spaces" >:: (fun _ -> 
       assert_raises (Malformed) (fun () -> parse "save      l"));
   "test parse bet malformed with spaces" >:: (fun _ -> 
-      assert_raises (Malformed) (fun () -> parse "bet      l"));
+      assert_raises (Malformed) (fun () -> parse "bet  "));
+  "test parse raise malformed with spaces" >:: (fun _ -> 
+      assert_raises (Malformed) (fun () -> parse "raise  "));
   "test parse go malformed" >:: (fun _ -> 
       assert_raises (Malformed) (fun () -> parse "go "));
   "test parse go malformed" >:: (fun _ -> 
@@ -165,9 +167,9 @@ let command_tests = [
   "test command to string6" >:: (fun command ->
       assert_equal Call (parse "call"));
   "test command to string7" >:: (fun command ->
-      assert_equal Save (parse "call"));
+      assert_equal Save (parse "save"));
   "test command to string8" >:: (fun command ->
-      assert_equal Show (parse "call"));
+      assert_equal Show (parse "show"));
   "test command to string9" >:: (fun command ->
       assert_equal (Bet 10) (parse "bet 10"));
   "test command to string10" >:: (fun command ->
