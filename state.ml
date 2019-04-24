@@ -156,21 +156,11 @@ let init_players num_players money =
       prompt ("Enter player " ^ (string_of_int) id ^ "'s name.");
       let name = read_line () in
       ANSITerminal.(print_string [ANSITerminal.default] array_choice);
-      prompt ("Choose " ^ name ^ "'s avatar.");
-      let rec get_int_id () =
-        try
-          let input = read_line () in
-          if input = "quit" then exit 0 else
-            int_of_string input
-        with
-        | Failure _ -> print_endline "Please enter a valid integer from 1 - 10";
-          prompt ("Choose player " ^ (string_of_int) id ^ "'s avatar.");
-          get_int_id (); in
-      let rec get_valid_id () =
-        let avatar_int_id = get_int_id () in
-        if avatar_int_id <= 10 && avatar_int_id >= 1 then avatar_int_id
-        else get_int_id () in
-      let valid_id = get_valid_id () - 1 in
+      let prompt_str = "Choose " ^ name ^ "'s avatar." in
+
+      let valid_id = read_integer prompt_str
+          ~condition:((fun x -> x >= 1 && x <= 10),
+                      "Please pick a number between 1 and 10.") () - 1 in
       let curr_player =
         {
           id;
