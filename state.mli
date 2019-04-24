@@ -222,3 +222,5 @@ val bet_or_raise : int -> t -> string -> move_result
 val pay_blinds : t -> t
 
 val load : Yojson.Basic.json -> t
+
+val save : string -> t -> t
