@@ -359,7 +359,7 @@ let rec get_players_in part players_in ls = match players_in with
   | a :: t -> get_players_in part t ls
   | [] -> List.rev ls
 
-let winner_new st = 
+let winner_new st =
   let board = st.table.board in
   let all_part = st.table.participants in
   let p_in = st.players_in in
@@ -372,7 +372,7 @@ let winner_new st =
       | p :: t -> let rank = seven_list_eval (p.cards @ board) in
         player_ranker t ((p,rank) :: outlist) in
     let ranked_players = player_ranker players_in [] in
-    let min_rank = List.fold_left (fun accu (id,rank) -> 
+    let min_rank = List.fold_left (fun accu (id,rank) ->
         if rank < accu then rank else accu) 7463 ranked_players in
     List.filter (fun (id,rank) -> rank = min_rank) ranked_players
 
@@ -429,6 +429,7 @@ let go_next_round st =
       winner_pl with
       money = winner_pl.money + st.table.pot;
       wins = winner_pl.wins + 1;
+      consecutive_wins = winner_pl.consecutive_wins + 1;
     } in
 
     let celebration_str = "The winner is " ^ winner_pl.name
@@ -450,6 +451,7 @@ let go_next_round st =
                 {
                   h with
                   losses = h.losses + 1;
+                  consecutive_wins = 0;
                 }
                 :: acc) t in
       update_player winner_pl_id winner_pl [] st.table.participants in
