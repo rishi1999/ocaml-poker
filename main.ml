@@ -293,25 +293,34 @@ let init_game num_players =
   clear_screen ();
   play_game st
 
-let load_or_playnew value =
+let load_or_new value =
   if value = "load" then
     (
-      print_string "Please enter the name of the game file you want to load";
-      print_string " without the extension (.json)\n";
-      print_string  "> ";
-      (match read_line () with
-       | exception End_of_file -> ()
-       | file_name ->
-         let extended = file_name ^ ".json" in
-         (match (Sys.file_exists extended) with
-          | false ->
-            print_string extended;
-            print_endline " is not in current directory!";
-            exit 0
-          | true ->
-            extended |> Yojson.Basic.from_file |> State.load |> play_game
-         )
-      )
+      let file_name =
+        State.read_string
+          "Please enter the name of the game file you want to load \
+           (without the extension .json)."
+          ~condition:((fun x -> Sys.file_exists (x ^ ".json")),
+                      "File is not in current directory!") () in
+
+      (file_name ^ ".json") |> Yojson.Basic.from_file |> State.load |> play_game
+
+      (*print_string "Please enter the name of the game file you want to load";
+        print_string " without the extension (.json)\n";
+        print_string  "> ";
+        match read_line () with
+        | exception End_of_file -> ()
+        | file_name ->
+        let extended = file_name ^ ".json" in
+        match (Sys.file_exists extended) with
+        | false ->
+          print_string extended;
+          print_endline " is not in current directory!";
+          exit 0
+        | true ->
+          extended |> Yojson.Basic.from_file |> State.load |> play_game*)
+
+
     )
   else
     State.read_integer "How many (human) players are there?"
@@ -329,7 +338,8 @@ let main () =
 
   State.read_string "Play new game or load game?"
     ~condition:((fun x -> List.mem x ["new"; "load"]), "Options: new, load.") ()
-  |> load_or_playnew
+  |> load_or_new
+
 
 (* Execute the game engine. *)
 let () = main ()
