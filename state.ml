@@ -604,6 +604,9 @@ let save file_name st =
          `List (List.map (fun x -> `String x) st.avail_action));
         ("winner", `Assoc [("player", `Int (fst st.winner));
                            ("rank", `Int (snd st.winner))]);
+        ("deck", `List (List.map (fun x -> `Int x)
+          (List.map (Deck.int_converter) !Deck.current_deck))
+          );
       ]
   );
   st
@@ -695,6 +698,8 @@ let load json =
   } in
 
   let parse json =
+    Deck.current_deck := json |> member "deck" |> to_list |> List.map to_int |>
+                       List.map (card_inverter);
     try t_of_json json
     with Type_error (s, _) -> failwith ("Parsing error: " ^ s) in
 
