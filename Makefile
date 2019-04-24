@@ -1,12 +1,13 @@
-MODULES= authors deck player table command main hashone \
-	tableflush hand_evaluator constantarrays state card montecarlo
+MODULES= authors avatar deck player table command main hashone \
+	tableflush hand_evaluator constantarrays state card montecarlo \
+	dynamicinterface
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
 TEST=test.byte
 MAIN=main.byte
 OCAMLBUILD=ocamlbuild -use-ocamlfind
-PKGS=unix,oUnit,str,qcheck,ANSITerminal,dune
+PKGS=unix,oUnit,str,qcheck,ANSITerminal,dune,yojson
 
 default: build
 	utop

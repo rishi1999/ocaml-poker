@@ -1,27 +1,25 @@
 open Card
 open Hand_evaluator
 open Montecarlo
+open Avatar
 
-let rec read_integer prompt_str ?(condition=((fun x -> true), "Number does not satisfy conditions.")) () =
-  let retry error_str () =
-    print_newline ();
-    print_string error_str;
-    read_integer prompt_str ~condition () in
-  State.prompt prompt_str;
 
-  let input = read_line () in
-  if input = "quit" then exit 0;
-  let num = try int_of_string input with
-    | Failure _ ->
-      retry "Please enter an integer value." () in
-  if fst condition num then num else retry (snd condition) ()
+let clear_screen () =
+  match Sys.command "clear" with
+  | 0 -> ()
+  | _ -> exit 2
 
-let print_hline () =
+(*let print_hline () =
   for i = 1 to 100 do
     print_char '-'
   done;
   print_newline ();
-  print_newline ()
+  print_newline ()*)
+
+let print_error_message str () =
+  print_endline str;
+  Unix.sleep 2;
+  clear_screen ()
 
 let print_intro () =
   print_endline "Tips:";
@@ -32,12 +30,13 @@ let print_intro () =
   ANSITerminal.(print_string [red] "red");
   print_endline ".";
   print_newline ();
+  print_newline ();
   ANSITerminal.(print_string [yellow] "LET'S PLAY!");
   print_newline ();
   print_newline ();
-  print_newline ()
-
-
+  print_endline "press enter to continue...";
+  ignore (read_line ());
+  clear_screen ()
 
 let print_list func = function
   | h :: t ->
@@ -49,21 +48,19 @@ let print_list func = function
 let print_string_list = print_list print_string
 let print_int_list = print_list print_int
 let print_single_player (st:State.t) num_of_player =
-  let x = Table.nth_participant st.table num_of_player
-  in
+  let player = Table.nth_participant st.table num_of_player in
   ANSITerminal.(
     (fun x ->
        print_string
          (
-           if x = (State.player_turn st) then [green]
-           else if x = (State.button st) then [red]
+           if Player.id x = (State.player_turn st) then [green]
+           else if Player.id x = (State.button st) then [red]
            else [default]
          )
-         ((State.find_participant st x).name ^ " ($" ^
-          (string_of_int (State.find_stack x st.table.participants)) ^
-          ")    ");
+         (Player.name x ^ ": $" ^
+          (string_of_int (Player.money x)));
     )
-  )
+  ) player
 
 let print_players_in st =
   let lst = State.players_in st in
@@ -83,35 +80,44 @@ let print_players_in st =
     print_newline ()
   )
 
-let print_table (st:State.t) = 
-  if (st.num_players>1) then print_single_player st 1;
-  print_endline "----------------------------------------------------------";
-  print_endline "|                                                        |";
-  print_endline "|                                                        |";
-  print_endline "|                                                        |";
-  print_endline "|                                                        |";
-  let print_player_bets st =
-    let lst = State.bet_paid_amt st in
-    let rec helper = function
-      | [] -> ()
-      | (a,b) :: t -> if b != 0 then
-          (
-            let p = State.find_participant st a in
-            print_string p.name;
-            print_string " added $";
-            print_int b;
-            print_endline " to the pot.";
-            helper t
-          ) in
-    let sorted = List.sort compare lst in
-    helper sorted;
-    print_newline ()
+let print_table st =
+  print_single_player st 0;
+  print_newline ()
+
+let print_player_bets st =
+  let lst = State.bet_paid_amt st in
+  let rec helper = function
+    | [] -> ()
+    | (a,b) :: t -> if b != 0 then
+        (
+          let p = State.find_participant st a in
+          print_string p.name;
+          print_string " added $";
+          print_int b;
+          print_endline " to the pot.";
+          helper t
+        ) in
+  let sorted = List.sort compare lst in
+  helper sorted;
+  print_newline ()
 
 let print_current_state st =
-  print_table st;
+  (*print_table st;*)
   ANSITerminal.(
-    print_string [yellow] (Player.name (State.find_participant st (State.player_turn st)));
-    print_string [yellow] "'s turn"
+    let player = State.find_participant st (State.player_turn st) in
+    print_string [yellow] (Player.name player);
+    print_string [yellow] "'s turn";
+    print_newline ();
+    print_newline ();
+    print_string [default]
+      (avatar_array.(Player.avatar_id player));
+    print_newline ();
+    print_string [yellow] "Wins: ";
+    print_string [yellow] (string_of_int player.wins);
+    print_newline ();
+    print_string [yellow] "Losses: ";
+    print_string [yellow] (string_of_int player.losses);
+    print_newline ();
   );
   print_newline ();
   print_newline ();
@@ -133,15 +139,22 @@ let play_game st =
   print_intro ();
 
   let rec keep_playing st =
+
     if (fst (State.winning_player st)) >= 0 then
       (
-        print_hline ();
+        clear_screen ();
+        print_string "~ ";
+        ANSITerminal.(print_string [yellow] "New Game!");
+        print_string " ~";
+        print_newline ();
+        print_newline ();
         keep_playing (State.continue_game st)
       );
 
-    print_hline ();
     print_current_state st;
     State.prompt "";
+
+    let player = State.(find_participant st (player_turn st)) in
 
     (* Easy Bot *)
     if (State.game_type st) = 1 && State.player_turn st = 2 then
@@ -201,34 +214,55 @@ let play_game st =
              keep_playing (State.get_avail_action t);
            | Illegal s -> failwith s)
     else
-
-      match read_line () with
+      match
+        let input = read_line () in
+        clear_screen ();
+        input
+      with
       | curr_cmd ->
         match Command.parse curr_cmd with
         | exception Command.Malformed ->
-          print_newline ();
-          print_endline "Not a valid command.";
+          print_error_message "Not a valid command." ();
           keep_playing st
 
         | exception Command.Empty ->
-          print_newline ();
-          print_endline "Please enter a command.";
+          print_error_message "Must enter a command." ();
           keep_playing st
 
         | Quit -> exit 0
 
+        | Save ->
+          print_endline "Please enter the file name.";
+          print_string  "> ";
+          (match read_line () with
+           | exception End_of_file ->
+             print_endline "You have not entered a valid name!";
+             keep_playing st
+           | file_name ->
+             print_string (file_name^".json has been saved!\n");
+             keep_playing (State.save file_name st))
+
+        | Show ->
+          print_endline "Your hand is: ";
+          Card.card_printer (Player.cards (State.find_participant st
+                                             (st.player_turn)));
+          ignore (read_line ());
+          clear_screen ();
+          keep_playing st
+
         | comm ->
           let func = State.command_to_function comm in
-          match func st with
+          let move_result = func st in
+          match move_result with
           | Legal t ->
-            print_newline ();
-            (*print_endline (Command.command_to_string comm);*)
-            print_newline ();
+            if (fst (State.winning_player st)) < 0 then (
+              print_endline (player.name ^ " " ^ Command.command_to_string comm);
+              print_newline ()
+            );
             keep_playing (State.get_avail_action t)
+
           | Illegal str->
-            print_newline ();
-            print_endline str;
-            print_newline ();
+            print_error_message str ();
             keep_playing (State.get_avail_action st)
   in
   keep_playing st
@@ -237,10 +271,10 @@ let play_game st =
     Requires: integer amount of players [num_players].
     Example: [init_game 3] initializes a game with 3 players. *)
 let init_game num_players =
-  let money = read_integer "Starting stack amount? ($)"
+  let money = State.read_integer "Starting stack amount? ($)"
       ~condition:((fun x -> x >= 20 && x <= 5000), "Min: 20; Max: 5000.") () in
   let blind_max = money / 10 in
-  let blind = read_integer "Blind amount? ($)"
+  let blind = State.read_integer "Blind amount? ($)"
       ~condition:((fun x -> x >= 2 && x <= blind_max),
                   "Min: 2; Max: " ^ (string_of_int blind_max) ^ ".")
       () in
@@ -256,9 +290,43 @@ let init_game num_players =
       )
     | x when x > 0 -> State.init_state 0 x money blind
     | _ -> failwith "ERROR: negative number of players" in
-  print_newline ();
-  print_newline ();
+  clear_screen ();
   play_game st
+
+let load_or_new value =
+  if value = "load" then
+    (
+      let file_name =
+        State.read_string
+          "Please enter the name of the game file you want to load \
+           (without the extension .json)."
+          ~condition:((fun x -> Sys.file_exists (x ^ ".json")),
+                      "File is not in current directory!") () in
+
+      (file_name ^ ".json") |> Yojson.Basic.from_file |> State.load |> play_game
+
+      (*print_string "Please enter the name of the game file you want to load";
+        print_string " without the extension (.json)\n";
+        print_string  "> ";
+        match read_line () with
+        | exception End_of_file -> ()
+        | file_name ->
+        let extended = file_name ^ ".json" in
+        match (Sys.file_exists extended) with
+        | false ->
+          print_string extended;
+          print_endline " is not in current directory!";
+          exit 0
+        | true ->
+          extended |> Yojson.Basic.from_file |> State.load |> play_game*)
+
+
+    )
+  else
+    State.read_integer "How many (human) players are there?"
+      ~condition:((fun x -> x > 0 && x <= 10), "Min: 1; Max: 10.") ()
+
+    |> init_game
 
 (** [main ()] prompts the user for the number of players,
     then starts the game. *)
@@ -268,10 +336,9 @@ let main () =
   ANSITerminal.(print_string [blue] "Welcome to OCaml Poker.");
   print_newline ();
 
-  read_integer "How many (human) players are there?"
-    ~condition:((fun x -> x > 0 && x <= 10), "Min: 1; Max: 10.") ()
-
-  |> init_game
+  State.read_string "Play new game or load game?"
+    ~condition:((fun x -> List.mem x ["new"; "load"]), "Options: new, load.") ()
+  |> load_or_new
 
 
 (* Execute the game engine. *)

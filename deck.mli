@@ -9,6 +9,7 @@ type suit = Clubs | Diamonds | Hearts | Spades
 (** [card] is a card with a suit and a rank*)
 type card = suit * rank
 
+val current_deck : ((suit * rank) list) ref
 
 val deck_size : int ref
 

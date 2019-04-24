@@ -19,26 +19,26 @@ exception Malformed
     Requires: command is a valid command
     Example: [command_to_string Check] is "checked!" *)
 let command_to_string = function
-  | Show -> ""
-  | Save -> "saved!"
+  | Show -> "ERROR_show(thisshouldnotbeprinted)"
+  | Save -> "ERROR_save(thisshouldnotbeprinted)"
   | Check -> "checked!"
   | Fold -> "folded!"
   | Call -> "called!"
-  | Bet _ -> "bet!"
-  | Raise _ -> "raised!"
-  | Stack -> "looked at stack!"
-  | Quit -> "quit!"
+  | Bet x -> "bet $" ^ (string_of_int x) ^ "!"
+  | Raise x -> "raised $" ^ (string_of_int x) ^ "!"
+  | Stack -> "ERROR_stack(thisshouldnotbeprinted)"
+  | Quit -> "ERROR_quit(thisshouldnotbeprinted)"
 
 (** [parse str] parses a player's input into a [command], as follows.
     The first word (i.e., consecutive sequence of non-space characters)
     of [str] becomes the verb. The rest of the words,
     if any, become the object phrase.
-    Examples: 
+    Examples:
     - [parse "    bet 10  "] is [Bet "10"]
-    - [parse "quit"] is [Quit]. 
-    Requires: [str] contains only alphanumeric (A-Z, a-z, 0-9) and space 
+    - [parse "quit"] is [Quit].
+    Requires: [str] contains only alphanumeric (A-Z, a-z, 0-9) and space
     characters (only ASCII character code 32; not tabs or newlines, etc.).
-    Raises: [Empty] if [str] is the empty string or contains only spaces. 
+    Raises: [Empty] if [str] is the empty string or contains only spaces.
     Raises: [Malformed] if the command is malformed. A command
     is malformed if the verb is neither "fold" nor "call" nor "quit" nor
     "stack" nor "check" nor "bet" nor "raise"
@@ -61,7 +61,7 @@ let parse str =
     let head = List.hd list_without_spaces in
     let tail = List.tl list_without_spaces in
     let standalone_commands = ["fold"; "call";"quit";"stack";
-    "show";"check"; "save"] in
+                               "show";"check"; "save"] in
     let phrase_commands = ["bet";"raise"] in
     if List.length tail > 1 then raise Malformed
     else
