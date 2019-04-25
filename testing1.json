@@ -1,1 +1,129 @@
-{"game_type":0,"num_players":2,"table":{"pot":0,"blind":2,"participants":[{"id":1,"name":"Jimmy","card1":51,"card2":48,"money":32,"avatar_id":0,"wins":0,"losses":0,"consecutive_wins":0,"orig_id":0},{"id":2,"name":"Bobby","card1":3,"card2":0,"money":32,"avatar_id":0,"wins":0,"losses":0,"consecutive_wins":0,"orig_id":0},{"id":3,"name":"Alice","card1":7,"card2":10,"money":42,"avatar_id":0,"wins":0,"losses":0,"consecutive_wins":0,"orig_id":0}],"board":[50,49,47,46,6]},"player_turn":0,"button":0,"players_in":[1,2,3],"players_played":[],"bet":{"bet_player":1,"bet_amount":0,"bet_paid_amt":[{"id":0,"paid":0}]},"avail_action":["fold"],"winners":{"players":[-1],"ranks":[0]},"deck":[51,21,43,12,9,14,48,8,20,42,38,29,18,19,36,26,15,39,46,24,33,1,7,10,40,27,30,31,49,17,41,22,50,23,2,34,25,3,35,32,4,13,11,6,47]}
+{
+  "game_type": 0,
+  "num_players": 2,
+  "table": {
+    "pot": 0,
+    "blind": 2,
+    "participants": [
+      {
+        "id": 1,
+        "name": "Jimmy",
+        "card1": 51,
+        "card2": 48,
+        "money": 32,
+        "avatar_id": 0,
+        "wins": 0,
+        "losses": 0,
+        "consecutive_wins": 0,
+        "orig_id": 0
+      },
+      {
+        "id": 2,
+        "name": "Bobby",
+        "card1": 3,
+        "card2": 0,
+        "money": 32,
+        "avatar_id": 0,
+        "wins": 0,
+        "losses": 0,
+        "consecutive_wins": 0,
+        "orig_id": 0
+      },
+      {
+        "id": 3,
+        "name": "Alice",
+        "card1": 7,
+        "card2": 10,
+        "money": 42,
+        "avatar_id": 0,
+        "wins": 0,
+        "losses": 0,
+        "consecutive_wins": 0,
+        "orig_id": 0
+      }
+    ],
+    "board": [
+      50,
+      49,
+      47,
+      46,
+      6
+    ]
+  },
+  "player_turn": 0,
+  "button": 0,
+  "players_in": [
+    1,
+    2,
+    3
+  ],
+  "players_played": [],
+  "bet": {
+    "bet_player": 1,
+    "bet_amount": 0,
+    "bet_paid_amt": [
+      {
+        "id": 0,
+        "paid": 0
+      }
+    ]
+  },
+  "avail_action": [
+    "fold"
+  ],
+  "winners": {
+    "players": [
+      -1
+    ],
+    "ranks": [
+      0
+    ]
+  },
+  "deck": [
+    30,
+    41,
+    7,
+    18,
+    1,
+    37,
+    42,
+    5,
+    17,
+    26,
+    14,
+    27,
+    11,
+    31,
+    48,
+    39,
+    51,
+    47,
+    4,
+    3,
+    38,
+    50,
+    33,
+    22,
+    21,
+    44,
+    28,
+    32,
+    15,
+    10,
+    23,
+    6,
+    43,
+    24,
+    35,
+    16,
+    2,
+    46,
+    34,
+    13,
+    20,
+    19,
+    29,
+    49,
+    0
+  ]
+}
