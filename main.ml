@@ -220,7 +220,7 @@ let play_game st =
         else iterations := 25000 in
 
       print_endline "AI is thinking...";
-      clear_screen ();
+
 
       change_difficulty (State.game_type st);
       let next_action = Montecarlo.declare_action_2p (State.find_participant
@@ -235,6 +235,7 @@ let play_game st =
         | comm ->
           (match State.command_to_function comm st with
            | Legal t ->
+             clear_screen ();
              if (List.length (State.winning_players st)) = 0 then (
                print_endline (player.name ^ " " ^ Command.command_to_string
                                 comm);
@@ -247,9 +248,12 @@ let play_game st =
         | comm ->
           (match State.command_to_function comm st with
            | Legal t ->
-             print_newline ();
-             print_endline (Command.command_to_string comm);
-             print_newline ();
+             clear_screen ();
+             if (List.length (State.winning_players st)) = 0 then (
+               print_endline (player.name ^ " " ^ Command.command_to_string
+                                comm);
+               print_newline ()
+             );
              keep_playing (State.get_avail_action t);
            | Illegal s -> failwith s)
     else
