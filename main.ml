@@ -216,8 +216,8 @@ let play_game st =
        State.player_turn st = 2 then
       let iterations = ref 4000 in
       let change_difficulty game_type =
-        if game_type = 2 then iterations := 4000
-        else iterations := 25000 in
+        if game_type = 2 then iterations := 5000
+        else iterations := 15000 in
 
       print_endline "AI is thinking...";
 
