@@ -362,7 +362,7 @@ let init_bet_2 =
 
 let state_tests =
   [
-    (*)
+    (*
        "winner_test_1" >:: (fun _ ->
          assert_equal jimmy (fst (winners state1)));
        "winner_test_2" >:: (fun _ ->
