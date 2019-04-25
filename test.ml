@@ -250,7 +250,7 @@ let state_table_1 = {pot = 0; blind = 2; participants = [jimmy; bobby; alice];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
 
-let state_table_a = {pot = 0; blind = 3; participants = [jimmy; bobby; alice];
+let state_table_a = {pot = 0; blind = 3; participants = [jimmy; bobby];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
 let state_bet_1 =
@@ -259,6 +259,7 @@ let state_bet_1 =
     bet_amount = 0;
     bet_paid_amt = [(0,0)];
   }
+
 
 let state_bet_a =
   {
@@ -296,7 +297,7 @@ let statea =
 let stateb =
   {
     game_type = 1;
-    num_players = 4;
+    num_players = 2;
     table = state_table_a;
     player_turn = 0;
     button = 1;
@@ -336,15 +337,32 @@ let state_4 = get_state (State.bet_or_raise 120 state_3 "raise")
 let state_5 = get_state (State.call state_4)
 let state_6 = get_state (State.check state_5)
 let state_7 = get_state (State.bet_or_raise 40 state_6 "bet")
+let state_8 = get_state (State.fold state_7)
 
 let test_save_1 = State.save "testing1" state1
 let test_save_2 = State.save "testing2" state2
+
+(* State Tests for all functions that can be unit tested. Functions
+   that cannot be unit tested or relied on functions that cannot
+   be unit tested were tested indirectly via play testing and extensive
+   comparisons with existing poker simulators.*)
+let init_bet_1 = 
+  {
+    bet_player = 0;
+    bet_amount = 0;
+    bet_paid_amt = [(1,0);(2,0);(3,0)]
+  }
+let init_bet_2 = 
+  {
+    init_bet_1 with
+    bet_paid_amt = [(3,0);(4,0);(1,0);(2,0)]
+  }
 
 (* State Tests*)
 
 let state_tests =
   [
-    (*)
+    (*
        "winner_test_1" >:: (fun _ ->
          assert_equal jimmy (fst (winners state1)));
        "winner_test_2" >:: (fun _ ->
@@ -408,6 +426,18 @@ let state_tests =
         assert_equal ["fold"] (avail_action state1));
     "avail_actions_2" >:: (fun _ ->
         assert_equal ["call"] (avail_action statea));
+    "winner_1" >:: (fun _ ->
+        assert_equal [jimmy, 11] (winners state1));
+    "winner_2" >:: (fun _ ->
+        assert_equal [jimmy, 11] (winners statea));
+    "find_stack_1" >:: (fun _ ->
+        assert_equal 42 (find_stack 3 state1.table.participants));
+    "find_stack_2" >:: (fun _ ->
+        assert_equal 32 (find_stack 2 statea.table.participants));
+    "init_bet1" >:: (fun _ ->
+        assert_equal init_bet_1 (State.init_bet [1;2;3]));
+    "init_bet2" >:: (fun _ ->
+        assert_equal init_bet_2 (State.init_bet [3;4;1;2]));
     (* test_save saves "testing.json" to current directory *)
     "save1" >:: (fun _ ->
         assert_equal true (Sys.file_exists "testing1.json"));
