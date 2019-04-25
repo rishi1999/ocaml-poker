@@ -30,9 +30,7 @@ let print_intro () =
   ANSITerminal.(print_string [red] "red");
   print_endline ".";
   print_newline ();
-  print_newline ();
   ANSITerminal.(print_string [yellow] "LET'S PLAY!");
-  print_newline ();
   print_newline ();
   print_endline "make sure to go full screen!";
   print_endline "press enter to continue...";
@@ -176,8 +174,6 @@ let print_current_state st =
     print_string [yellow] "Losses: ";
     print_string [yellow] (string_of_int player.losses);
     print_newline ();
-    print_newline ();
-    print_newline ();
     print_string [yellow] ("$" ^ (string_of_int st.table.pot) ^
                            " is in the pot.");
     print_newline ();
@@ -186,10 +182,6 @@ let print_current_state st =
     print_string [default] "Available actions: ";
     print_string_list ("quit" :: (State.avail_action st))
   )
-
-
-
-
 
 let play_game st =
   print_intro ();
@@ -202,7 +194,6 @@ let play_game st =
         print_string "~ ";
         ANSITerminal.(print_string [yellow] "New Game!");
         print_string " ~";
-        print_newline ();
         print_newline ();
         keep_playing (State.continue_game st)
       );

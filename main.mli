@@ -7,6 +7,6 @@
     Example: [play_game poker.txt] plays the game with [poker.txt]. *)
 val play_game : State.t -> unit
 
-(*Note to Grader: The interface was designed with a dark terminal
-  background color in mind. Visibility of certain printed cards is reduced
-  if the terminal background color is white. *)
+(*Note to Grader: Please maximize the terminal window before
+  running make play in order to have the best experience and
+  avoid any issues with the UI not fully displaying.. *)
