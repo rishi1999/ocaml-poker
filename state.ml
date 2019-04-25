@@ -316,6 +316,7 @@ let players_in st = st.players_in
 let bet st = st.bet
 let avail_action st = st.avail_action
 let bet_paid_amt st = st.bet.bet_paid_amt
+let winners st = st.winners
 
 
 (** [are_all_bets_equal] is true if all bets made
@@ -594,8 +595,15 @@ let save file_name st =
   let participants_json = get_participants [] st.table.participants in
   let bet_amt = get_bet_amt [] st.bet.bet_paid_amt in
 
-  let winner_pl_ids = List.map (fun (p,_) -> `Int p.id) (winners st) in
-  let hand_qualities = List.map (fun (_,r) -> `Int r) (winners st) in
+  let winners_to_json =
+    let rec helper playerlst ranklst = function
+    | [] -> (playerlst, ranklst)
+    | (player, rank)::t -> 
+      helper (`Int player::playerlst) (`Int rank::ranklst) t in
+    helper [] [] (st.winners) in
+
+  let win_players = List.rev (fst winners_to_json) in
+  let ranks = List.rev (snd winners_to_json) in
 
   Yojson.to_file (file_name ^ ".json") (
     `Assoc
@@ -624,8 +632,8 @@ let save file_name st =
         );
         ("avail_action",
          `List (List.map (fun x -> `String x) st.avail_action));
-        ("winners", `Assoc [("players", `List (winner_pl_ids));
-                            ("ranks", `List (hand_qualities))]);
+        ("winners", `Assoc [("players", `List win_players);
+                            ("ranks", `List ranks)]);
         ("deck", `List (List.map (fun x -> `Int x)
                           (List.map (Deck.int_converter) !Deck.current_deck))
         );
@@ -723,7 +731,6 @@ let load json =
     current_deck := json |> member "deck" |> to_list |> List.map to_int |>
                     List.map (card_inverter);
     deck_size := List.length (!current_deck);
-    print_int (Deck.int_converter (List.nth !current_deck 0));
     try t_of_json json
     with Type_error (s, _) -> failwith ("Parsing error: " ^ s) in
 
