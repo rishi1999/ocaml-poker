@@ -309,6 +309,7 @@ let play_game st =
 
         | Show ->
           print_endline "Your hand is: ";
+          print_newline ();
           Card.card_printer (Player.cards (State.find_participant st
                                              (st.player_turn)));
           print_newline ();
