@@ -249,7 +249,7 @@ let play_game st =
       let iterations = ref 4000 in
       let change_difficulty game_type =
         if game_type = 2 then iterations := 4000
-        else iterations := 50000 in
+        else iterations := 25000 in
       change_difficulty (State.game_type st);
       let next_action = Montecarlo.declare_action_2p (State.find_participant st 2)
           (Player.cards (State.find_participant st 2)) st !iterations in
