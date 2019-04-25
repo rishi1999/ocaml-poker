@@ -4,10 +4,10 @@ open Deck
     accordance with the method developed by Bill Chen and provides a useful
     heuristic for gauging the relative strength of a hand. Higher Chen
     strength corresponds to a better hand.
-    Example: [chen_formula [(Ace, Spades);(Ace, King)] is [12].
+    Example: [chen_formula [(Ace, Spades);(Ace, King)]] is [12].
     Requires: [hand] must be a list of length two of type
-    Deck.suit * Deck.rank. *)
-let chen_formula hand = 
+    [Deck.suit * Deck.rank]. *)
+let chen_formula hand =
   let custom_rank_converter card = match card with
     | Two -> 1.
     | Three -> 1.5
