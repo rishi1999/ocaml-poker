@@ -265,16 +265,21 @@ val bet_or_raise : int -> t -> string -> move_result
     Requires: st is a valid state. *)
 val pay_blinds : t -> t
 
-(** [load] json returns a state t according to the data stored in json
+(** [load json] is a state t according to the data stored in json
     file. 
     Requires: json file exists in the current directory,
               json file contains the right data to load a new state.
 *)
 val load : Basic.json -> t
 
-(** [save] string st returns the same state t, but saves in the current
+(** [save st] is the same state t, but saves in the current
     directory a file named from the string input as a .json file.
     Requires: string is a non-empty string,
               t is a valid state.
 *)
 val save : string -> t -> t
+
+(** [filter_busted_players st] is the state st without those player
+    that do not have any money from players_in of t.
+    Requires : *)
+val filter_busted_players : t -> t
