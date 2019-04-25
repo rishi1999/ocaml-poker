@@ -167,8 +167,15 @@ let print_current_state st =
     print_string [yellow] (Player.name player);
     print_string [yellow] "'s turn:";
     print_newline ();
-    print_string [default]
+
+    let col =
+      if player.consecutive_wins = 0 then default
+      else if player.consecutive_wins = 1 then green
+      else if player.consecutive_wins = 2 then cyan
+      else magenta in
+    print_string [col]
       (avatar_array.(Player.avatar_id player));
+
     print_newline ();
     print_string [yellow] "Wins: ";
     print_string [yellow] (string_of_int player.wins);
