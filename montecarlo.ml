@@ -5,7 +5,7 @@ open Player
 
 
 (** [community_card_fill_eff base_cards used] returns a random number of cards
-    from the deck but does not return any card that is present in [used].
+    from the deck but does not return any card that is present in [used]
     The number of cards returned is equal to 5 - the number of elements
     in [base_cards].
     Example: [community_card_fill_eff [1;2;3;5] [1;2;3;4;6;7] could be

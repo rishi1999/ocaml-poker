@@ -53,7 +53,7 @@ let const_int_deck =  [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15;
     before shuffling the deck.
     Requires: [used] is an int list comprising integers from 0 (inclusive) to
     51 (inclusive).
-    Requires: [number] is >=0 *)
+    Requires: [number] >=0 *)
 let pick_efficient number used = 
   let new_deck = List.filter (fun x -> not (List.mem x used)) const_int_deck in
   let shuffle_list compare list =

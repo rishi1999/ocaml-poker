@@ -389,7 +389,13 @@ let cards_3 = [(Spades, Three); (Hearts, Four)] @ [(Hearts, Ace);
                                                    (Hearts, Three)];;
 let single_card = [(Spades, Ace)]
 
+let cards_4 = [(Hearts,Two);(Hearts,Three);(Spades,Four);
+               (Diamonds,Five);(Diamonds,Ace);(Diamonds,Ten);(Diamonds,King)]
 
+let cards_a = [1;2;3;4;5;6;7]
+let cards_b = [1;2;3;4;5;6;8]
+let cards_c = [1;2;3;42;5;6;9]
+let cards_d = [1;2;3;4;49;50;51]
 
 let hand_evaluator_tests =
   [
@@ -411,6 +417,17 @@ let hand_evaluator_tests =
     "seven_list_eval_test3" >:: (fun _ ->
         assert_equal 2476 (seven_list_eval cards_3));
 
+    "seven_list_eval_test4" >:: (fun _ ->
+        assert_equal 1609 (seven_list_eval cards_4));
+
+    "seven_int_list_eval_test1" >:: (fun _ ->
+        assert_equal 154 (seven_int_list_eval cards_a));
+    "seven_int_list_eval_test2" >:: (fun _ ->
+        assert_equal 310 (seven_int_list_eval cards_b));
+    "seven_int_list_eval_test3" >:: (fun _ ->
+        assert_equal 322 (seven_int_list_eval cards_c));
+    "seven_int_list_eval_test4" >:: (fun _ ->
+        assert_equal 178 (seven_int_list_eval cards_d));
   ]
 
 let suite =
