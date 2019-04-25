@@ -1,3 +1,5 @@
+(* The avatar art here was edited from that available at 
+   https://www.asciiart.eu/ *)
 let avatar_array = [|"
       __        __      
      /\\ \\      /\\ \\ 

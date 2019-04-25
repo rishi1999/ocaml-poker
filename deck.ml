@@ -14,10 +14,10 @@ type card = suit * rank
    which cards have been selected and used from the deck. *)
 let played_cards = ref []
 
-(* [current_deck] is a mutable (suit * rank) list ref that is used to track
-   which cards are currently in the deck and have not been used. The cards
-   at the front of the list are at the top of the deck and would be used
-   first. *)
+(** [current_deck] is a mutable (suit * rank) list ref that is used to track
+    which cards are currently in the deck and have not been used. The cards
+    at the front of the list are at the top of the deck and would be used
+    first. *)
 let current_deck = ref []
 
 (** [deck_size] is an int ref that tracks the number of cards currently in
@@ -32,21 +32,14 @@ let deck = let ranks = [Two; Three; Four; Five; Six; Seven; Eight; Nine; Ten;
 
 let constant_deck =  deck
 
-let pick_new number used = 
-  let new_deck = List.filter (fun x -> not (List.mem x used)) constant_deck in
-  let shuffle_list compare list =
-    Random.self_init();
-    let tagged_list = List.map (fun card -> (card, Random.bits())) list in
-    let sorted_tags = List.sort compare tagged_list in
-    List.map fst sorted_tags in
-  let compare_second a b = Pervasives.compare (snd a) (snd b) in
-  let shuffled_new = shuffle_list compare_second new_deck in
-  let rec list_builder count outlist a = match a with
-    | [] -> outlist
-    | h :: t when count = 0 -> outlist
-    | h :: t -> list_builder (count - 1) (h :: outlist) t in
-  List.rev (list_builder number [] shuffled_new)
-
+(* [cons_int_deck] is a list of integers from 0 to 51 that represents
+   all 52 cards in a deck as follows: 
+   We take the rank of each card and
+   map it to an integer such that Two maps to 0 and Ace maps to 12 (with the 
+   remaining cards being mapped in a corresponding order) and
+   then match the suits such that Clubs maps to 0, Diamonds to 1, Hearts to 2
+   and Spades to 3. Then the integer representation of the card is
+   rank * 4 + suit. *)
 let const_int_deck =  [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 
                        16; 17; 18; 19; 20; 21; 22; 23; 24; 25; 26; 27; 28; 
                        29; 30; 31; 32; 33; 34; 35; 36; 37; 38; 39; 40; 41; 
@@ -60,7 +53,7 @@ let const_int_deck =  [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15;
     before shuffling the deck.
     Requires: [used] is an int list comprising integers from 0 (inclusive) to
     51 (inclusive).
-    Requires: [number] is >=0 *)
+    Requires: [number] >=0 *)
 let pick_efficient number used = 
   let new_deck = List.filter (fun x -> not (List.mem x used)) const_int_deck in
   let shuffle_list compare list =

@@ -97,6 +97,8 @@ let seven_eval c1 c2 c3 c4 c5 c6 c7 =
 (** [seven_list_eval hand] gives the ranking of [hand] in terms of which of
     the 7462 equivalence classes of 7 card poker it corresponds to. 
     Lower values denote a more powerful rank.
+    Example: [seven_list_eval [(Hearts,Two);(Hearts,Three);(Spades,Four);
+    (Diamonds,Five);(Diamonds,Ace);(Diamonds,Ten);(Diamonds,King)]] is [1609]
     Requires: [hand] comprises 7 unique cards represented as (suit, rank)
     tuples. *)
 let seven_list_eval hand = 
@@ -109,6 +111,12 @@ let seven_list_eval hand =
   let g = Deck.int_converter (List.nth hand 6) in
   seven_eval a b c d e f g
 
+(** [seven_int_list_eval hand] returns the rank of [hand] in terms of which of
+    the 7462 equivalence classes of 7 card poker it corresponds to. 
+    Lower values denote a more powerful rank.
+    Example: [seven_int_list_eval [1;2;3;4;5;6;7] is [154].]
+    Requires: [hand] is a list of 7 unique cards represented as distinct
+    integers from 0 to 1 inclusive.  *)
 let seven_int_list_eval hand = 
   let a = List.nth hand 0 in
   let b = List.nth hand 1 in

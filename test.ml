@@ -5,6 +5,7 @@ open Hand_evaluator
 open Deck
 open State
 open Command
+open Hand_analysis
 
 let make_new_deck =
   Deck.deck_init
@@ -64,7 +65,7 @@ let julian = {id = 2; name = "Julian"; cards = [(Diamonds, Five)];
 let player_tests =
   [
     "ID Test1" >:: (fun _->
-        print_endline "player"; assert_equal 0  (id james));
+        assert_equal 0  (id james));
     "ID Test2" >:: (fun _->
         assert_equal 1  (id bob));
     "ID Test3" >:: (fun _->
@@ -125,7 +126,7 @@ let player_tests =
 
 let command_tests = [
   "test parse empty" >:: (fun _ -> 
-      print_endline "command"; assert_raises (Empty) (fun () -> parse ""));
+      assert_raises (Empty) (fun () -> parse ""));
   "test parse empty with spaces" >:: (fun _ -> 
       assert_raises (Empty) (fun () -> parse "      "));
   "test parse quit malformed" >:: (fun _ -> 
@@ -187,6 +188,20 @@ let command_tests = [
   "test command to string with extra spaces" >:: (fun command ->
       assert_equal (Raise 10) (parse "raise     10"));
 ]
+(* Tests for the Chen Strength hand analysis function.*)
+let hand_analysis_tests =
+  [
+    "Chen Formula test 1" >:: (fun command ->
+        assert_equal 12. (chen_formula [(Spades, Ace);(Spades,King)]));
+    "Chen Formula test 2" >:: (fun command ->
+        assert_equal 10. (chen_formula [(Spades, Ten);(Diamonds,Ten)]));
+    "Chen Formula test 3" >:: (fun command ->
+        assert_equal 6. (chen_formula [(Hearts, Five);(Hearts,Seven)]));
+    "Chen Formula test 4" >:: (fun command ->
+        assert_equal (-1.) (chen_formula [(Spades, Two);(Hearts,Seven)]));
+    "Chen Formula test 5" >:: (fun command ->
+        assert_equal 20. (chen_formula [(Spades, Ace);(Hearts,Ace)]));
+  ]
 
 let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}
 let james = {id = 0; name = "James"; cards = []; money = 32; wins = 0;
@@ -279,48 +294,47 @@ let state_1 = (get_avail_action
                         winners = [(-1,0)];
                        } )))
 let state_2 = get_state (State.call state_1)
-let state_3 = get_state (State.bet_or_raise 50 state_2 "bet")
-(*let state_4 = get_state (State.bet_or_raise 120 state_3 "raise")
-  let state_5 = get_state (State.call state_4)
-  let state_6 = get_state (State.check state_5)
-  let state_7 = get_state (State.bet_or_raise 40 state_6 "bet")
-  let state_8 = get_state (State.fold state_7)
-*)
+let state_3 = get_state (State.bet_or_raise 50 state_2 "raise")
+let state_4 = get_state (State.bet_or_raise 120 state_3 "raise")
+let state_5 = get_state (State.call state_4)
+let state_6 = get_state (State.check state_5)
+let state_7 = get_state (State.bet_or_raise 40 state_6 "bet")
 
 (* State Tests*)
 
 let state_tests =
   [
-    (*"hand_order_test1" >:: (fun _ ->
-        assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
-      "winner_test_1" >:: (fun _ ->
-        assert_equal jimmy (fst (winner state1)));
-      "winner_test_2" >:: (fun _ ->
-        assert_equal bobby (fst (winner state2)));
-      "winner_test_3" >:: (fun _ ->
-        assert_equal alice (fst (winner state3)));
-      "winner_test_4" >:: (fun _ ->
-        assert_equal alice (fst (winner state3)));
-
-      "simulation_1" >:: (fun _ ->
-        assert_equal 498 (State.find_participant state_1 1).money);
-      "simulation_2" >:: (fun _ ->
-        assert_equal 495 (State.find_participant state_1 2).money);
-      "simulation_3" >:: (fun _ ->
-        assert_equal 495 (State.find_participant state_2 1).money);
-      "simulation_4" >:: (fun _ ->
-        assert_equal 445 (State.find_participant state_3 1).money);
-      "simulation_5" >:: (fun _ ->
-        assert_equal 375 (State.find_participant state_4 2).money);
-      "simulation_6" >:: (fun _ ->
-        assert_equal 375 (State.find_participant state_5 1).money);
-      "simulation_7" >:: (fun _ ->
-         assert_equal 335 (State.find_participant state_7 2).money);
-       "simulation_8" >:: (fun _ ->
-         assert_equal 623 (State.find_participant state_8 2).money);
-       "simulation_9" >:: (fun _ ->
-         assert_equal 370 (State.find_participant state_8 1).money);
+    (* "hand_order_test1" >:: (fun _ ->
+         assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
+       "winner_test_1" >:: (fun _ ->
+         assert_equal jimmy (fst (winners state1)));
+       "winner_test_2" >:: (fun _ ->
+         assert_equal bobby (fst (winners state2)));
+       "winner_test_3" >:: (fun _ ->
+         assert_equal alice (fst (winners state3)));
+       "winner_test_4" >:: (fun _ ->
+         assert_equal alice (fst (winners state3)));
     *)
+    "simulation_1" >:: (fun _ ->
+        assert_equal 498 (State.find_participant state_1 1).money);
+    "simulation_2" >:: (fun _ ->
+        assert_equal 495 (State.find_participant state_1 2).money);
+    "simulation_3" >:: (fun _ ->
+        assert_equal 495 (State.find_participant state_2 1).money);
+    "simulation_4" >:: (fun _ ->
+        assert_equal 495 (State.find_participant state_3 1).money);
+    "simulation_5" >:: (fun _ ->
+        assert_equal 445 (State.find_participant state_3 2).money);
+    "simulation_6" >:: (fun _ ->
+        assert_equal 445 (State.find_participant state_4 2).money);
+    "simulation_7" >:: (fun _ ->
+        assert_equal 375 (State.find_participant state_4 1).money);
+    "simulation_8" >:: (fun _ ->
+        assert_equal 375 (State.find_participant state_5 1).money);
+    "simulation_9" >:: (fun _ ->
+        assert_equal 335 (State.find_participant state_7 2).money);
+
+
 
     (* Also extensive testing done by play testing the engine *)
   ]
@@ -375,7 +389,13 @@ let cards_3 = [(Spades, Three); (Hearts, Four)] @ [(Hearts, Ace);
                                                    (Hearts, Three)];;
 let single_card = [(Spades, Ace)]
 
+let cards_4 = [(Hearts,Two);(Hearts,Three);(Spades,Four);
+               (Diamonds,Five);(Diamonds,Ace);(Diamonds,Ten);(Diamonds,King)]
 
+let cards_a = [1;2;3;4;5;6;7]
+let cards_b = [1;2;3;4;5;6;8]
+let cards_c = [1;2;3;42;5;6;9]
+let cards_d = [1;2;3;4;49;50;51]
 
 let hand_evaluator_tests =
   [
@@ -397,6 +417,17 @@ let hand_evaluator_tests =
     "seven_list_eval_test3" >:: (fun _ ->
         assert_equal 2476 (seven_list_eval cards_3));
 
+    "seven_list_eval_test4" >:: (fun _ ->
+        assert_equal 1609 (seven_list_eval cards_4));
+
+    "seven_int_list_eval_test1" >:: (fun _ ->
+        assert_equal 154 (seven_int_list_eval cards_a));
+    "seven_int_list_eval_test2" >:: (fun _ ->
+        assert_equal 310 (seven_int_list_eval cards_b));
+    "seven_int_list_eval_test3" >:: (fun _ ->
+        assert_equal 322 (seven_int_list_eval cards_c));
+    "seven_int_list_eval_test4" >:: (fun _ ->
+        assert_equal 178 (seven_int_list_eval cards_d));
   ]
 
 let suite =
@@ -407,5 +438,6 @@ let suite =
     state_tests;
     player_tests;
     command_tests;
+    hand_analysis_tests;
   ]
 let _ = run_test_tt_main suite

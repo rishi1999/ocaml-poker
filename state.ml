@@ -571,7 +571,7 @@ let bet_or_raise amt st comm_str =
                  temp_state with
                  bet = updated_bet;
                })
-  else Illegal "You can't bet or raise right now!"
+  else Illegal "You can't do that right now!"
 
 let bet' amt st = bet_or_raise amt st "bet"
 let raise' amt st = bet_or_raise amt st "raise"
