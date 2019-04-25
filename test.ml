@@ -342,10 +342,14 @@ let state_8 = get_state (State.fold state_7)
 let test_save_1 = State.save "testing1" state1
 let test_save_2 = State.save "testing2" state2
 
-(* State Tests for all functions that can be unit tested. Functions
-   that cannot be unit tested or relied on functions that cannot
+(* State Tests for all functions that can be unit tested. 
+   The simulation tests
+   given below from simulation1 to simulation9 are
+   also used to test for the check, call, fold, bet_or_raise,
+   calculate_bet_amt and pay_blinds functions present within state.
+   Functions that cannot be unit tested or relied on functions that cannot
    be unit tested were tested indirectly via play testing and extensive
-   comparisons with existing poker simulators.*)
+   comparisons with existing poker simulators. *)
 let init_bet_1 = 
   {
     bet_player = 0;
@@ -362,16 +366,6 @@ let init_bet_2 =
 
 let state_tests =
   [
-    (*
-       "winner_test_1" >:: (fun _ ->
-         assert_equal jimmy (fst (winners state1)));
-       "winner_test_2" >:: (fun _ ->
-         assert_equal bobby (fst (winners state2)));
-       "winner_test_3" >:: (fun _ ->
-         assert_equal alice (fst (winners state3)));
-       "winner_test_4" >:: (fun _ ->
-         assert_equal alice (fst (winners state3)));
-    *)
     "hand_order_test1" >:: (fun _ ->
         assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
     "hand_order_test2" >:: (fun _ ->

@@ -1,5 +1,6 @@
 (* The avatar art here was edited from that available at 
    https://www.asciiart.eu/ *)
+(*BISECT-IGNORE-BEGIN*)
 let avatar_array = [|"
       __        __      
      /\\ \\      /\\ \\ 
@@ -208,3 +209,4 @@ let array_choice = "
     \\  / /______\\/ /                                           _)(  )(_
      \\/___________/                                           `---''---`
 "
+(*BISECT-IGNORE-END*)
