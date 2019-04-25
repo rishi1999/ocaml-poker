@@ -236,8 +236,10 @@ let play_game st =
       let action = fst next_action in
       print_endline action;
       let amt = snd next_action in
-      print_int amt;
-      print_newline();
+      if amt <> 0 then (
+        print_int amt;
+        print_newline()
+      );
       if action = "raise" || action = "bet" then
         match Command.parse (action ^ " " ^ string_of_int amt) with
         | comm ->

@@ -172,7 +172,7 @@ let declare_action_2p bot hole_cards state iterations =
       hole_cards (state.table.board) in
   let can_call = List.mem "call" valid_actions in
   let call_amount = if can_call then calculate_pay_amt state else -1 in
-  if bot.money = 0 then 
+  if bot.money = 0 then
     ("check", 0)
   else
   if win_rate >= 0.85 then
