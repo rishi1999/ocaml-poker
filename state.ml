@@ -152,23 +152,37 @@ let pay_blinds st =
   let st = pick_blind st (st.table.blind / 2) in
   pick_blind st st.table.blind
 
-(** [init_players] num_players money returns the sorted list of players,
+(** [init_players game_type num_players money] returns the sorted list of players,
     with length of num_players and everyone's money is equal to the
     input money. *)
-let init_players num_players money =
+let init_players game_type num_players money =
   let rec init_players' acc money = function
     | id when id > num_players -> acc
+    | id when game_type = 1 && id = 2 ->
+      let curr_player =
+        {
+          id;
+          name = "AI";
+          cards = [];
+          money;
+          wins = 0;
+          losses = 0;
+          avatar_id = 11;
+          consecutive_wins = 0;
+          orig_id = 11;
+        } in
+      init_players' (curr_player :: acc) money (id + 1)
     | id ->
       let name = read_string ("Enter player " ^(string_of_int) id^ "'s name.")
           ~condition:((fun x -> String.length x <= 10
                                 && String.length x >= 1)
                      ,"Max length: 10 characters.") () in
       ANSITerminal.(print_string [ANSITerminal.default] array_choice);
-      let prompt_str = "Choose " ^ name ^ "'s avatar." in
 
-      let valid_id = read_integer prompt_str
+      let valid_id = read_integer ("Choose " ^ name ^ "'s avatar.")
           ~condition:((fun x -> x >= 1 && x <= 10),
                       "Please pick a number between 1 and 10.") () - 1 in
+
       let curr_player =
         {
           id;
@@ -184,14 +198,14 @@ let init_players num_players money =
       init_players' (curr_player :: acc) money (id + 1) in
   (init_players' [] money 1)
 
-(** [init_table] num_players money blind returns the list of type
+(** [init_table game_type num_players money blind] returns the list of type
     Player.player, with length of num_players and everyone's money is equal
     to the input money. *)
-let init_table num_players money blind =
+let init_table game_type num_players money blind =
   Table.deal {
     pot = 0;
     blind;
-    participants = init_players num_players money;
+    participants = init_players game_type num_players money;
     board = [];
   }
 
@@ -290,13 +304,13 @@ let filter_busted_players st =
       else
         helper (outlst) t in
   {st with
-   players_in = List.rev (helper [] st.players_in)} 
+   players_in = List.rev (helper [] st.players_in)}
 
 let init_state game_type num_players money blind =
   {
     game_type;
     num_players;
-    table = init_table num_players money blind;
+    table = init_table game_type num_players money blind;
     player_turn = 1;
     button = num_players;
     players_in = init_players_in num_players;
@@ -395,9 +409,9 @@ let go_next_round st =
           money = pl.money + profit;
           wins = pl.wins + 1;
           consecutive_wins = pl.consecutive_wins + 1;
-          avatar_id = if pl.consecutive_wins < 5 
+          (*avatar_id = if pl.consecutive_wins < 5
             then 9 + pl.consecutive_wins + 1
-            else pl.avatar_id
+            else pl.avatar_id*)
         }
       ) winner_pls in
 
@@ -407,7 +421,7 @@ let go_next_round st =
         ^ "\n" ^ dyndescrp (List.hd winner_pls)
       else
         let names = List.map (fun pl -> pl.name) winner_pls in
-        "Winners:\n" ^ (List.fold_left (fun a b -> a ^ "    " ^ b) "" names) 
+        "Winners:\n" ^ (List.fold_left (fun a b -> a ^ "    " ^ b) "" names)
         ^ " and each earned $" ^ string_of_int profit ^ "!"
     in
     print_newline ();
@@ -596,9 +610,9 @@ let save file_name st =
 
   let winners_to_json =
     let rec helper playerlst ranklst = function
-    | [] -> (playerlst, ranklst)
-    | (player, rank)::t -> 
-      helper (`Int player::playerlst) (`Int rank::ranklst) t in
+      | [] -> (playerlst, ranklst)
+      | (player, rank)::t ->
+        helper (`Int player::playerlst) (`Int rank::ranklst) t in
     helper [] [] (st.winners) in
 
   let win_players = List.rev (fst winners_to_json) in
