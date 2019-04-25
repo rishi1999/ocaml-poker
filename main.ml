@@ -179,7 +179,7 @@ let print_current_state st =
     print_newline ();
     print_newline ();
     print_string [yellow] ("$" ^ (string_of_int st.table.pot) ^
-                           " has been added to the pot.");
+                           " is in the pot.");
     print_newline ();
     print_player_bets st;
     print_newline ();
