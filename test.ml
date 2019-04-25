@@ -249,10 +249,21 @@ let alice = {id = 3; name = "Alice"; cards =
 let state_table_1 = {pot = 0; blind = 2; participants = [jimmy; bobby; alice];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
+
+let state_table_a = {pot = 0; blind = 3; participants = [jimmy; bobby; alice];
+                     board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
+                              (Hearts, King); (Hearts, Three)]}
 let state_bet_1 =
   {
     bet_player = 1;
     bet_amount = 0;
+    bet_paid_amt = [(0,0)];
+  }
+
+let state_bet_a =
+  {
+    bet_player = 1;
+    bet_amount = 2;
     bet_paid_amt = [(0,0)];
   }
 
@@ -268,6 +279,32 @@ let state1 =
     bet = state_bet_1;
     avail_action = ["fold"];
     winners = [(-1,0)];
+  }
+let statea =
+  {
+    game_type = 1;
+    num_players = 4;
+    table = state_table_a;
+    player_turn = 0;
+    button = 1;
+    players_in = [1;2];
+    players_played = [];
+    bet = state_bet_a;
+    avail_action = ["call"];
+    winners = [(-1,0)];
+  }
+let stateb =
+  {
+    game_type = 1;
+    num_players = 4;
+    table = state_table_a;
+    player_turn = 0;
+    button = 1;
+    players_in = [1;2];
+    players_played = [];
+    bet = state_bet_1;
+    avail_action = ["fold"];
+    winners = [];
   }
 let state2 = {state1 with players_in = [2]}
 let state3 = {state1 with players_in = [3]}
@@ -304,8 +341,7 @@ let state_7 = get_state (State.bet_or_raise 40 state_6 "bet")
 
 let state_tests =
   [
-    (* "hand_order_test1" >:: (fun _ ->
-         assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
+    (*)
        "winner_test_1" >:: (fun _ ->
          assert_equal jimmy (fst (winners state1)));
        "winner_test_2" >:: (fun _ ->
@@ -315,6 +351,10 @@ let state_tests =
        "winner_test_4" >:: (fun _ ->
          assert_equal alice (fst (winners state3)));
     *)
+    "hand_order_test1" >:: (fun _ ->
+        assert_equal [4; 5; 1; 2; 3] (hand_order 5 3 ));
+    "hand_order_test2" >:: (fun _ ->
+        assert_equal [3; 4; 5; 1; 2] (hand_order 5 2 ));
     "simulation_1" >:: (fun _ ->
         assert_equal 498 (State.find_participant state_1 1).money);
     "simulation_2" >:: (fun _ ->
@@ -333,8 +373,38 @@ let state_tests =
         assert_equal 375 (State.find_participant state_5 1).money);
     "simulation_9" >:: (fun _ ->
         assert_equal 335 (State.find_participant state_7 2).money);
-
-
+    "game_type test1" >:: (fun _ ->
+        assert_equal 0 (game_type state1));
+    "game_type test1" >:: (fun _ ->
+        assert_equal 1 (game_type statea));
+    "num_players test1" >:: (fun _ ->
+        assert_equal 2 (num_players state1));
+    "num_players test2" >:: (fun _ ->
+        assert_equal 4 (num_players statea));
+    "table test1" >:: (fun _ ->
+        assert_equal state_table_1 (table state1));
+    "table test2" >:: (fun _ ->
+        assert_equal state_table_a (table statea));
+    "players_in test1" >:: (fun _ ->
+        assert_equal [1;2;3] (players_in state1));
+    "players_in test2" >:: (fun _ ->
+        assert_equal [1;2] (players_in statea));
+    "button test1" >:: (fun _ ->
+        assert_equal 0 (button state1));
+    "button test2" >:: (fun _ ->
+        assert_equal 1 (button statea));
+    "continue_game_1" >:: (fun _ ->
+        assert_equal {statea with winners = []} (continue_game statea));
+    "continue_game_2" >:: (fun _ ->
+        assert_equal {stateb with winners = []} (continue_game stateb));
+    "continue_game_1" >:: (fun _ ->
+        assert_equal state_bet_1 (bet state1));
+    "continue_game_2" >:: (fun _ ->
+        assert_equal state_bet_a (bet statea));
+    "avail_actions_1" >:: (fun _ ->
+        assert_equal ["fold"] (avail_action state1));
+    "avail_actions_2" >:: (fun _ ->
+        assert_equal ["call"] (avail_action statea));
 
     (* Also extensive testing done by play testing the engine *)
   ]
