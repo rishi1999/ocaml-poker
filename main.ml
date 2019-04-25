@@ -310,14 +310,20 @@ let play_game st =
         | Show ->
           print_endline "Your hand is: ";
           print_newline ();
+          print_newline ();
           Card.card_printer (Player.cards (State.find_participant st
                                              (st.player_turn)));
+          print_newline ();
           print_newline ();
           print_newline ();
           if List.length (Table.board (State.table st)) = 0 then
             print_endline
               ("The Chen strength of your hand is " ^
-               (string_of_float (Hand_analysis.chen_formula player.cards)));
+               (string_of_int
+                  ( int_of_float ((Hand_analysis.chen_formula player.cards) /.
+                                  20. *. 100.))) ^
+               "%");
+          print_newline ();
           print_newline ();
           print_newline ();
           print_endline "press enter to continue...";
