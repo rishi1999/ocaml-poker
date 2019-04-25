@@ -214,7 +214,7 @@ let play_game st =
     let player = State.(find_participant st (player_turn st)) in
 
     (* Easy Bot *)
-    if (State.game_type st) = 1 && State.player_turn st = 2 then
+    if State.game_type st = 1 && State.player_turn st = 2 then
       if List.mem "check" (State.avail_action st) then
         match State.check st with
         | Legal t ->
@@ -241,10 +241,10 @@ let play_game st =
           print_endline str;
           print_newline ();
           keep_playing (State.get_avail_action st)
-      else failwith "AI next move not defined"
+      else failwith "ERROR: AI next move not defined"
 
     (* Medium / Hard Bot *)
-    else if ((State.game_type st) = 2 || (State.game_type st) = 3) &&
+    else if (State.game_type st = 2 || State.game_type st = 3) &&
             State.player_turn st = 2 then
       let iterations = ref 4000 in
       let change_difficulty game_type =

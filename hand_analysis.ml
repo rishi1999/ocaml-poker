@@ -1,38 +1,43 @@
 open Deck
 
-let custom_rank_converter card = match card with
-  | Two -> 1.
-  | Three -> 1.5
-  | Four -> 2.
-  | Five -> 2.5
-  | Six -> 3.
-  | Seven -> 3.5
-  | Eight -> 4.
-  | Nine -> 4.5
-  | Ten -> 5.
-  | Jack -> 6.
-  | Queen -> 7.
-  | King -> 8.
-  | Ace -> 10.
-
-let rank_converter card = match card with
-  | Two -> 2.
-  | Three -> 3.
-  | Four -> 4.
-  | Five -> 5.
-  | Six -> 6.
-  | Seven -> 7.
-  | Eight -> 8.
-  | Nine -> 9.
-  | Ten -> 10.
-  | Jack -> 11.
-  | Queen -> 12.
-  | King -> 13.
-  | Ace -> 14.
-
-let chen_formula hole = 
-  let card1 = List.hd hole in
-  let card2 = List.nth hole 1 in
+(** [chen_formula hand] computes the Chen strength of a particular hand in
+    accordance with the method developed by Bill Chen and provides a useful
+    heuristic for gauging the relative strength of a hand. Higher Chen
+    strength corresponds to a better hand.
+    Example: [chen_formula [(Ace, Spades);(Ace, King)] is [12].
+    Requires: [hand] must be a list of length two of type
+    Deck.suit * Deck.rank. *)
+let chen_formula hand = 
+  let custom_rank_converter card = match card with
+    | Two -> 1.
+    | Three -> 1.5
+    | Four -> 2.
+    | Five -> 2.5
+    | Six -> 3.
+    | Seven -> 3.5
+    | Eight -> 4.
+    | Nine -> 4.5
+    | Ten -> 5.
+    | Jack -> 6.
+    | Queen -> 7.
+    | King -> 8.
+    | Ace -> 10. in
+  let rank_converter card = match card with
+    | Two -> 2.
+    | Three -> 3.
+    | Four -> 4.
+    | Five -> 5.
+    | Six -> 6.
+    | Seven -> 7.
+    | Eight -> 8.
+    | Nine -> 9.
+    | Ten -> 10.
+    | Jack -> 11.
+    | Queen -> 12.
+    | King -> 13.
+    | Ace -> 14. in
+  let card1 = List.hd hand in
+  let card2 = List.nth hand 1 in
   let suit1 = fst card1 in
   let suit2 = fst card2 in
   let rank1 = custom_rank_converter (snd card1) in
