@@ -346,7 +346,7 @@ let init_game num_players =
       () in
   let st = match num_players with
     | 1 ->
-      let difficulty = State.read_string "Difficulty of AI? (easy, medium,\
+      let difficulty = State.read_string "Difficulty of AI? (easy, medium, \
                                           hard)"
           ~condition:((fun x -> x = "easy" || x = "medium" || x = "hard"),
                       "Options: easy, medium, hard.") () in
