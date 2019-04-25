@@ -42,19 +42,19 @@ let constant_deck =  deck
    rank * 4 + suit. *)
 let const_int_deck =  [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 
                        16; 17; 18; 19; 20; 21; 22; 23; 24; 25; 26; 27; 28; 
-                       29; 30; 31; 32; 33; 34; 35; 36; 37; 38; 39; 40; 41; 
+                       29; 30; 31; 32; 33; 34; 35; 36; 37; 38; 39; 40; 41;
                        42; 43; 44; 45; 46; 47; 48;49; 50; 51]
 
-(** [pick_efficent number used] returns a list containing [number] random cards 
+(** [pick_efficent number used] returns a list containing [number] random cards
     from a deck does not contain any [used] cards.
-    Example: [pick_efficient 1 (Spades,Ace) could be (Hearts, Three).
-    Note that we say could be and not guarranteed to be as pick_efficient 
+    Example: [pick_efficient 1 (Spades,Ace)] could be [(Hearts, Three)].
+    Note that we say could be and not guarranteed to be as pick_efficient
     randomly initializes the seed value for the random number generator
     before shuffling the deck.
     Requires: [used] is an int list comprising integers from 0 (inclusive) to
     51 (inclusive).
-    Requires: [number] >=0 *)
-let pick_efficient number used = 
+    Requires: [number] is positive. *)
+let pick_efficient number used =
   let new_deck = List.filter (fun x -> not (List.mem x used)) const_int_deck in
   let shuffle_list compare list =
     Random.self_init();
@@ -91,11 +91,11 @@ let deck_init () =
 (** [update_state lst] is the deck with all cards played
     since the last update, [lst],
     removed from the deck and included in the cards-played list.
-    Example: update_state [(Club, Five)] removes (Club, Five) from the 
-    [current_deck]*)
+    Example: update_state [(Club, Five)] removes (Club, Five) from the
+    [current_deck] *)
 let update_state card_list =
   played_cards := card_list @ !played_cards;
-  current_deck := List.filter (fun x -> not (List.mem x card_list)) 
+  current_deck := List.filter (fun x -> not (List.mem x card_list))
       !current_deck;
   deck_size := List.length !current_deck
 
