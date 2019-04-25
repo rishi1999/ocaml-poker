@@ -548,7 +548,8 @@ let bet_or_raise amt st comm_str =
     if amt < st.table.blind then
       Illegal "You have to bet at least the blind!"
     else if comm_str = "raise" && (amt < 2*st.bet.bet_amount &&
-                                   amt <> (find_participant st st.player_turn).money) then
+                                   amt <> (find_participant st 
+                                             st.player_turn).money) then
       Illegal "You have to raise at least twice the bet!"
     else if amt > (find_stack st.player_turn st.table.participants) then
       Illegal "You don't have enough money to do that!"
@@ -584,7 +585,8 @@ let save file_name st =
                     ("id", `Int h.id);
                     ("name", `String h.name);
                     ("card1", `Int (Deck.int_converter (List.hd h.cards)));
-                    ("card2", `Int (Deck.int_converter (List.hd (List.tl h.cards))));
+                    ("card2", `Int (Deck.int_converter (List.hd 
+                                                          (List.tl h.cards))));
                     ("money", `Int h.money);
                     ("avatar_id", `Int h.avatar_id);
                     ("wins", `Int h.wins);

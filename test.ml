@@ -25,7 +25,10 @@ let empty_table = {
 }
 
 
-(**Deck Tests*)
+(**Deck Tests. Most exposed deck functions returned unit. For 
+   pick_efficient, it always executes by first selecting a random seed
+   using Random.self_init() so its output varies and cannot be
+   directly tested. *)
 let deck_tests = 
   [
     "pick first card" >:: (fun _ -> deck_init ();

@@ -86,7 +86,7 @@ let estimate_win_rate_eff num_simulations num_player hole board =
     [iterations] montecarlo simulations and then returns a string * amount
     tuple to represent the action that the bot should take.
     Example: [declare_action_eff [;money = 25;...] [1;2] [...;avail_actions = 
-    ["call";"raise";"fold"];...;num_players = 2; table.board = [3;4;5;6;7]...] 
+    ["call";"raise";"fold"];...;num_players = 2; table.board = [3;4;5;6;7]...]
     10000] could be [raise, 50]. The exact output depends on the
     random simulations that are run and what the results of those simulations
     is.

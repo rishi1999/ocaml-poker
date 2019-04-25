@@ -50,5 +50,6 @@ let chen_formula hand =
   let gap = (abs_float (ord_rank1 -. ord_rank2)) -. 1. in
   let gap_penalty = if gap >= 4. then -5. else if gap = 3. then -4.
     else if gap >= 1. then -1. *. gap else 0. in
-  let straight_bonus = if rank1 < 7. && rank2 < 7. && gap <= 1. && pair = 1.  then 1. else 0. in
+  let straight_bonus = if rank1 < 7. && rank2 < 7. && gap <= 1. 
+                          && pair = 1.  then 1. else 0. in
   ceil ((highest_score *. pair) +. suited +. gap_penalty +. straight_bonus)
