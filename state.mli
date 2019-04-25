@@ -78,7 +78,8 @@ val read_integer : string -> ?condition:(int -> bool) * string -> unit -> int
     will ask the user to input something, and will continue to
     do so until they have entered exactly the string ["Hello!"],
     at which point, it will evaluate to ["Hello!"]. *)
-val read_string : string -> ?condition:(string -> bool) * string -> unit -> string
+val read_string : string -> ?condition:(string -> bool) * string -> unit -> 
+  string
 
 (** [prompt str] prompts the user for input, using the string [str].
     Requires: [str] is a valid string.
@@ -221,7 +222,7 @@ val fold : t -> move_result
     associated with the command [comm].
     Requires: valid command [comm].
     Example: [command_to_function Check] is [State.check]. *)
-val command_to_function : Command.command -> (t -> move_result)
+val command_to_function : Command.command -> t -> move_result
 
 (** [winners st] is the list of players that win the round and the ranks of
     the winning hand, in the form [[(player, rank)]].
