@@ -246,7 +246,7 @@ let get_avail_action st =
 
                      ((find_participant st x.id).name ^ " ended with $" ^
                       (string_of_int ((find_stack x.id st.table.participants)
-                      + st.table.blind*3/2)) ^
+                                      + st.table.blind*3/2)) ^
                       "!");
                 ) lst;
               print_newline ();
@@ -280,18 +280,17 @@ let get_avail_action st =
       avail_action = ["call"; "raise"; "fold"; "show"]
     }
 
-(** [filter_busted_players] st [] filters out those player that do not
-    have any money from players_in of t. *)
+
 let filter_busted_players st =
-   let rec helper outlst = function
+  let rec helper outlst = function
     | [] -> outlst
     | h::t ->
       let player_money = (find_participant st h).money in
       if player_money > 0 then helper (h::outlst) t
       else
         helper (outlst) t in
-      {st with
-        players_in = List.rev (helper [] st.players_in)} 
+  {st with
+   players_in = List.rev (helper [] st.players_in)} 
 
 let init_state game_type num_players money blind =
   {
@@ -494,7 +493,7 @@ let check st =
     else
       Legal
         (get_avail_action checked)
-  else Illegal "You can't do that right now!"
+  else Illegal "You can't check right now!"
 
 let call st =
   if List.mem "call" st.avail_action then
@@ -506,7 +505,7 @@ let call st =
       else
         Legal (get_avail_action t)
     else Illegal "You don't have enough money to do that!"
-  else Illegal "You can't do that right now!"
+  else Illegal "You can't call right now!"
 
 let fold st =
   if List.mem "fold" st.avail_action then
@@ -528,14 +527,14 @@ let fold st =
       Legal (get_avail_action (go_next_round t))
     else
       Legal (get_avail_action t)
-  else Illegal "You can't do that right now!"
+  else Illegal "You can't fold right now!"
 
 let bet_or_raise amt st comm_str =
   if List.mem comm_str st.avail_action then
     if amt < st.table.blind then
       Illegal "You have to bet at least the blind!"
     else if comm_str = "raise" && (amt < 2*st.bet.bet_amount &&
-      amt <> (find_participant st st.player_turn).money) then
+                                   amt <> (find_participant st st.player_turn).money) then
       Illegal "You have to raise at least twice the bet!"
     else if amt > (find_stack st.player_turn st.table.participants) then
       Illegal "You don't have enough money to do that!"
@@ -558,7 +557,7 @@ let bet_or_raise amt st comm_str =
                  temp_state with
                  bet = updated_bet;
                })
-  else Illegal "You can't do that right now!"
+  else Illegal "You can't bet or raise right now!"
 
 let bet' amt st = bet_or_raise amt st "bet"
 let raise' amt st = bet_or_raise amt st "raise"
@@ -567,18 +566,18 @@ let save file_name st =
   let rec get_participants outlst = function
     | [] -> outlst
     | h::t -> let x = `Assoc
-     [
-      ("id", `Int h.id);
-      ("name", `String h.name);
-      ("card1", `Int (Deck.int_converter (List.hd h.cards)));
-      ("card2", `Int (Deck.int_converter (List.hd (List.tl h.cards))));
-      ("money", `Int h.money);
-      ("avatar_id", `Int h.avatar_id);
-      ("wins", `Int h.wins);
-      ("losses", `Int h.losses);
-      ("consecutive_wins", `Int h.consecutive_wins);
-      ("orig_id", `Int h.orig_id);
-                             ] in
+                  [
+                    ("id", `Int h.id);
+                    ("name", `String h.name);
+                    ("card1", `Int (Deck.int_converter (List.hd h.cards)));
+                    ("card2", `Int (Deck.int_converter (List.hd (List.tl h.cards))));
+                    ("money", `Int h.money);
+                    ("avatar_id", `Int h.avatar_id);
+                    ("wins", `Int h.wins);
+                    ("losses", `Int h.losses);
+                    ("consecutive_wins", `Int h.consecutive_wins);
+                    ("orig_id", `Int h.orig_id);
+                  ] in
       get_participants (x::outlst) t in
 
   let rec get_cards_int outlst = function
