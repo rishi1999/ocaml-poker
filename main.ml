@@ -165,8 +165,15 @@ let print_current_state st =
     print_string [yellow] (Player.name player);
     print_string [yellow] "'s turn:";
     print_newline ();
-    print_string [default]
+
+    let col =
+      if player.consecutive_wins = 0 then default
+      else if player.consecutive_wins = 1 then green
+      else if player.consecutive_wins = 2 then cyan
+      else magenta in
+    print_string [col]
       (avatar_array.(Player.avatar_id player));
+
     print_newline ();
     print_string [yellow] "Wins: ";
     print_string [yellow] (string_of_int player.wins);
@@ -204,39 +211,9 @@ let play_game st =
 
     let player = State.(find_participant st (player_turn st)) in
 
-    (* Easy Bot *)
-    if State.game_type st = 1 && State.player_turn st = 2 then
-      if List.mem "check" (State.avail_action st) then
-        match State.check st with
-        | Legal t ->
-          if (List.length (State.winning_players st)) = 0 then (
-            clear_screen ();
-            print_endline (player.name ^ " " ^ Command.command_to_string Check);
-            print_newline ()
-          );
-          keep_playing (State.get_avail_action t)
-        | Illegal str->
-          print_newline ();
-          print_endline str;
-          print_newline ();
-          keep_playing (State.get_avail_action st)
-      else if List.mem "call" (State.avail_action st) then
-        match (State.call st) with
-        | Legal t ->
-          print_newline ();
-          print_endline (Command.command_to_string Call);
-          print_newline ();
-          keep_playing (State.get_avail_action t)
-        | Illegal str->
-          print_newline ();
-          print_endline str;
-          print_newline ();
-          keep_playing (State.get_avail_action st)
-      else failwith "ERROR: AI next move not defined"
-
     (* Medium / Hard Bot *)
-    else if (State.game_type st = 2 || State.game_type st = 3) &&
-            State.player_turn st = 2 then
+    if (State.game_type st = 2 || State.game_type st = 3) &&
+       State.player_turn st = 2 then
       let iterations = ref 4000 in
       let change_difficulty game_type =
         if game_type = 2 then iterations := 4000
@@ -271,9 +248,14 @@ let play_game st =
            | Illegal s -> failwith s)
     else
       match
-        let input = read_line () in
-        clear_screen ();
-        input
+        if State.game_type st = 1 && State.player_turn st = 2 then
+          if List.mem "check" (State.avail_action st) then "check"
+          else if List.mem "call" (State.avail_action st) then "call"
+          else failwith "ERROR: AI next move not defined"
+        else
+          let input = read_line () in
+          clear_screen ();
+          input
       with
       | curr_cmd ->
         match Command.parse curr_cmd with
