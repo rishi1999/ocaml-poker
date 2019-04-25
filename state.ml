@@ -158,7 +158,7 @@ let pay_blinds st =
 let init_players game_type num_players money =
   let rec init_players' acc money = function
     | id when id > num_players -> acc
-    | id when game_type = 1 && id = 2 ->
+    | id when game_type > 0 && id = 2 ->
       let curr_player =
         {
           id;
