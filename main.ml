@@ -179,7 +179,7 @@ let print_current_state st =
     print_newline ();
     print_newline ();
     print_string [yellow] ("$" ^ (string_of_int st.table.pot) ^
-                           " has been added to the pot.");
+                           " is in the pot.");
     print_newline ();
     print_player_bets st;
     print_newline ();
@@ -249,7 +249,7 @@ let play_game st =
       let iterations = ref 4000 in
       let change_difficulty game_type =
         if game_type = 2 then iterations := 4000
-        else iterations := 50000 in
+        else iterations := 25000 in
       change_difficulty (State.game_type st);
       let next_action = Montecarlo.declare_action_2p (State.find_participant st 2)
           (Player.cards (State.find_participant st 2)) st !iterations in
@@ -309,14 +309,21 @@ let play_game st =
 
         | Show ->
           print_endline "Your hand is: ";
+          print_newline ();
+          print_newline ();
           Card.card_printer (Player.cards (State.find_participant st
                                              (st.player_turn)));
+          print_newline ();
           print_newline ();
           print_newline ();
           if List.length (Table.board (State.table st)) = 0 then
             print_endline
               ("The Chen strength of your hand is " ^
-               (string_of_float (Hand_analysis.chen_formula player.cards)));
+               (string_of_int
+                  ( int_of_float ((Hand_analysis.chen_formula player.cards) /.
+                                  20. *. 100.))) ^
+               "%");
+          print_newline ();
           print_newline ();
           print_newline ();
           print_endline "press enter to continue...";
