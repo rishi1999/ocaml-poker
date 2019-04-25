@@ -219,7 +219,8 @@ let play_game st =
         if game_type = 2 then iterations := 4000
         else iterations := 25000 in
       change_difficulty (State.game_type st);
-      let next_action = Montecarlo.declare_action_2p (State.find_participant st 2)
+      let next_action = Montecarlo.declare_action_2p (State.find_participant 
+                                                        st 2)
           (Player.cards (State.find_participant st 2)) st !iterations in
       let action = fst next_action in
       print_endline action;
@@ -310,7 +311,8 @@ let play_game st =
           match move_result with
           | Legal t ->
             if (List.length (State.winning_players st)) = 0 then (
-              print_endline (player.name ^ " " ^ Command.command_to_string comm);
+              print_endline (player.name ^ " " ^ Command.command_to_string 
+                               comm);
               print_newline ()
             );
             keep_playing (State.get_avail_action t)
@@ -326,7 +328,8 @@ let play_game st =
     Example: [init_game 3] initializes a game with 3 players. *)
 let init_game num_players =
   let money = State.read_integer "Starting stack amount? ($)"
-      ~condition:((fun x -> x >= 20 && x <= 5000), "Min: 20; Max: 5000.") () in
+      ~condition:((fun x -> x >= 20 && x <= 5000), "Min: 20; Max: 5000.") () 
+  in
   let blind_max = money / 10 in
   let blind = State.read_integer "Blind amount? ($)"
       ~condition:((fun x -> x >= 2 && x <= blind_max),
@@ -334,7 +337,8 @@ let init_game num_players =
       () in
   let st = match num_players with
     | 1 ->
-      let difficulty = State.read_string "Difficulty of AI? (easy, medium, hard)"
+      let difficulty = State.read_string "Difficulty of AI? (easy, medium, 
+      hard)"
           ~condition:((fun x -> x = "easy" || x = "medium" || x = "hard"),
                       "Options: easy, medium, hard.") () in
       let game_type = match difficulty with
@@ -358,7 +362,8 @@ let load_or_new value =
           ~condition:((fun x -> Sys.file_exists (x ^ ".json")),
                       "File is not in current directory!") () in
 
-      (file_name ^ ".json") |> Yojson.Basic.from_file |> State.load |> play_game
+      (file_name ^ ".json") |> Yojson.Basic.from_file |> State.load |> 
+      play_game
 
       (*print_string "Please enter the name of the game file you want to load";
         print_string " without the extension (.json)\n";
@@ -391,7 +396,8 @@ let main () =
   print_newline ();
 
   State.read_string "Play new game or load game?"
-    ~condition:((fun x -> List.mem x ["new"; "load"]), "Options: new, load.") ()
+    ~condition:((fun x -> List.mem x ["new"; "load"]), "Options: new, load.") 
+    ()
   |> load_or_new
 
 
