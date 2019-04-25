@@ -5,6 +5,7 @@ open Hand_evaluator
 open Deck
 open State
 open Command
+open Hand_analysis
 
 let make_new_deck =
   Deck.deck_init
@@ -177,6 +178,20 @@ let command_tests = [
   "test command to string with extra spaces" >:: (fun command ->
       assert_equal (Raise 10) (parse "raise     10"));
 ]
+(* Tests for the Chen Strength hand analysis function.*)
+let hand_analysis_tests =
+  [
+    "Chen Formula test 1" >:: (fun command ->
+        assert_equal 12. (chen_formula [(Spades, Ace);(Spades,King)]));
+    "Chen Formula test 2" >:: (fun command ->
+        assert_equal 10. (chen_formula [(Spades, Ten);(Diamonds,Ten)]));
+    "Chen Formula test 3" >:: (fun command ->
+        assert_equal 6. (chen_formula [(Hearts, Five);(Hearts,Seven)]));
+    "Chen Formula test 4" >:: (fun command ->
+        assert_equal (-1.) (chen_formula [(Spades, Two);(Hearts,Seven)]));
+    "Chen Formula test 5" >:: (fun command ->
+        assert_equal 20. (chen_formula [(Spades, Ace);(Hearts,Ace)]));
+  ]
 
 let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}
 let james = {id = 0; name = "James"; cards = []; money = 32; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}
@@ -374,5 +389,6 @@ let suite =
     state_tests;
     player_tests;
     command_tests;
+    hand_analysis_tests;
   ]
 let _ = run_test_tt_main suite
