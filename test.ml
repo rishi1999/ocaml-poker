@@ -14,8 +14,12 @@ let make_new_deck =
 let empty_table = {
   pot=0;
   blind=5;
-  participants = [{id = 1; name = "Wilson"; cards = []; money = 500; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0};
-                  {id = 2; name = "Lucy"; cards = []; money = 500; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}];
+  participants = [{id = 1; name = "Wilson"; cards = []; money = 500; wins = 0;
+                   losses = 0; avatar_id = 0; orig_id = 0;
+                   consecutive_wins = 0};
+                  {id = 2; name = "Lucy"; cards = []; money = 500; wins = 0;
+                   losses = 0; avatar_id = 0; orig_id = 0; 
+                   consecutive_wins = 0}];
   board = [];
 }
 
@@ -47,9 +51,15 @@ let deck_tests =
         assert_equal 4 (List.length (pick_cards 4)));
   ]
 
-let james = {id = 0; name = "James"; cards = []; money = 32; wins = 1; losses = 1; avatar_id = 1; orig_id = 1; consecutive_wins = 0}
-let bob = {id = 1; name = "Bob"; cards = [(Hearts, Five)]; money = 23; wins = 2; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 2}
-let julian = {id = 2; name = "Julian"; cards = [(Diamonds, Five)]; money = 35; wins = 1; losses = 0; avatar_id = 10; orig_id = 2; consecutive_wins = 1}
+let james = {id = 0; name = "James"; cards = []; money = 32; wins = 1;
+             losses = 1; avatar_id = 1; orig_id = 1; 
+             consecutive_wins = 0}
+let bob = {id = 1; name = "Bob"; cards = [(Hearts, Five)]; money = 23;
+           wins = 2; losses = 0; avatar_id = 0; orig_id = 0; 
+           consecutive_wins = 2}
+let julian = {id = 2; name = "Julian"; cards = [(Diamonds, Five)]; 
+              money = 35; wins = 1; losses = 0; avatar_id = 10; orig_id = 2;
+              consecutive_wins = 1}
 
 let player_tests =
   [
@@ -179,8 +189,10 @@ let command_tests = [
 ]
 
 let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}
-let james = {id = 0; name = "James"; cards = []; money = 32; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}
-let bob = {id = 1; name = "Bob"; cards = []; money = 32; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}
+let james = {id = 0; name = "James"; cards = []; money = 32; wins = 0;
+             losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}
+let bob = {id = 1; name = "Bob"; cards = []; money = 32; wins = 0; 
+           losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}
 let table1 = {pot = 0; blind = 1; participants = [james;bob]; board= []}
 let table2 = deal table1
 
@@ -206,9 +218,19 @@ let james_cards = match table1_players with
   | _ -> failwith "table2 not dealt"
 
 let empty : Deck.card list = []
-let jimmy = {id = 1; name = "Jimmy"; cards = [(Spades, Ace);(Clubs, Ace)]; money = 32; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}
-let bobby = {id = 2; name = "Bobby"; cards = [(Spades, Two);(Clubs, Two)]; money = 32; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}
-let alice = {id = 3; name = "Alice"; cards = [(Spades, Three); (Hearts, Four)]; money = 42; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}
+let jimmy = {id = 1; name = "Jimmy"; cards = [(Spades, Ace);(Clubs, Ace)];
+             money = 32; wins = 0; losses = 0; avatar_id = 0; orig_id = 0;
+             consecutive_wins = 0}
+let bobby = {id = 2; name = "Bobby"; cards = [(Spades, Two);(Clubs, Two)];
+             money = 32; wins = 0; losses = 0; avatar_id = 0; orig_id = 0;
+             consecutive_wins = 0}
+let alice = {id = 3; name = "Alice"; cards = 
+                                       [(Spades, Three);
+                                        (Hearts, Four)];
+             money = 42; 
+             wins = 0; 
+             losses = 0; 
+             avatar_id = 0; orig_id = 0; consecutive_wins = 0}
 let state_table_1 = {pot = 0; blind = 2; participants = [jimmy; bobby; alice];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
@@ -240,18 +262,25 @@ let get_state move_result =
   match move_result with
   | Legal t -> t
   | Illegal failed -> failwith failed
-let init_players = [{id = 1; name = "Wilson"; cards = []; money = 500; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0};
-                    {id = 2; name = "Lucy"; cards = []; money = 500; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}]
-let state_1 = get_avail_action (pay_blinds {game_type = 0;num_players = 2; table = empty_table;
-                                            player_turn = 1; button = 1; players_in = [1;2];
-                                            players_played = [];
-                                            bet = init_bet [1;2];
-                                            avail_action = ["bet"; "check"; "fold"];
-                                            winners = [(-1,0)];
-                                           })
+let init_players = [{id = 1; name = "Wilson"; cards = []; money = 500;
+                     wins = 0; losses = 0; avatar_id = 1; orig_id = 0; 
+                     consecutive_wins = 0};
+                    {id = 2; name = "Lucy"; cards = []; money = 500; 
+                     wins = 0; losses = 0; avatar_id = 2; orig_id = 0; 
+                     consecutive_wins = 0}]
+let state_1 = (get_avail_action
+                 (State.pay_blinds
+                    (State.filter_busted_players 
+                       {game_type = 0;num_players = 2; table = empty_table;
+                        player_turn = 1; button = 1; players_in = [1;2];
+                        players_played = [];
+                        bet = init_bet [1;2];
+                        avail_action = ["bet"; "check"; "fold"];
+                        winners = [(-1,0)];
+                       } )))
 let state_2 = get_state (State.call state_1)
-(*let state_3 = get_state (State.bet_or_raise 50 state_2 "bet")
-  let state_4 = get_state (State.bet_or_raise 120 state_3 "raise")
+let state_3 = get_state (State.bet_or_raise 50 state_2 "bet")
+(*let state_4 = get_state (State.bet_or_raise 120 state_3 "raise")
   let state_5 = get_state (State.call state_4)
   let state_6 = get_state (State.check state_5)
   let state_7 = get_state (State.bet_or_raise 40 state_6 "bet")
@@ -299,8 +328,12 @@ let state_tests =
 let table_tests =
   [
     "participants test" >:: (fun _ ->
-        assert_equal [{id = 1; name = "Wilson"; cards = []; money = 500; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0};
-                      {id = 2; name = "Lucy"; cards = []; money = 500; wins = 0; losses = 0; avatar_id = 0; orig_id = 0; consecutive_wins = 0}]
+        assert_equal [{id = 1; name = "Wilson"; cards = []; money = 500;
+                       wins = 0; losses = 0; avatar_id = 0; orig_id = 0; 
+                       consecutive_wins = 0};
+                      {id = 2; name = "Lucy"; cards = []; money = 500;
+                       wins = 0; losses = 0; avatar_id = 0; orig_id = 0;
+                       consecutive_wins = 0}]
           (participants
              empty_table));
     "deal_test_1" >:: (fun _->
