@@ -283,21 +283,15 @@ let get_avail_action st =
 (** [filter_busted_players] st [] filters out those player that do not
     have any money from players_in of t. *)
 let filter_busted_players st =
-  let rec helper outlst = function
+   let rec helper outlst = function
     | [] -> outlst
     | h::t ->
-      if h.money > 0 then helper (h::outlst) t
+      let player_money = (find_participant st h).money in
+      if player_money > 0 then helper (h::outlst) t
       else
         helper (outlst) t in
-  
-  let updated_participants = List.rev (helper [] st.table.participants) in
-  let updated_table =
-  {
-    st.table with
-    participants = updated_participants;
-  } in
-  {st with
-    table = updated_table}
+      {st with
+        players_in = List.rev (helper [] st.players_in)} 
 
 let init_state game_type num_players money blind =
   {
