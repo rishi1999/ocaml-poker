@@ -218,8 +218,19 @@ let play_game st =
       let change_difficulty game_type =
         if game_type = 2 then iterations := 4000
         else iterations := 25000 in
+
+      clear_screen ();
+      print_string "AI is thinking";
+      Unix.sleepf 0.5;
+      print_char '.';
+      Unix.sleepf 0.5;
+      print_char '.';
+      Unix.sleepf 0.5;
+      print_char '.';
+      clear_screen ();
+
       change_difficulty (State.game_type st);
-      let next_action = Montecarlo.declare_action_2p (State.find_participant 
+      let next_action = Montecarlo.declare_action_2p (State.find_participant
                                                         st 2)
           (Player.cards (State.find_participant st 2)) st !iterations in
       let action = fst next_action in
@@ -250,8 +261,8 @@ let play_game st =
     else
       match
         if State.game_type st = 1 && State.player_turn st = 2 then
-          if List.mem "check" (State.avail_action st) then "check"
-          else if List.mem "call" (State.avail_action st) then "call"
+          if List.mem "check" (State.avail_action st) then (clear_screen (); "check")
+          else if List.mem "call" (State.avail_action st) then (clear_screen (); "call")
           else failwith "ERROR: AI next move not defined"
         else
           let input = read_line () in
@@ -311,7 +322,7 @@ let play_game st =
           match move_result with
           | Legal t ->
             if (List.length (State.winning_players st)) = 0 then (
-              print_endline (player.name ^ " " ^ Command.command_to_string 
+              print_endline (player.name ^ " " ^ Command.command_to_string
                                comm);
               print_newline ()
             );
@@ -328,7 +339,7 @@ let play_game st =
     Example: [init_game 3] initializes a game with 3 players. *)
 let init_game num_players =
   let money = State.read_integer "Starting stack amount? ($)"
-      ~condition:((fun x -> x >= 20 && x <= 5000), "Min: 20; Max: 5000.") () 
+      ~condition:((fun x -> x >= 20 && x <= 5000), "Min: 20; Max: 5000.") ()
   in
   let blind_max = money / 10 in
   let blind = State.read_integer "Blind amount? ($)"
@@ -337,7 +348,7 @@ let init_game num_players =
       () in
   let st = match num_players with
     | 1 ->
-      let difficulty = State.read_string "Difficulty of AI? (easy, medium, 
+      let difficulty = State.read_string "Difficulty of AI? (easy, medium,
       hard)"
           ~condition:((fun x -> x = "easy" || x = "medium" || x = "hard"),
                       "Options: easy, medium, hard.") () in
@@ -362,7 +373,7 @@ let load_or_new value =
           ~condition:((fun x -> Sys.file_exists (x ^ ".json")),
                       "File is not in current directory!") () in
 
-      (file_name ^ ".json") |> Yojson.Basic.from_file |> State.load |> 
+      (file_name ^ ".json") |> Yojson.Basic.from_file |> State.load |>
       play_game
 
       (*print_string "Please enter the name of the game file you want to load";
@@ -396,7 +407,7 @@ let main () =
   print_newline ();
 
   State.read_string "Play new game or load game?"
-    ~condition:((fun x -> List.mem x ["new"; "load"]), "Options: new, load.") 
+    ~condition:((fun x -> List.mem x ["new"; "load"]), "Options: new, load.")
     ()
   |> load_or_new
 
