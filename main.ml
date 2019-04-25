@@ -259,8 +259,10 @@ let play_game st =
     else
       match
         if State.game_type st = 1 && State.player_turn st = 2 then
-          if List.mem "check" (State.avail_action st) then (clear_screen (); "check")
-          else if List.mem "call" (State.avail_action st) then (clear_screen (); "call")
+          if List.mem "check" (State.avail_action st) then 
+            (clear_screen (); "check")
+          else if List.mem "call" (State.avail_action st) then 
+            (clear_screen (); "call")
           else failwith "ERROR: AI next move not defined"
         else
           let input = read_line () in
@@ -373,23 +375,6 @@ let load_or_new value =
 
       (file_name ^ ".json") |> Yojson.Basic.from_file |> State.load |>
       play_game
-
-      (*print_string "Please enter the name of the game file you want to load";
-        print_string " without the extension (.json)\n";
-        print_string  "> ";
-        match read_line () with
-        | exception End_of_file -> ()
-        | file_name ->
-        let extended = file_name ^ ".json" in
-        match (Sys.file_exists extended) with
-        | false ->
-          print_string extended;
-          print_endline " is not in current directory!";
-          exit 0
-        | true ->
-          extended |> Yojson.Basic.from_file |> State.load |> play_game*)
-
-
     )
   else
     State.read_integer "How many (human) players are there?"
