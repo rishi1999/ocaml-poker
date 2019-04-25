@@ -557,7 +557,7 @@ let bet_or_raise amt st comm_str =
                  temp_state with
                  bet = updated_bet;
                })
-  else Illegal "You can't bet or raise right now!"
+  else Illegal "You can't do that right now!"
 
 let bet' amt st = bet_or_raise amt st "bet"
 let raise' amt st = bet_or_raise amt st "raise"
@@ -596,9 +596,9 @@ let save file_name st =
 
   let winners_to_json =
     let rec helper playerlst ranklst = function
-    | [] -> (playerlst, ranklst)
-    | (player, rank)::t -> 
-      helper (`Int player::playerlst) (`Int rank::ranklst) t in
+      | [] -> (playerlst, ranklst)
+      | (player, rank)::t -> 
+        helper (`Int player::playerlst) (`Int rank::ranklst) t in
     helper [] [] (st.winners) in
 
   let win_players = List.rev (fst winners_to_json) in
