@@ -250,7 +250,7 @@ let state_table_1 = {pot = 0; blind = 2; participants = [jimmy; bobby; alice];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
 
-let state_table_a = {pot = 0; blind = 3; participants = [jimmy; bobby; alice];
+let state_table_a = {pot = 0; blind = 3; participants = [jimmy; bobby];
                      board = [(Hearts, Ace);(Diamonds, Ace);(Spades, King);
                               (Hearts, King); (Hearts, Three)]}
 let state_bet_1 =
@@ -259,6 +259,7 @@ let state_bet_1 =
     bet_amount = 0;
     bet_paid_amt = [(0,0)];
   }
+
 
 let state_bet_a =
   {
@@ -296,7 +297,7 @@ let statea =
 let stateb =
   {
     game_type = 1;
-    num_players = 4;
+    num_players = 2;
     table = state_table_a;
     player_turn = 0;
     button = 1;
@@ -340,8 +341,10 @@ let state_7 = get_state (State.bet_or_raise 40 state_6 "bet")
 let test_save_1 = State.save "testing1" state1
 let test_save_2 = State.save "testing2" state2
 
-(* State Tests*)
-
+(* State Tests for all functions that can be unit tested. Functions
+   that cannot be unit tested or relied on functions that cannot
+   be unit tested were tested indirectly via play testing and extensive
+   comparisons with existing poker simulators.*)
 let state_tests =
   [
     (*)
@@ -408,6 +411,14 @@ let state_tests =
         assert_equal ["fold"] (avail_action state1));
     "avail_actions_2" >:: (fun _ ->
         assert_equal ["call"] (avail_action statea));
+    "winner_1" >:: (fun _ ->
+        assert_equal [jimmy, 11] (winners state1));
+    "winner_2" >:: (fun _ ->
+        assert_equal [jimmy, 11] (winners statea));
+    "find_stack_1" >:: (fun _ ->
+        assert_equal 42 (find_stack 3 state1.table.participants));
+    "find_stack_2" >:: (fun _ ->
+        assert_equal 32 (find_stack 2 statea.table.participants));
     (* test_save saves "testing.json" to current directory *)
     "save1" >:: (fun _ ->
         assert_equal true (Sys.file_exists "testing1.json"));
