@@ -337,7 +337,6 @@ let state_4 = get_state (State.bet_or_raise 120 state_3 "raise")
 let state_5 = get_state (State.call state_4)
 let state_6 = get_state (State.check state_5)
 let state_7 = get_state (State.bet_or_raise 40 state_6 "bet")
-let state_8 = get_state (State.fold state_7)
 
 let test_save_1 = State.save "testing1" state1
 let test_save_2 = State.save "testing2" state2

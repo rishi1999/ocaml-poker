@@ -219,35 +219,28 @@ let play_game st =
         if game_type = 2 then iterations := 4000
         else iterations := 25000 in
 
-      clear_screen ();
-      print_string "AI is thinking";
-      Unix.sleepf 0.5;
-      print_char '.';
-      Unix.sleepf 0.5;
-      print_char '.';
-      Unix.sleepf 0.5;
-      print_char '.';
-      clear_screen ();
+      print_endline "AI is thinking...";
+
 
       change_difficulty (State.game_type st);
       let next_action = Montecarlo.declare_action_2p (State.find_participant
                                                         st 2)
           (Player.cards (State.find_participant st 2)) st !iterations in
+
       let action = fst next_action in
-      print_endline action;
       let amt = snd next_action in
-      if amt <> 0 then (
-        print_int amt;
-        print_newline()
-      );
+
       if action = "raise" || action = "bet" then
         match Command.parse (action ^ " " ^ string_of_int amt) with
         | comm ->
           (match State.command_to_function comm st with
            | Legal t ->
-             print_newline ();
-             print_endline (Command.command_to_string comm);
-             print_newline ();
+             clear_screen ();
+             if (List.length (State.winning_players st)) = 0 then (
+               print_endline (player.name ^ " " ^ Command.command_to_string
+                                comm);
+               print_newline ()
+             );
              keep_playing (State.get_avail_action t);
            | Illegal s -> failwith s)
       else
@@ -255,9 +248,12 @@ let play_game st =
         | comm ->
           (match State.command_to_function comm st with
            | Legal t ->
-             print_newline ();
-             print_endline (Command.command_to_string comm);
-             print_newline ();
+             clear_screen ();
+             if (List.length (State.winning_players st)) = 0 then (
+               print_endline (player.name ^ " " ^ Command.command_to_string
+                                comm);
+               print_newline ()
+             );
              keep_playing (State.get_avail_action t);
            | Illegal s -> failwith s)
     else
@@ -350,8 +346,8 @@ let init_game num_players =
       () in
   let st = match num_players with
     | 1 ->
-      let difficulty = State.read_string "Difficulty of AI? (easy, medium,
-      hard)"
+      let difficulty = State.read_string "Difficulty of AI? (easy, medium,\
+                                          hard)"
           ~condition:((fun x -> x = "easy" || x = "medium" || x = "hard"),
                       "Options: easy, medium, hard.") () in
       let game_type = match difficulty with
