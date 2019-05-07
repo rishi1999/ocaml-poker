@@ -1,6 +1,6 @@
 # OCaml Poker
 
-Texas hold 'em game built in OCaml
+Text-based Texas hold 'em game built in OCaml
 
 ## Usage
 
